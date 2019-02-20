@@ -26,6 +26,9 @@
     <ClInclude Include="Types.hpp" />
     <ClInclude Include="VirtualMachine.hpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="program.bin" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{0E24CC91-FA07-8DE7-6368-873A4F6B7769}</ProjectGuid>
     <IgnoreWarnCompileDuplicatedFilename>true</IgnoreWarnCompileDuplicatedFilename>

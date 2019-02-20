@@ -2,6 +2,9 @@
 
 #include "Types.hpp"
 
+#include <string>
+#include <vector>
+
 namespace SDIM
 {
 	/// TODO: Find a better place for this to be shared between the Compiler and VM
@@ -63,6 +66,26 @@ namespace SDIM
 	public:
 		VirtualMachine();
 		~VirtualMachine();
+
+		bool LoadFile(const std::string& path);
+
+		// Run the file which is currently loaded into memory
+		bool RunFile();
+
+	private: 
+		char* program_data_{ nullptr };
+		char* instruction_pointer_{ nullptr };
+		
+		// Returns false if an error occurs
+		bool ExecuteNextOpcode();
+
+		inline void AdvanceInstructionPointer() { instruction_pointer_ += 1; }
+
+		std::vector<SDIM::Variable> stack_;
+
+		size_t stack_top_{ 0 };
+
+		bool running_{ false };
 	};
 
 }
