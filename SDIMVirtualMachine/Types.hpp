@@ -16,23 +16,46 @@ namespace SDIM
 	typedef float F32;
 	typedef double F64;
 
-	union Variable
+	enum class VariableType : UInt8
 	{
-		Int8  int8;
-		Int16 int16;
-		Int32 int32;
-		Int64 int64;
+	 
+		UInt8,
+		UInt16,
+		UInt32,
+		UInt64,
 
+		Int8,
+		Int16,
+		Int32,
+		Int64,
 
-		UInt8  uint8;
-		UInt16 uint16;
-		UInt32 uint32;
-		UInt64 uint64;
-
-		F32 f32;
-		F64 f64;
-
-		void* ptr;
-		
+		F32,
+		F64,
+		Pointer
 	};
+	struct Variable
+	{
+		VariableType type;
+
+		union
+		{
+			Int8  int8;
+			Int16 int16;
+			Int32 int32;
+			Int64 int64;
+
+
+			UInt8  uint8;
+			UInt16 uint16;
+			UInt32 uint32;
+			UInt64 uint64;
+
+			F32 f32;
+			F64 f64;
+
+			void* ptr;
+
+		};
+	};
+	
 }

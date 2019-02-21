@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
 
 namespace SDIM
 {
@@ -58,7 +59,16 @@ namespace SDIM
 		PushClass = 0x2D,
 		LocalVar = 0x2E,
 		Pop = 0x2F,
-		PushLocal = 0x30
+		PushLocal = 0x30,
+
+		PushAddr = 0x41,
+		Break = 0x42,
+		PushStackCount = 0x43,
+		Dump = 0x44,
+		Error = 0x45,
+		Halt = 0x48,
+		Pause = 0x50,
+		PushInfoString = 0x53
 
 	};
 	class VirtualMachine
@@ -75,15 +85,131 @@ namespace SDIM
 	private: 
 		char* program_data_{ nullptr };
 		char* instruction_pointer_{ nullptr };
+
+		size_t program_length_{ 0 };
 		
 		// Returns false if an error occurs
 		bool ExecuteNextOpcode();
 
 		inline void AdvanceInstructionPointer() { instruction_pointer_ += 1; }
+		// Reads a UInt64 literal in little endian format
+		UInt64 ReadUInt64Literal()
+		{
+			UInt64 literal_value{ 0 };
 
+			for (int i = 0; i < sizeof(literal_value); i++)
+			{
+				unsigned char read_byte = static_cast<unsigned char>(*(instruction_pointer_++));
+				literal_value |= read_byte << (i * 8);
+			}
+			
+			return literal_value;
+		}
+
+		UInt16 ReadUInt16Literal()
+		{
+			UInt16 literal_value{ 0 };
+
+			for (int i = 0; i < sizeof(literal_value); i++)
+			{
+				UInt8 read_byte = static_cast<UInt8>(*(instruction_pointer_++));
+				literal_value |= read_byte << (i * 8);
+			}
+
+			return literal_value;
+		}
+
+		void PrintStackTop()
+		{
+			if (stack_.empty())
+			{
+				std::cerr << "Stack is empty during call to print stack top\n";
+				return;
+			}
+
+			SDIM::Variable var = stack_[--stack_top_];
+
+			std::cout << "Top of stack: ";
+			switch (var.type)
+			{
+			case VariableType::UInt8:
+				std::cout << var.uint8 << "\n";
+				break;
+			case VariableType::UInt16:
+				std::cout << var.uint16 << "\n";
+				break;
+			case VariableType::UInt32:
+				std::cout << var.uint32 << "\n";
+				break;
+			case VariableType::UInt64:
+				std::cout << var.uint64 << "\n";
+				break;
+
+			case VariableType::Int8:
+				std::cout << var.int8 << "\n";
+				break;
+			case VariableType::Int16:
+				std::cout << var.int16 << "\n";
+				break;
+			case VariableType::Int32:
+				std::cout << var.int32 << "\n";
+				break;
+			case VariableType::Int64:
+				std::cout << var.int64 << "\n";
+				break;
+
+			case VariableType::F32:
+				std::cout << var.f32 << "\n";
+				break;
+			case VariableType::F64:
+				std::cout << var.f64 << "\n";
+				break;
+			
+			case VariableType::Pointer:
+				std::cout << var.ptr << "\n";
+				break;
+
+			default:
+				std::cout << "Unknown Var Type\n";
+				break;
+			}
+		}
+		// Adds the top two variables on the stack pops them and pushes the result
+		void AddStack()
+		{
+			if (stack_.size() < 2)
+			{
+				std::cerr << "Not enough items on stack to add " << stack_.size() << "\n";
+				return;
+			}
+
+			Variable var_rhs = stack_[--stack_top_];
+			stack_.pop_back();
+			Variable var_lhs = stack_[--stack_top_];
+			stack_.pop_back();
+			
+			if (var_lhs.type == VariableType::UInt16 && var_rhs.type == VariableType::UInt16)
+			{
+				Variable result;
+				result.type = VariableType::UInt16;
+				result.uint16 = var_lhs.uint16 + var_rhs.uint16;
+
+				PushVariable(result);
+			}
+
+		}
+
+		void PushVariable(Variable var)
+		{
+			stack_.push_back(var);
+			++stack_top_;
+		}
+		// TODO: Use actual stack here
 		std::vector<SDIM::Variable> stack_;
 
 		size_t stack_top_{ 0 };
+
+		SDIM::Variable accumulator; // optimisation, might not be needed
 
 		bool running_{ false };
 	};
