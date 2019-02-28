@@ -55,7 +55,7 @@ namespace SDIM
 
 			void* ptr;
 
-		};
+		} as;
 	};
 	
 }

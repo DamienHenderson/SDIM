@@ -94,10 +94,10 @@ namespace SDIM
 				UInt16 literal_value = ReadUInt16Literal();
 				Variable var;
 				var.type = VariableType::UInt16;
-				var.uint16 = literal_value;
+				var.as.uint16 = literal_value;
 				PushVariable(var);
 
-				std::cout << "Pushed UInt16 " << var.uint16 << "\n";
+				std::cout << "Pushed UInt16 " << var.as.uint16 << "\n";
 				return true;
 			}
 			case Instruction::Halt:

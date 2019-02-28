@@ -2,11 +2,4 @@
 
 
 
-Token::Token()
-{
-}
 
-
-Token::~Token()
-{
-}

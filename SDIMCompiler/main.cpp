@@ -5,6 +5,9 @@
 #include <cassert>
 
 #include "Utils.hpp"
+#include "Scanner.hpp"
+#include "Token.hpp"
+
 
 void PrintHelp()
 {
@@ -20,6 +23,9 @@ int main(int argc, char** argv)
 	}
 	std::string compile_filename = argv[1];
 	std::cout << "Attempting to compile: " << compile_filename << "\n";
+	SDIM::Scanner scanner;
+	std::vector<SDIM::Token> tokens;
+	bool res = scanner.ScanFile(compile_filename, tokens);
 
 	// TODO: Move this into a function
 	for (int i = 1; i < argc; i++)

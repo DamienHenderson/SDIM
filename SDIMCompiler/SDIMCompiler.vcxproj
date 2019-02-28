@@ -20,14 +20,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Scanner.cpp" />
     <ClCompile Include="Token.cpp" />
-    <ClCompile Include="Tokeniser.cpp" />
-    <ClCompile Include="TokenTree.cpp" />
+    <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Scanner.hpp" />
     <ClInclude Include="Token.hpp" />
-    <ClInclude Include="Tokeniser.hpp" />
-    <ClInclude Include="TokenTree.hpp" />
     <ClInclude Include="Utils.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

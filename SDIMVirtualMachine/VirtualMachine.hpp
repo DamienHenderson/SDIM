@@ -133,40 +133,40 @@ namespace SDIM
 			switch (var.type)
 			{
 			case VariableType::UInt8:
-				std::cout << var.uint8 << "\n";
+				std::cout << var.as.uint8 << "\n";
 				break;
 			case VariableType::UInt16:
-				std::cout << var.uint16 << "\n";
+				std::cout << var.as.uint16 << "\n";
 				break;
 			case VariableType::UInt32:
-				std::cout << var.uint32 << "\n";
+				std::cout << var.as.uint32 << "\n";
 				break;
 			case VariableType::UInt64:
-				std::cout << var.uint64 << "\n";
+				std::cout << var.as.uint64 << "\n";
 				break;
 
 			case VariableType::Int8:
-				std::cout << var.int8 << "\n";
+				std::cout << var.as.int8 << "\n";
 				break;
 			case VariableType::Int16:
-				std::cout << var.int16 << "\n";
+				std::cout << var.as.int16 << "\n";
 				break;
 			case VariableType::Int32:
-				std::cout << var.int32 << "\n";
+				std::cout << var.as.int32 << "\n";
 				break;
 			case VariableType::Int64:
-				std::cout << var.int64 << "\n";
+				std::cout << var.as.int64 << "\n";
 				break;
 
 			case VariableType::F32:
-				std::cout << var.f32 << "\n";
+				std::cout << var.as.f32 << "\n";
 				break;
 			case VariableType::F64:
-				std::cout << var.f64 << "\n";
+				std::cout << var.as.f64 << "\n";
 				break;
 			
 			case VariableType::Pointer:
-				std::cout << var.ptr << "\n";
+				std::cout << var.as.ptr << "\n";
 				break;
 
 			default:
@@ -192,7 +192,7 @@ namespace SDIM
 			{
 				Variable result;
 				result.type = VariableType::UInt16;
-				result.uint16 = var_lhs.uint16 + var_rhs.uint16;
+				result.as.uint16 = var_lhs.as.uint16 + var_rhs.as.uint16;
 
 				PushVariable(result);
 			}
