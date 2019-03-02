@@ -20,4 +20,9 @@ namespace SDIM
 	
 	/// Reads a text file and preserves all characters contained within (does not exclude whitespace)
 	std::string ReadWholeFile(const std::string& path);
+
+	void LogString(const std::string& message);
+
+	std::string ConvertToString(char c);
+	
 }

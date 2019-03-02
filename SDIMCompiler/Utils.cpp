@@ -1,6 +1,7 @@
 #include "Utils.hpp"
 
 #include <fstream>
+#include <iostream>
 
 namespace SDIM
 {
@@ -40,4 +41,18 @@ namespace SDIM
 		return std::string((std::istreambuf_iterator<char>(ifs)),
 			(std::istreambuf_iterator<char>()));
 	}
+
+	void LogString(const std::string & message)
+	{
+#ifdef SDIMC_DEBUG
+		std::cerr << message << "\n";
+#endif
+	}
+
+	std::string ConvertToString(char c)
+	{
+		return std::string() + c;
+	};
+
+
 }
