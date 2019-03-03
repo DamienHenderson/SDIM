@@ -42,7 +42,7 @@ namespace SDIM
 			if (IsWhitespace(current_char) && current_token.token_type != TokenType::StringLiteral)
 			{
 				// skip whitespace
-				++i;
+				continue;
 			}
 			switch (current_char)
 			{
