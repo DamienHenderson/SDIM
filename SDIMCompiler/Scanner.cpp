@@ -58,6 +58,12 @@ namespace SDIM
 				current_token = Token(TokenType::Unknown, "");
 
 			}
+			if (current_token.token_type == TokenType::NumericLiteral && !std::isdigit(current_char))
+			{
+				tokens.push_back(current_token);
+				std::cout << "Extracted lexeme: " << current_token.lexeme << "\n";
+				current_token = Token(TokenType::Unknown, "");
+			}
 			switch (current_char)
 			{
 			case '(':
