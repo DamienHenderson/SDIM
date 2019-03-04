@@ -41,8 +41,22 @@ namespace SDIM
 			// String literals may contain whitespace
 			if (IsWhitespace(current_char) && current_token.token_type != TokenType::StringLiteral)
 			{
+				// whitespace ends numeric literals and identifiers
+				if (current_token.token_type == TokenType::Identifier || current_token.token_type == TokenType::NumericLiteral)
+				{
+					std::cout << "Extracted lexeme: " << current_token.lexeme << "\n";
+					tokens.push_back(current_token);
+					current_token = Token(TokenType::Unknown, "");
+				}
 				// skip whitespace
 				continue;
+			}
+			if (current_token.token_type == TokenType::Identifier && !IsIdentifier(current_char))
+			{
+				tokens.push_back(current_token);
+				std::cout << "Extracted lexeme: " << current_token.lexeme << "\n";
+				current_token = Token(TokenType::Unknown, "");
+
 			}
 			switch (current_char)
 			{
@@ -250,10 +264,56 @@ namespace SDIM
 					LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
-				 
+			case '"':
+				if (current_token.token_type == TokenType::StringLiteral)
+				{
+					// if the current lexeme is a string literal then a quote will finish it
+					// note that a preceding backslash will escape a string literal
+					if (i > 0 && file_contents[i - 1] == '\\')
+					{
+						// escape char here
+						current_token.lexeme += current_char;
+					}
+					else
+					{
+						tokens.push_back(current_token);
+						current_token = Token(TokenType::Unknown, "");
+					}
+
+				}
+				else
+				{
+					current_token.token_type = TokenType::StringLiteral;
+				}
+				break;
 			default:
 				// TODO: remove once keywords and identifiers are processed
-				LogString(std::string("Unknown char: ") + current_char);
+				// LogString(std::string("Unknown char: ") + current_char);
+				if (current_token.token_type == TokenType::StringLiteral)
+				{
+					current_token.lexeme += current_char;
+				}
+				else if (current_token.token_type == TokenType::Identifier && IsIdentifier(current_char))
+				{
+					current_token.lexeme += current_char;
+				}
+				else if(current_token.token_type == TokenType::Unknown && IsIdentifierStart(current_char))
+				{
+					current_token.token_type = TokenType::Identifier;
+					current_token.lexeme += current_char;
+				}
+				else if (std::isdigit(current_char))
+				{
+					if (current_token.token_type == TokenType::Unknown)
+					{
+						current_token.token_type = TokenType::NumericLiteral;
+						current_token.lexeme += current_char;
+					}
+					else if (current_token.token_type == TokenType::NumericLiteral)
+					{
+						current_token.lexeme += current_char;
+					}
+				}
 				break;
 			}
 		}
