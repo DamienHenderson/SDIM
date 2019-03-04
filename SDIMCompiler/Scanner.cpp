@@ -270,6 +270,19 @@ namespace SDIM
 					LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
+			case '=':
+				if (MatchNext('=', i + 1))
+				{
+					tokens.push_back(Token(TokenType::EqualEqual, "="));
+					++i;
+					LogString("Extracted lexeme: ==");
+				}
+				else
+				{
+					Token(TokenType::Equal, ConvertToString(current_char));
+					LogString(std::string("Extracted lexeme: ") + current_char);
+				}
+				break;
 			case '"':
 				if (current_token.token_type == TokenType::StringLiteral)
 				{
@@ -292,6 +305,7 @@ namespace SDIM
 					current_token.token_type = TokenType::StringLiteral;
 				}
 				break;
+			
 			default:
 				// TODO: remove once keywords and identifiers are processed
 				// LogString(std::string("Unknown char: ") + current_char);

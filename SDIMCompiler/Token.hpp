@@ -14,7 +14,7 @@ namespace SDIM
 
 		// Single character symbols
 		LeftBracket, RightBracket, LeftBrace, RightBrace, LeftSquareBracket, RightSquareBracket,
-		LessThan, GreaterThan, SemiColon, Comma, Dot, Plus, Minus,
+		LessThan, GreaterThan, SemiColon, Comma, Dot, Plus, Minus, Equal,
 		ForwardSlash, Asterisk, Percent, Ampersand, VerticalBar, Caret, Bang, Tilde,
 
 		// Multiple character symbols
