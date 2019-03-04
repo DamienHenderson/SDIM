@@ -296,6 +296,7 @@ namespace SDIM
 					else
 					{
 						tokens.push_back(current_token);
+						LogString("Extracted lexeme: " + current_token.lexeme);
 						current_token = Token(TokenType::Unknown, "");
 					}
 
@@ -303,6 +304,7 @@ namespace SDIM
 				else
 				{
 					current_token.token_type = TokenType::StringLiteral;
+					
 				}
 				break;
 			
