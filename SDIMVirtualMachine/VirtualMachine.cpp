@@ -40,6 +40,14 @@ namespace SDIM
 
 	bool VirtualMachine::RunFile()
 	{
+		if (SDIM::Utils::IsLittleEndian())
+		{
+			SDIM::Utils::LogString("Platform endianness is little endian");
+		}
+		else
+		{
+			SDIM::Utils::LogString("Platform endianness is big endian");
+		}
 		if (program_data_ != nullptr && instruction_pointer_ != nullptr)
 		{
 			running_ = true;

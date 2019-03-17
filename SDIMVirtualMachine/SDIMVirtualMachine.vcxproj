@@ -20,10 +20,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Utils.cpp" />
     <ClCompile Include="VirtualMachine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Types.hpp" />
+    <ClInclude Include="Utils.hpp" />
     <ClInclude Include="VirtualMachine.hpp" />
   </ItemGroup>
   <ItemGroup>
