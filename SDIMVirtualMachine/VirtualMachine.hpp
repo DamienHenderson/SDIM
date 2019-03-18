@@ -130,48 +130,48 @@ namespace SDIM
 
 			SDIM::Variable var = stack_[--stack_top_];
 
-			std::cout << "Top of stack: ";
+			SDIM::Utils::LogIntermediate("Top of stack: ");
 			switch (var.type)
 			{
 			case VariableType::UInt8:
-				std::cout << var.as.uint8 << "\n";
+				SDIM::Utils::Log(var.as.uint8);
 				break;
 			case VariableType::UInt16:
-				std::cout << var.as.uint16 << "\n";
+				SDIM::Utils::Log(var.as.uint16);
 				break;
 			case VariableType::UInt32:
-				std::cout << var.as.uint32 << "\n";
+				SDIM::Utils::Log(var.as.uint32);
 				break;
 			case VariableType::UInt64:
-				std::cout << var.as.uint64 << "\n";
+				SDIM::Utils::Log(var.as.uint64);
 				break;
 
 			case VariableType::Int8:
-				std::cout << var.as.int8 << "\n";
+				SDIM::Utils::Log(var.as.int8);
 				break;
 			case VariableType::Int16:
-				std::cout << var.as.int16 << "\n";
+				SDIM::Utils::Log(var.as.int16);
 				break;
 			case VariableType::Int32:
-				std::cout << var.as.int32 << "\n";
+				SDIM::Utils::Log(var.as.int32);
 				break;
 			case VariableType::Int64:
-				std::cout << var.as.int64 << "\n";
+				SDIM::Utils::Log(var.as.int64);
 				break;
 
 			case VariableType::F32:
-				std::cout << var.as.f32 << "\n";
+				SDIM::Utils::Log(var.as.f32);
 				break;
 			case VariableType::F64:
-				std::cout << var.as.f64 << "\n";
+				SDIM::Utils::Log(var.as.f64);
 				break;
 			
 			case VariableType::Pointer:
-				std::cout << var.as.ptr << "\n";
+				SDIM::Utils::Log(var.as.ptr);
 				break;
 
 			default:
-				std::cout << "Unknown Var Type\n";
+				SDIM::Utils::Log("Unknown Var Type");
 				break;
 			}
 		}
@@ -180,7 +180,7 @@ namespace SDIM
 		{
 			if (stack_.size() < 2)
 			{
-				std::cerr << "Not enough items on stack to add " << stack_.size() << "\n";
+				SDIM::Utils::Log("Not enough items on stack to add ", stack_.size());
 				return;
 			}
 
@@ -199,7 +199,16 @@ namespace SDIM
 			}
 
 		}
+		SDIM::Variable PopStack()
+		{
+			if (stack_.empty())
+			{
+				SDIM::Utils::Log("Stack is empty at attempt to pop variable");
+				return SDIM::Variable();
+			}
 
+			return stack_[--stack_top_];
+		}
 		void PushVariable(Variable var)
 		{
 			stack_.push_back(var);

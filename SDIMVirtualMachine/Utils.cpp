@@ -16,9 +16,13 @@ namespace SDIM
 
 			return end_test.c[0] == 0x04;
 		}
-		void LogString(const std::string & log_str)
+
+		void TerminateLog()
 		{
-			std::cout << log_str << "\n";
+			std::cout << "\n";
 		}
+
+
+		
 	}
 }

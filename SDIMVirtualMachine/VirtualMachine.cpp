@@ -5,6 +5,7 @@
 
 namespace SDIM
 {
+	
 	VirtualMachine::VirtualMachine()
 	{
 	}
@@ -24,7 +25,7 @@ namespace SDIM
 
 		if (!file.good())
 		{
-			std::cerr << "Failed to open file at path: " << path << "\n";
+			SDIM::Utils::Log("Failed to open file at path: ", path);
 			return false;
 		}
 
@@ -42,11 +43,11 @@ namespace SDIM
 	{
 		if (SDIM::Utils::IsLittleEndian())
 		{
-			SDIM::Utils::LogString("Platform endianness is little endian");
+			SDIM::Utils::Log("Platform endianness is little endian");
 		}
 		else
 		{
-			SDIM::Utils::LogString("Platform endianness is big endian");
+			SDIM::Utils::Log("Platform endianness is big endian");
 		}
 		if (program_data_ != nullptr && instruction_pointer_ != nullptr)
 		{
@@ -75,7 +76,7 @@ namespace SDIM
 			switch (next_instruction)
 			{
 			case Instruction::NOP:
-				std::cerr << "No Operation\n";
+				SDIM::Utils::Log("No Operation");
 				AdvanceInstructionPointer();
 				return true;
 			case Instruction::VMCall:
@@ -86,7 +87,7 @@ namespace SDIM
 				if (func_id == 1)
 				{
 					PrintStackTop();
-					std::cout << "Print Stack Top called\n";
+					SDIM::Utils::Log("Print Stack Top called");
 				}
 				return true;
 			}
@@ -94,7 +95,7 @@ namespace SDIM
 			case Instruction::Add:
 				AdvanceInstructionPointer();
 				AddStack();
-				std::cout << "Add Stack\n";
+				SDIM::Utils::Log("Add Stack");
 				return true;
 			case Instruction::PushUInt16:
 			{
@@ -105,16 +106,16 @@ namespace SDIM
 				var.as.uint16 = literal_value;
 				PushVariable(var);
 
-				std::cout << "Pushed UInt16 " << var.as.uint16 << "\n";
+				SDIM::Utils::Log("Pushed UInt16 ", var.as.uint16);
 				return true;
 			}
 			case Instruction::Halt:
-				std::cerr << "Halt Reached\n";
+				SDIM::Utils::Log("Halt Reached");
 				return false;
 				
 			default:
 			
-				std::cerr << "Unknown Opcode: " << static_cast<UInt8>(next_instruction) << "\n";
+				SDIM::Utils::Log("Unknown Opcode: ", static_cast<UInt8>(next_instruction));
 				AdvanceInstructionPointer();
 				return false;
 			

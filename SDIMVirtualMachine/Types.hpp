@@ -31,7 +31,8 @@ namespace SDIM
 
 		F32,
 		F64,
-		Pointer
+		Pointer,
+		Unknown
 	};
 	struct Variable
 	{
@@ -56,6 +57,8 @@ namespace SDIM
 			void* ptr;
 
 		} as;
+
+		Variable() : type(SDIM::VariableType::Unknown) {}
 	};
 	
 }
