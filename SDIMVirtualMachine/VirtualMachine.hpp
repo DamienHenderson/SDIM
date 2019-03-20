@@ -3,6 +3,7 @@
 #include "Types.hpp"
 #include "Utils.hpp"
 #include "Instructions.hpp"
+#include "Stack.hpp"
 
 #include <string>
 #include <vector>
@@ -61,13 +62,13 @@ namespace SDIM
 
 		void PrintStackTop()
 		{
-			if (stack_.empty())
+			if (stack_.Empty())
 			{
-				std::cerr << "Stack is empty during call to print stack top\n";
+				SDIM::Utils::Log("Stack is empty during call to print stack top");
 				return;
 			}
 
-			SDIM::Variable var = stack_[--stack_top_];
+			SDIM::Variable var = stack_.Pop();
 
 			SDIM::Utils::LogIntermediate("Top of stack: ");
 			switch (var.type)
@@ -117,16 +118,15 @@ namespace SDIM
 		// Adds the top two variables on the stack pops them and pushes the result
 		void AddStack()
 		{
-			if (stack_.size() < 2)
+			if (stack_.Size() < 2)
 			{
-				SDIM::Utils::Log("Not enough items on stack to add ", stack_.size());
+				SDIM::Utils::Log("Not enough items on stack to add ", stack_.Size(), "Expected ", 2);
 				return;
 			}
 
-			Variable var_rhs = stack_[--stack_top_];
-			stack_.pop_back();
-			Variable var_lhs = stack_[--stack_top_];
-			stack_.pop_back();
+			
+			SDIM::Variable var_rhs = stack_.Pop();
+			SDIM::Variable var_lhs = stack_.Pop();
 			
 			if (var_lhs.type == VariableType::UInt16 && var_rhs.type == VariableType::UInt16)
 			{
@@ -134,29 +134,13 @@ namespace SDIM
 				result.type = VariableType::UInt16;
 				result.as.uint16 = var_lhs.as.uint16 + var_rhs.as.uint16;
 
-				PushVariable(result);
+				stack_.Push(result);
 			}
 
 		}
-		SDIM::Variable PopStack()
-		{
-			if (stack_.empty())
-			{
-				SDIM::Utils::Log("Stack is empty at attempt to pop variable");
-				return SDIM::Variable();
-			}
+		
 
-			return stack_[--stack_top_];
-		}
-		void PushVariable(Variable var)
-		{
-			stack_.push_back(var);
-			++stack_top_;
-		}
-		// TODO: Use actual stack here
-		std::vector<SDIM::Variable> stack_;
-
-		size_t stack_top_{ 0 };
+		SDIM::Stack stack_;
 
 		SDIM::Variable accumulator; // optimisation, might not be needed
 

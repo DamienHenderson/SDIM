@@ -17,15 +17,66 @@ namespace SDIM
 	}
 	size_t Call(UInt64 func_addr)
 	{
-		return size_t();
+		// size of opcode + 64 bit address
+		return opcode_size + sizeof(UInt64);
 	}
 	size_t Jump(UInt64 jump_addr)
+	{
+		// size of opcode + 64 bit address
+		return opcode_size + sizeof(UInt64);
+	}
+	size_t JumpStack(Stack & prog_stack)
+	{
+		return size_t();
+	}
+	size_t JumpTrueStack(Stack & prog_stack)
+	{
+		return size_t();
+	}
+	size_t JumpFalseStack(Stack & prog_stack)
+	{
+		return size_t();
+	}
+	size_t Return(Stack & prog_stack)
+	{
+		return size_t();
+	}
+	size_t JumpTrue(Stack & prog_stack, UInt64 address)
+	{
+		return size_t();
+	}
+	size_t JumpFalse(Stack & prog_stack, UInt64 address)
+	{
+		return size_t();
+	}
+	size_t CallTrue(Stack & prog_stack, UInt64 address)
+	{
+		return size_t();
+	}
+	size_t CallFalse(Stack & prog_stack, UInt64 address)
+	{
+		return size_t();
+	}
+	size_t CallTrueStack(Stack & prog_stack, UInt64 address)
+	{
+		return size_t();
+	}
+	size_t CallFalseStack(Stack & prog_stack, UInt64 address)
+	{
+		return size_t();
+	}
+	size_t NativeCall(Stack & prog_stack)
+	{
+		return size_t();
+	}
+	size_t Less(Stack & prog_stack)
 	{
 		return size_t();
 	}
 	size_t JumpStack()
 	{
-		return size_t();
+		// size of opcode as this doesn't use an immediate value
+		return opcode_size;
 	}
 	size_t JumpTrueStack()
 	{

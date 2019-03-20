@@ -8,6 +8,9 @@ namespace SDIM
 	
 	VirtualMachine::VirtualMachine()
 	{
+		// 4k Variables 
+		// profile this to see if it's a good starting value
+		stack_.Resize(4096);
 	}
 
 
@@ -104,7 +107,7 @@ namespace SDIM
 				Variable var;
 				var.type = VariableType::UInt16;
 				var.as.uint16 = literal_value;
-				PushVariable(var);
+				stack_.Push(var);
 
 				SDIM::Utils::Log("Pushed UInt16 ", var.as.uint16);
 				return true;

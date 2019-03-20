@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Types.hpp"
+
+#include "Stack.hpp"
 namespace SDIM
 {
 
@@ -89,38 +91,38 @@ namespace SDIM
 	size_t Jump(UInt64 jump_addr);
 	
 	/// Jump to the address at stack[top]
-	size_t JumpStack();
+	size_t JumpStack(Stack& prog_stack);
 	
 	/// Jump to the address at stack[top - 1] if stack[top] is true
-	size_t JumpTrueStack();
+	size_t JumpTrueStack(Stack& prog_stack);
 	
 	/// Jump to the address at stack[top - 1] if stack[top] is false
-	size_t JumpFalseStack();
+	size_t JumpFalseStack(Stack& prog_stack);
 	
 	/// Returns from function call
-	size_t Return();
+	size_t Return(Stack& prog_stack);
 	
 	/// Jumps to immediate address if stack[top] is true
-	size_t JumpTrue();
+	size_t JumpTrue(Stack& prog_stack, UInt64 address);
 	
 	/// Jumps to immediate address if stack[top] is false
-	size_t JumpFalse();
+	size_t JumpFalse(Stack& prog_stack, UInt64 address);
 	
 	/// Call function at immediate address if stack[top] is true
-	size_t CallTrue();
+	size_t CallTrue(Stack& prog_stack, UInt64 address);
 	
 	/// Call function at immediate address if stack[top] is false
-	size_t CallFalse();
+	size_t CallFalse(Stack& prog_stack, UInt64 address);
 	
 	/// Call function at stack[top - 1] if stack[top] is true
-	size_t CallTrueStack();
+	size_t CallTrueStack(Stack& prog_stack, UInt64 address);
 	
 	/// Call function at stack[top - 1] if stack[top] is false
-	size_t CallFalseStack();
+	size_t CallFalseStack(Stack& prog_stack, UInt64 address);
 	
 	/// Call registered native function with provided name
-	size_t NativeCall();
+	size_t NativeCall(Stack& prog_stack);
 	
 	/// Performs Boolean operation stack[top - 1] < stack[top] and pushes result as UInt8
-	size_t Less();
+	size_t Less(Stack& prog_stack);
 }

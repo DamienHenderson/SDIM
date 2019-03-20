@@ -3,6 +3,7 @@
 #include "Types.hpp"
 
 #include <string>
+#include <iostream>
 
 namespace SDIM
 {

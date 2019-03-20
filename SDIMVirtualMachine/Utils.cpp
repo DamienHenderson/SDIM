@@ -1,6 +1,6 @@
 #include "Utils.hpp"
 
-#include <iostream>
+
 
 namespace SDIM
 {
@@ -12,8 +12,8 @@ namespace SDIM
 			{
 				char c[4];
 				UInt32 ui;
-			} end_test = {0x01020304};
-
+			} end_test;
+			end_test.ui = { 0x01020304 };
 			return end_test.c[0] == 0x04;
 		}
 
