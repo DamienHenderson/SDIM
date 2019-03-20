@@ -19,11 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Instructions.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="VirtualMachine.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Instructions.hpp" />
     <ClInclude Include="Types.hpp" />
     <ClInclude Include="Utils.hpp" />
     <ClInclude Include="VirtualMachine.hpp" />
