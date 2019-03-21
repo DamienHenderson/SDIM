@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
+
 namespace SDIM
 {
 	typedef std::uint8_t  UInt8;
@@ -59,6 +61,8 @@ namespace SDIM
 		} as;
 
 		Variable() : type(SDIM::VariableType::Unknown) {}
+
+		std::string ToString();
 	};
 	
 }

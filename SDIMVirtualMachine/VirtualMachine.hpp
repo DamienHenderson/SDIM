@@ -32,8 +32,9 @@ namespace SDIM
 		// Returns false if an error occurs
 		bool ExecuteNextOpcode();
 
-		inline void AdvanceInstructionPointer() { instruction_pointer_ += 1; }
+		inline void AdvanceInstructionPointer(size_t offset) { instruction_pointer_ += offset; }
 		// Reads a UInt64 literal in little endian format
+		// TODO: read literal without adjusting instruction pointer
 		UInt64 ReadUInt64Literal()
 		{
 			UInt64 literal_value{ 0 };
@@ -60,61 +61,7 @@ namespace SDIM
 			return literal_value;
 		}
 
-		void PrintStackTop()
-		{
-			if (stack_.Empty())
-			{
-				SDIM::Utils::Log("Stack is empty during call to print stack top");
-				return;
-			}
-
-			SDIM::Variable var = stack_.Pop();
-
-			SDIM::Utils::LogIntermediate("Top of stack: ");
-			switch (var.type)
-			{
-			case VariableType::UInt8:
-				SDIM::Utils::Log(var.as.uint8);
-				break;
-			case VariableType::UInt16:
-				SDIM::Utils::Log(var.as.uint16);
-				break;
-			case VariableType::UInt32:
-				SDIM::Utils::Log(var.as.uint32);
-				break;
-			case VariableType::UInt64:
-				SDIM::Utils::Log(var.as.uint64);
-				break;
-
-			case VariableType::Int8:
-				SDIM::Utils::Log(var.as.int8);
-				break;
-			case VariableType::Int16:
-				SDIM::Utils::Log(var.as.int16);
-				break;
-			case VariableType::Int32:
-				SDIM::Utils::Log(var.as.int32);
-				break;
-			case VariableType::Int64:
-				SDIM::Utils::Log(var.as.int64);
-				break;
-
-			case VariableType::F32:
-				SDIM::Utils::Log(var.as.f32);
-				break;
-			case VariableType::F64:
-				SDIM::Utils::Log(var.as.f64);
-				break;
-			
-			case VariableType::Pointer:
-				SDIM::Utils::Log(var.as.ptr);
-				break;
-
-			default:
-				SDIM::Utils::Log("Unknown Var Type");
-				break;
-			}
-		}
+		
 		// Adds the top two variables on the stack pops them and pushes the result
 		void AddStack()
 		{

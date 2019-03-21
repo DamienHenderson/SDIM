@@ -70,59 +70,63 @@ namespace SDIM
 		PushInfoString = 0x53
 
 	};
-	/// Opcode functions
-	/// return value is size_t which is the amount to move the instruction pointer in bytes
-	
-	/// immediate refers to literal values in little endian format embedded in the bytecode file
+	namespace Instructions
+	{
+		/// Opcode functions
+		/// return value is size_t which is the amount to move the instruction pointer in bytes
 
-	/// TODO: make a variable stack object to pass by reference into these functions
-	/// to allow the state of the vm stack to be modified 
+		/// immediate refers to literal values in little endian format embedded in the bytecode file
 
-	/// Perform no action for this instruction
-	size_t NoOperation();
+		/// TODO: make a variable stack object to pass by reference into these functions
+		/// to allow the state of the vm stack to be modified 
 
-	/// Call built in utilities in the VM
-	size_t VMCall(UInt64 func_id);
-	
-	/// Call immediate address
-	size_t Call(UInt64 func_addr);
-	
-	/// Jump to immediate address
-	size_t Jump(UInt64 jump_addr);
-	
-	/// Jump to the address at stack[top]
-	size_t JumpStack(Stack& prog_stack);
-	
-	/// Jump to the address at stack[top - 1] if stack[top] is true
-	size_t JumpTrueStack(Stack& prog_stack);
-	
-	/// Jump to the address at stack[top - 1] if stack[top] is false
-	size_t JumpFalseStack(Stack& prog_stack);
-	
-	/// Returns from function call
-	size_t Return(Stack& prog_stack);
-	
-	/// Jumps to immediate address if stack[top] is true
-	size_t JumpTrue(Stack& prog_stack, UInt64 address);
-	
-	/// Jumps to immediate address if stack[top] is false
-	size_t JumpFalse(Stack& prog_stack, UInt64 address);
-	
-	/// Call function at immediate address if stack[top] is true
-	size_t CallTrue(Stack& prog_stack, UInt64 address);
-	
-	/// Call function at immediate address if stack[top] is false
-	size_t CallFalse(Stack& prog_stack, UInt64 address);
-	
-	/// Call function at stack[top - 1] if stack[top] is true
-	size_t CallTrueStack(Stack& prog_stack, UInt64 address);
-	
-	/// Call function at stack[top - 1] if stack[top] is false
-	size_t CallFalseStack(Stack& prog_stack, UInt64 address);
-	
-	/// Call registered native function with provided name
-	size_t NativeCall(Stack& prog_stack);
-	
-	/// Performs Boolean operation stack[top - 1] < stack[top] and pushes result as UInt8
-	size_t Less(Stack& prog_stack);
+		/// Perform no action for this instruction
+		size_t NoOperation();
+
+		/// Call built in utilities in the VM
+		size_t VMCall(Stack& stack, UInt64 func_id);
+
+		/// Call immediate address
+		size_t Call(UInt64 func_addr);
+
+		/// Jump to immediate address
+		size_t Jump(UInt64 jump_addr);
+
+		/// Jump to the address at stack[top]
+		size_t JumpStack(Stack& prog_stack);
+
+		/// Jump to the address at stack[top - 1] if stack[top] is true
+		size_t JumpTrueStack(Stack& prog_stack);
+
+		/// Jump to the address at stack[top - 1] if stack[top] is false
+		size_t JumpFalseStack(Stack& prog_stack);
+
+		/// Returns from function call
+		size_t Return(Stack& prog_stack);
+
+		/// Jumps to immediate address if stack[top] is true
+		size_t JumpTrue(Stack& prog_stack, UInt64 address);
+
+		/// Jumps to immediate address if stack[top] is false
+		size_t JumpFalse(Stack& prog_stack, UInt64 address);
+
+		/// Call function at immediate address if stack[top] is true
+		size_t CallTrue(Stack& prog_stack, UInt64 address);
+
+		/// Call function at immediate address if stack[top] is false
+		size_t CallFalse(Stack& prog_stack, UInt64 address);
+
+		/// Call function at stack[top - 1] if stack[top] is true
+		size_t CallTrueStack(Stack& prog_stack);
+
+		/// Call function at stack[top - 1] if stack[top] is false
+		size_t CallFalseStack(Stack& prog_stack);
+
+		/// Call registered native function with provided name
+		size_t NativeCall(Stack& prog_stack);
+
+		/// Performs Boolean operation stack[top - 1] < stack[top] and pushes result as UInt8
+		size_t Less(Stack& prog_stack);
+
+	}
 }

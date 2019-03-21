@@ -19,13 +19,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Allocator.cpp" />
     <ClCompile Include="Instructions.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Stack.cpp" />
+    <ClCompile Include="Types.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="VirtualMachine.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Allocator.hpp" />
     <ClInclude Include="Instructions.hpp" />
     <ClInclude Include="Stack.hpp" />
     <ClInclude Include="Types.hpp" />

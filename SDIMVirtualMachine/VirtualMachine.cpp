@@ -8,9 +8,9 @@ namespace SDIM
 	
 	VirtualMachine::VirtualMachine()
 	{
-		// 4k Variables 
+		// 32k Variables 
 		// profile this to see if it's a good starting value
-		stack_.Resize(4096);
+		stack_.Resize(32768);
 	}
 
 
@@ -74,35 +74,45 @@ namespace SDIM
 		if (instruction_pointer_ != nullptr)
 		{
 			Instruction next_instruction = static_cast<Instruction>(static_cast<UInt8>(*instruction_pointer_));
-
+#ifdef SDIMVM_DEBUG
+			stack_.PrintStack();
+#endif
 			// TODO: Optimise this as a big switch usually isn't optimal
+			// once all the functions are done i could make a function pointer table and address it with opcode ids
 			switch (next_instruction)
 			{
 			case Instruction::NOP:
-				SDIM::Utils::Log("No Operation");
-				AdvanceInstructionPointer();
+			{
+				size_t offset = SDIM::Instructions::NoOperation();
+				AdvanceInstructionPointer(offset);
 				return true;
+			}
 			case Instruction::VMCall:
 			{	
-				// For now VMCall with argument 1 is Print the top of the stack
-				AdvanceInstructionPointer();
+				AdvanceInstructionPointer(1);
 				UInt64 func_id = ReadUInt64Literal();
+				size_t offset = SDIM::Instructions::VMCall(stack_, func_id);
+				
+				// For now VMCall with argument 1 is Print the top of the stack
+				// AdvanceInstructionPointer();
+				/*
 				if (func_id == 1)
 				{
-					PrintStackTop();
+					stack_.PrintStackTop();
 					SDIM::Utils::Log("Print Stack Top called");
 				}
+				*/
 				return true;
 			}
 			
 			case Instruction::Add:
-				AdvanceInstructionPointer();
+				AdvanceInstructionPointer(1);
 				AddStack();
 				SDIM::Utils::Log("Add Stack");
 				return true;
 			case Instruction::PushUInt16:
 			{
-				AdvanceInstructionPointer();
+				AdvanceInstructionPointer(1);
 				UInt16 literal_value = ReadUInt16Literal();
 				Variable var;
 				var.type = VariableType::UInt16;
@@ -119,7 +129,7 @@ namespace SDIM
 			default:
 			
 				SDIM::Utils::Log("Unknown Opcode: ", static_cast<UInt8>(next_instruction));
-				AdvanceInstructionPointer();
+				AdvanceInstructionPointer(1);
 				return false;
 			
 			}

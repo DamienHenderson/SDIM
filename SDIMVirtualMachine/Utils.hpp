@@ -4,6 +4,7 @@
 
 #include <string>
 #include <iostream>
+#include <sstream>
 
 namespace SDIM
 {
@@ -26,6 +27,7 @@ namespace SDIM
 		template <typename T, typename... Args>
 		void Log(T&& arg, Args&&... args);
 
+		
 		template<typename T>
 		void Log(T && arg)
 		{
@@ -52,6 +54,37 @@ namespace SDIM
 
 		
 
+		
+		/// TODO: variadic ConstructString function to go alongside the Log functions
+		template <typename T>
+		std::string ConstructString(T&& arg);
+
+		template <typename T, typename... Args>
+		std::string ConstructString(T&& arg, Args&&... args);
+
+		template<typename T>
+		std::string ConstructString(T && arg)
+		{
+			// definitely not optimal but it can be improved later
+			std::stringstream ss;
+			ss << arg;
+			return ss.str();
+		}
+
+		template<typename T, typename ...Args>
+		std::string ConstructString(T && arg, Args && ...args)
+		{
+			std::string base = ConstructString(arg);
+			
+			if (sizeof...(args) == 0)
+			{
+				return base;
+			}
+			else
+			{
+				return base + ConstructString(args...);
+			}
+		}
 
 	}
 }

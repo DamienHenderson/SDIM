@@ -14,7 +14,6 @@ namespace SDIM
 		void Push(const SDIM::Variable& data);
 		
 		/// Pop the top of the stack
-		// elided copy i hope
 		SDIM::Variable Pop();
 
 		/// Look at the top of the stack without popping it
@@ -33,6 +32,10 @@ namespace SDIM
 
 		/// Returns the number of elements in the stack
 		size_t Size() const;
+
+		void PrintStackTop() const;
+
+		void PrintStack() const;
 	private:
 
 		SDIM::Variable* data_{ nullptr };

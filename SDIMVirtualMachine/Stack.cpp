@@ -66,6 +66,26 @@ namespace SDIM
 	}
 	size_t Stack::Size() const
 	{
-		return stack_capacity_;
+		return stack_top_;
+	}
+	void Stack::PrintStackTop() const
+	{
+		SDIM::Variable top = Peek();
+
+		SDIM::Utils::Log("Top of stack: ", top.ToString());
+	}
+	void Stack::PrintStack() const
+	{
+		SDIM::Utils::Log("Stack capacity: elements(", Capacity(), ") bytes(", Capacity() * sizeof(SDIM::Variable), ")");
+		SDIM::Utils::Log("Element count: ", Size());
+		for (size_t i = 0; i < stack_top_; i++)
+		{
+			// gives the relative position of the element of the stack in negative form with -1 being the top
+			Int64 element_offset = (-(Int64)stack_top_) + (Int64)i;
+
+			SDIM::Variable var = data_[i];
+
+			SDIM::Utils::Log("Stack[" , element_offset,"]: ", var.ToString());
+		}
 	}
 }
