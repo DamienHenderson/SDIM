@@ -107,19 +107,14 @@ namespace SDIM
 			
 			case Instruction::Add:
 				AdvanceInstructionPointer(1);
-				AddStack();
+				Instructions::Add(stack_);
 				SDIM::Utils::Log("Add Stack");
 				return true;
 			case Instruction::PushUInt16:
 			{
 				AdvanceInstructionPointer(1);
 				UInt16 literal_value = ReadUInt16Literal();
-				Variable var;
-				var.type = VariableType::UInt16;
-				var.as.uint16 = literal_value;
-				stack_.Push(var);
-
-				SDIM::Utils::Log("Pushed UInt16 ", var.as.uint16);
+				Instructions::PushUInt16(stack_, literal_value);
 				return true;
 			}
 			case Instruction::Halt:

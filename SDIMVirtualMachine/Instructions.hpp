@@ -128,5 +128,86 @@ namespace SDIM
 		/// Performs Boolean operation stack[top - 1] < stack[top] and pushes result as UInt8
 		size_t Less(Stack& prog_stack);
 
+		size_t LessEqual(Stack& prog_stack);
+
+		size_t Greater(Stack& prog_stack);
+		
+		size_t GreaterEqual(Stack& prog_stack);
+
+		size_t Equal(Stack& prog_stack);
+			
+		size_t NotEqual(Stack& prog_stack);
+			
+		size_t Not(Stack& prog_stack);
+			
+		size_t And(Stack& prog_stack);
+			
+		size_t Or(Stack& prog_stack);
+			
+		size_t Xor(Stack& prog_stack);
+
+		size_t Add(Stack& prog_stack);
+			
+		size_t Subtract(Stack& prog_stack);
+
+		size_t Multiply(Stack& prog_stack);
+		
+		size_t BitwiseNot(Stack& prog_stack);
+
+		size_t Divide(Stack& prog_stack);
+			
+		size_t Negate(Stack& prog_stack);
+			
+		size_t Modulo(Stack& prog_stack);
+			
+		size_t PushInt8(Stack& prog_stack, Int8 val);
+			
+		size_t PushInt16(Stack& prog_stack, Int16 val);
+			
+		size_t PushInt32(Stack& prog_stack, Int32 val);
+
+		size_t PushInt64(Stack& prog_stack, Int64 val);
+			
+		size_t PushUInt8(Stack& prog_stack, UInt8 val);
+		
+		size_t PushUInt16(Stack& prog_stack, UInt16 val);
+			
+		size_t PushUInt32(Stack& prog_stack, UInt32 val);
+			
+		size_t PushUInt64(Stack& prog_stack, UInt64 val);
+			
+		size_t PushF32(Stack& prog_stack, F32 val);
+			
+		size_t PushF64(Stack& prog_stack, F64 val);
+
+		size_t PushPointer(Stack& prog_stack, void* ptr);
+		
+		size_t PushString(Stack& prog_stack);
+
+		size_t PushStruct(Stack& prog_stack);
+			
+		size_t PushClass(Stack& prog_stack);
+			
+		size_t LocalVar(Stack& prog_stack);
+			
+		size_t Pop(Stack& prog_stack);
+			
+		size_t PushLocal(Stack& prog_stack);
+
+		size_t PushAddr(Stack& prog_stack);
+
+		size_t Break();
+			
+		size_t PushStackCount(Stack& prog_stack);
+			
+		// size_t Dump();
+			
+		// size_t Error();
+			
+		// size_t Halt();
+			
+		// size_t Pause();
+			
+		// size_t PushInfoString();
 	}
 }

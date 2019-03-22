@@ -36,31 +36,35 @@ namespace SDIM
 		Pointer,
 		Unknown
 	};
+
+	typedef union
+	{
+		Int8  int8;
+		Int16 int16;
+		Int32 int32;
+		Int64 int64;
+
+
+		UInt8  uint8;
+		UInt16 uint16;
+		UInt32 uint32;
+		UInt64 uint64;
+
+		F32 f32;
+		F64 f64;
+
+		void* ptr;
+
+	} VarUnion;
 	struct Variable
 	{
 		VariableType type;
 
-		union
-		{
-			Int8  int8;
-			Int16 int16;
-			Int32 int32;
-			Int64 int64;
-
-
-			UInt8  uint8;
-			UInt16 uint16;
-			UInt32 uint32;
-			UInt64 uint64;
-
-			F32 f32;
-			F64 f64;
-
-			void* ptr;
-
-		} as;
+		VarUnion as;
 
 		Variable() : type(SDIM::VariableType::Unknown) {}
+
+		Variable(VariableType var_type, VarUnion value) : type(var_type), as(value) {}
 
 		std::string ToString();
 	};
