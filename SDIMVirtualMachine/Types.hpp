@@ -68,5 +68,9 @@ namespace SDIM
 
 		std::string ToString();
 	};
+
+	bool IsTrue(const SDIM::Variable& var);
+	bool IsFalse(const SDIM::Variable& var);
+
 	
 }

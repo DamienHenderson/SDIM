@@ -48,4 +48,41 @@ namespace SDIM
 			return SDIM::Utils::ConstructString("ERROR! Unknown Type");
 		}
 	}
+	bool IsTrue(const SDIM::Variable & var)
+	{
+		switch (var.type)
+		{
+		case VariableType::UInt8:
+			return var.as.uint8 != 0;
+		case VariableType::UInt16:
+			return var.as.uint16 != 0;
+		case VariableType::UInt32:
+			return var.as.uint32 != 0;
+		case VariableType::UInt64:
+			return var.as.uint64 != 0;
+		
+		case VariableType::Int8:
+			return var.as.int8 != 0;
+		case VariableType::Int16:
+			return var.as.int16 != 0;
+		case VariableType::Int32:
+			return var.as.int32 != 0;
+		case VariableType::Int64:
+			return var.as.int64 != 0;
+
+		case VariableType::F32:
+			return var.as.f32 != 0.0f;
+		case VariableType::F64:
+			return var.as.f64 != 0.0;
+
+		case VariableType::Pointer:
+			return var.as.ptr != nullptr;
+		default:
+			return false;
+		}
+	}
+	bool IsFalse(const SDIM::Variable & var)
+	{
+		return !IsTrue(var);
+	}
 }

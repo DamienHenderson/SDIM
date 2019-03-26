@@ -10,7 +10,7 @@ namespace SDIM
 	{
 		// 32k Variables 
 		// profile this to see if it's a good starting value
-		stack_.Resize(32768);
+		state_.program_stack_.Resize(32768);
 	}
 
 
@@ -35,9 +35,9 @@ namespace SDIM
 		std::vector<char> file_data(std::istreambuf_iterator<char>(file), {});
 		program_data_ = new char[file_data.size()];
 		std::memcpy(program_data_, file_data.data(), file_data.size());
-		program_length_ = file_data.size();
+		state_.program_length_ = file_data.size();
 
-		instruction_pointer_ = program_data_;
+		state_.program_counter_ = 0;
 
 		return true;
 	}
@@ -52,7 +52,7 @@ namespace SDIM
 		{
 			SDIM::Utils::Log("Platform endianness is big endian");
 		}
-		if (program_data_ != nullptr && instruction_pointer_ != nullptr)
+		if (program_data_ != nullptr)
 		{
 			running_ = true;
 			while (running_)
@@ -71,11 +71,11 @@ namespace SDIM
 
 	bool VirtualMachine::ExecuteNextOpcode()
 	{
-		if (instruction_pointer_ != nullptr)
+		if (state_.program_counter_ < state_.program_length_)
 		{
-			Instruction next_instruction = static_cast<Instruction>(static_cast<UInt8>(*instruction_pointer_));
+			Instruction next_instruction = static_cast<Instruction>(static_cast<UInt8>(program_data_[state_.program_counter_]));
 #ifdef SDIMVM_DEBUG
-			stack_.PrintStack();
+			state_.program_stack_.PrintStack();
 #endif
 			// TODO: Optimise this as a big switch usually isn't optimal
 			// once all the functions are done i could make a function pointer table and address it with opcode ids
@@ -89,32 +89,25 @@ namespace SDIM
 			}
 			case Instruction::VMCall:
 			{	
-				AdvanceInstructionPointer(1);
-				UInt64 func_id = ReadUInt64Literal();
-				size_t offset = SDIM::Instructions::VMCall(stack_, func_id);
 				
-				// For now VMCall with argument 1 is Print the top of the stack
-				// AdvanceInstructionPointer();
-				/*
-				if (func_id == 1)
-				{
-					stack_.PrintStackTop();
-					SDIM::Utils::Log("Print Stack Top called");
-				}
-				*/
+				UInt64 func_id = ReadUInt64Literal(state_.program_counter_ + 1);
+				size_t offset = SDIM::Instructions::VMCall(state_, func_id);
+				AdvanceInstructionPointer(offset);
+				
 				return true;
 			}
 			
 			case Instruction::Add:
 				AdvanceInstructionPointer(1);
-				Instructions::Add(stack_);
+				Instructions::Add(state_);
 				SDIM::Utils::Log("Add Stack");
 				return true;
 			case Instruction::PushUInt16:
 			{
-				AdvanceInstructionPointer(1);
-				UInt16 literal_value = ReadUInt16Literal();
-				Instructions::PushUInt16(stack_, literal_value);
+				
+				UInt16 literal_value = ReadUInt16Literal(state_.program_counter_ + 1);
+				size_t offset = Instructions::PushUInt16(state_, literal_value);
+				AdvanceInstructionPointer(offset);
 				return true;
 			}
 			case Instruction::Halt:

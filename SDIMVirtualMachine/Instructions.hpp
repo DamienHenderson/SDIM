@@ -3,6 +3,8 @@
 #include "Types.hpp"
 
 #include "Stack.hpp"
+
+#include "VMState.hpp"
 namespace SDIM
 {
 
@@ -84,103 +86,103 @@ namespace SDIM
 		size_t NoOperation();
 
 		/// Call built in utilities in the VM
-		size_t VMCall(Stack& stack, UInt64 func_id);
+		size_t VMCall(SDIM::VMState& state, UInt64 func_id);
 
 		/// Call immediate address
-		size_t Call(UInt64 func_addr);
+		size_t Call(SDIM::VMState& state, UInt64 func_addr);
 
 		/// Jump to immediate address
-		size_t Jump(UInt64 jump_addr);
+		size_t Jump(SDIM::VMState& state, UInt64 func_addr);
 
 		/// Jump to the address at stack[top]
-		size_t JumpStack(Stack& prog_stack);
+		size_t JumpStack(SDIM::VMState& state);
 
 		/// Jump to the address at stack[top - 1] if stack[top] is true
-		size_t JumpTrueStack(Stack& prog_stack);
+		size_t JumpTrueStack(SDIM::VMState& state);
 
 		/// Jump to the address at stack[top - 1] if stack[top] is false
-		size_t JumpFalseStack(Stack& prog_stack);
+		size_t JumpFalseStack(SDIM::VMState& state);
 
 		/// Returns from function call
-		size_t Return(Stack& prog_stack);
+		size_t Return(SDIM::VMState& state);
 
 		/// Jumps to immediate address if stack[top] is true
-		size_t JumpTrue(Stack& prog_stack, UInt64 address);
+		size_t JumpTrue(SDIM::VMState& state, UInt64 address);
 
 		/// Jumps to immediate address if stack[top] is false
-		size_t JumpFalse(Stack& prog_stack, UInt64 address);
+		size_t JumpFalse(SDIM::VMState& state, UInt64 address);
 
 		/// Call function at immediate address if stack[top] is true
-		size_t CallTrue(Stack& prog_stack, UInt64 address);
+		size_t CallTrue(SDIM::VMState& state, UInt64 address);
 
 		/// Call function at immediate address if stack[top] is false
-		size_t CallFalse(Stack& prog_stack, UInt64 address);
+		size_t CallFalse(SDIM::VMState& state, UInt64 address);
 
 		/// Call function at stack[top - 1] if stack[top] is true
-		size_t CallTrueStack(Stack& prog_stack);
+		size_t CallTrueStack(SDIM::VMState& state);
 
 		/// Call function at stack[top - 1] if stack[top] is false
-		size_t CallFalseStack(Stack& prog_stack);
+		size_t CallFalseStack(SDIM::VMState& state);
 
 		/// Call registered native function with provided name
-		size_t NativeCall(Stack& prog_stack);
+		size_t NativeCall(SDIM::VMState& state);
 
 		/// Performs Boolean operation stack[top - 1] < stack[top] and pushes result as UInt8
-		size_t Less(Stack& prog_stack);
+		size_t Less(SDIM::VMState& state);
 
-		size_t LessEqual(Stack& prog_stack);
+		size_t LessEqual(SDIM::VMState& state);
 
-		size_t Greater(Stack& prog_stack);
+		size_t Greater(SDIM::VMState& state);
 		
-		size_t GreaterEqual(Stack& prog_stack);
+		size_t GreaterEqual(SDIM::VMState& state);
 
-		size_t Equal(Stack& prog_stack);
+		size_t Equal(SDIM::VMState& state);
 			
-		size_t NotEqual(Stack& prog_stack);
+		size_t NotEqual(SDIM::VMState& state);
 			
-		size_t Not(Stack& prog_stack);
+		size_t Not(SDIM::VMState& state);
 			
-		size_t And(Stack& prog_stack);
+		size_t And(SDIM::VMState& state);
 			
-		size_t Or(Stack& prog_stack);
+		size_t Or(SDIM::VMState& state);
 			
-		size_t Xor(Stack& prog_stack);
+		size_t Xor(SDIM::VMState& state);
 
-		size_t Add(Stack& prog_stack);
+		size_t Add(SDIM::VMState& state);
 			
-		size_t Subtract(Stack& prog_stack);
+		size_t Subtract(SDIM::VMState& state);
 
-		size_t Multiply(Stack& prog_stack);
+		size_t Multiply(SDIM::VMState& state);
 		
-		size_t BitwiseNot(Stack& prog_stack);
+		size_t BitwiseNot(SDIM::VMState& state);
 
-		size_t Divide(Stack& prog_stack);
+		size_t Divide(SDIM::VMState& state);
 			
-		size_t Negate(Stack& prog_stack);
+		size_t Negate(SDIM::VMState& state);
 			
-		size_t Modulo(Stack& prog_stack);
+		size_t Modulo(SDIM::VMState& state);
 			
-		size_t PushInt8(Stack& prog_stack, Int8 val);
+		size_t PushInt8(SDIM::VMState& state, Int8 val);
 			
-		size_t PushInt16(Stack& prog_stack, Int16 val);
+		size_t PushInt16(SDIM::VMState& state, Int16 val);
 			
-		size_t PushInt32(Stack& prog_stack, Int32 val);
+		size_t PushInt32(SDIM::VMState& state, Int32 val);
 
-		size_t PushInt64(Stack& prog_stack, Int64 val);
+		size_t PushInt64(SDIM::VMState& state, Int64 val);
 			
-		size_t PushUInt8(Stack& prog_stack, UInt8 val);
+		size_t PushUInt8(SDIM::VMState& state, UInt8 val);
 		
-		size_t PushUInt16(Stack& prog_stack, UInt16 val);
+		size_t PushUInt16(SDIM::VMState& state, UInt16 val);
 			
-		size_t PushUInt32(Stack& prog_stack, UInt32 val);
+		size_t PushUInt32(SDIM::VMState& state, UInt32 val);
 			
-		size_t PushUInt64(Stack& prog_stack, UInt64 val);
+		size_t PushUInt64(SDIM::VMState& state, UInt64 val);
 			
-		size_t PushF32(Stack& prog_stack, F32 val);
+		size_t PushF32(SDIM::VMState& state, F32 val);
 			
-		size_t PushF64(Stack& prog_stack, F64 val);
+		size_t PushF64(SDIM::VMState& state, F64 val);
 
-		size_t PushPointer(Stack& prog_stack, void* ptr);
+		size_t PushPointer(SDIM::VMState& state, void* ptr);
 		
 		size_t PushString(Stack& prog_stack);
 

@@ -4,6 +4,8 @@
 #include "Utils.hpp"
 #include "Instructions.hpp"
 #include "Stack.hpp"
+#include "VMState.hpp"
+
 
 #include <string>
 #include <vector>
@@ -25,69 +27,50 @@ namespace SDIM
 
 	private: 
 		char* program_data_{ nullptr };
-		char* instruction_pointer_{ nullptr };
+		// size_t program_counter_{ 0 };
 
-		size_t program_length_{ 0 };
+		// size_t program_length_{ 0 };
 		
+		VMState state_;
 		// Returns false if an error occurs
 		bool ExecuteNextOpcode();
 
-		inline void AdvanceInstructionPointer(size_t offset) { instruction_pointer_ += offset; }
+		inline void AdvanceInstructionPointer(size_t offset) { state_.program_counter_ += offset; }
 		// Reads a UInt64 literal in little endian format
 		// TODO: read literal without adjusting instruction pointer
-		UInt64 ReadUInt64Literal()
+		UInt64 ReadUInt64Literal(size_t location)
 		{
 			UInt64 literal_value{ 0 };
-
+			if ((location + sizeof(literal_value) - 1) > state_.program_length_)
+			{
+				SDIM::Utils::Log("Attempt to read immediate value which would read past the end of the program data");
+				return literal_value;
+			}
 			for (int i = 0; i < sizeof(literal_value); i++)
 			{
-				unsigned char read_byte = static_cast<unsigned char>(*(instruction_pointer_++));
+				unsigned char read_byte = static_cast<unsigned char>(program_data_[location + i]);
 				literal_value |= read_byte << (i * 8);
 			}
 			
 			return literal_value;
 		}
 
-		UInt16 ReadUInt16Literal()
+		UInt16 ReadUInt16Literal(size_t location)
 		{
 			UInt16 literal_value{ 0 };
-
+			if ((location + sizeof(literal_value) - 1) > state_.program_length_)
+			{
+				SDIM::Utils::Log("Attempt to read immediate value which would read past the end of the program data");
+				return literal_value;
+			}
 			for (int i = 0; i < sizeof(literal_value); i++)
 			{
-				UInt8 read_byte = static_cast<UInt8>(*(instruction_pointer_++));
+				UInt8 read_byte = static_cast<unsigned char>(program_data_[location + i]);
 				literal_value |= read_byte << (i * 8);
 			}
 
 			return literal_value;
 		}
-
-		
-		// Adds the top two variables on the stack pops them and pushes the result
-		void AddStack()
-		{
-			if (stack_.Size() < 2)
-			{
-				SDIM::Utils::Log("Not enough items on stack to add ", stack_.Size(), "Expected ", 2);
-				return;
-			}
-
-			
-			SDIM::Variable var_rhs = stack_.Pop();
-			SDIM::Variable var_lhs = stack_.Pop();
-			
-			if (var_lhs.type == VariableType::UInt16 && var_rhs.type == VariableType::UInt16)
-			{
-				Variable result;
-				result.type = VariableType::UInt16;
-				result.as.uint16 = var_lhs.as.uint16 + var_rhs.as.uint16;
-
-				stack_.Push(result);
-			}
-
-		}
-		
-
-		SDIM::Stack stack_;
 
 		SDIM::Variable accumulator; // optimisation, might not be needed
 
