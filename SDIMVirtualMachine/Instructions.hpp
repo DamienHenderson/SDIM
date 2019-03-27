@@ -72,10 +72,13 @@ namespace SDIM
 		PushInfoString = 0x53
 
 	};
+	// number of allowed single byte opcodes
+	constexpr size_t MAX_OPCODES = 256;
+
 	namespace Instructions
 	{
 		/// Opcode functions
-		/// return value is size_t which is the amount to move the instruction pointer in bytes
+		/// return value is void which is the amount to move the instruction pointer in bytes
 
 		/// immediate refers to literal values in little endian format embedded in the bytecode file
 
@@ -83,133 +86,133 @@ namespace SDIM
 		/// to allow the state of the vm stack to be modified 
 
 		/// Perform no action for this instruction
-		size_t NoOperation();
+		void NoOperation(SDIM::VMState& state);
 
 		/// Call built in utilities in the VM
-		size_t VMCall(SDIM::VMState& state, UInt64 func_id);
+		void VMCall(SDIM::VMState& state);
 
 		/// Call immediate address
-		size_t Call(SDIM::VMState& state, UInt64 func_addr);
+		void Call(SDIM::VMState& state);
 
 		/// Jump to immediate address
-		size_t Jump(SDIM::VMState& state, UInt64 func_addr);
+		void Jump(SDIM::VMState& state);
 
 		/// Jump to the address at stack[top]
-		size_t JumpStack(SDIM::VMState& state);
+		void JumpStack(SDIM::VMState& state);
 
 		/// Jump to the address at stack[top - 1] if stack[top] is true
-		size_t JumpTrueStack(SDIM::VMState& state);
+		void JumpTrueStack(SDIM::VMState& state);
 
 		/// Jump to the address at stack[top - 1] if stack[top] is false
-		size_t JumpFalseStack(SDIM::VMState& state);
+		void JumpFalseStack(SDIM::VMState& state);
 
 		/// Returns from function call
-		size_t Return(SDIM::VMState& state);
+		void Return(SDIM::VMState& state);
 
 		/// Jumps to immediate address if stack[top] is true
-		size_t JumpTrue(SDIM::VMState& state, UInt64 address);
+		void JumpTrue(SDIM::VMState& state);
 
 		/// Jumps to immediate address if stack[top] is false
-		size_t JumpFalse(SDIM::VMState& state, UInt64 address);
+		void JumpFalse(SDIM::VMState& state);
 
 		/// Call function at immediate address if stack[top] is true
-		size_t CallTrue(SDIM::VMState& state, UInt64 address);
+		void CallTrue(SDIM::VMState& state);
 
 		/// Call function at immediate address if stack[top] is false
-		size_t CallFalse(SDIM::VMState& state, UInt64 address);
+		void CallFalse(SDIM::VMState& state);
 
 		/// Call function at stack[top - 1] if stack[top] is true
-		size_t CallTrueStack(SDIM::VMState& state);
+		void CallTrueStack(SDIM::VMState& state);
 
 		/// Call function at stack[top - 1] if stack[top] is false
-		size_t CallFalseStack(SDIM::VMState& state);
+		void CallFalseStack(SDIM::VMState& state);
 
 		/// Call registered native function with provided name
-		size_t NativeCall(SDIM::VMState& state);
+		void NativeCall(SDIM::VMState& state);
 
 		/// Performs Boolean operation stack[top - 1] < stack[top] and pushes result as UInt8
-		size_t Less(SDIM::VMState& state);
+		void Less(SDIM::VMState& state);
 
-		size_t LessEqual(SDIM::VMState& state);
+		void LessEqual(SDIM::VMState& state);
 
-		size_t Greater(SDIM::VMState& state);
+		void Greater(SDIM::VMState& state);
 		
-		size_t GreaterEqual(SDIM::VMState& state);
+		void GreaterEqual(SDIM::VMState& state);
 
-		size_t Equal(SDIM::VMState& state);
+		void Equal(SDIM::VMState& state);
 			
-		size_t NotEqual(SDIM::VMState& state);
+		void NotEqual(SDIM::VMState& state);
 			
-		size_t Not(SDIM::VMState& state);
+		void Not(SDIM::VMState& state);
 			
-		size_t And(SDIM::VMState& state);
+		void And(SDIM::VMState& state);
 			
-		size_t Or(SDIM::VMState& state);
+		void Or(SDIM::VMState& state);
 			
-		size_t Xor(SDIM::VMState& state);
+		void Xor(SDIM::VMState& state);
 
-		size_t Add(SDIM::VMState& state);
+		void Add(SDIM::VMState& state);
 			
-		size_t Subtract(SDIM::VMState& state);
+		void Subtract(SDIM::VMState& state);
 
-		size_t Multiply(SDIM::VMState& state);
+		void Multiply(SDIM::VMState& state);
 		
-		size_t BitwiseNot(SDIM::VMState& state);
+		void BitwiseNot(SDIM::VMState& state);
 
-		size_t Divide(SDIM::VMState& state);
+		void Divide(SDIM::VMState& state);
 			
-		size_t Negate(SDIM::VMState& state);
+		void Negate(SDIM::VMState& state);
 			
-		size_t Modulo(SDIM::VMState& state);
+		void Modulo(SDIM::VMState& state);
 			
-		size_t PushInt8(SDIM::VMState& state, Int8 val);
+		void PushInt8(SDIM::VMState& state);
 			
-		size_t PushInt16(SDIM::VMState& state, Int16 val);
+		void PushInt16(SDIM::VMState& state);
 			
-		size_t PushInt32(SDIM::VMState& state, Int32 val);
+		void PushInt32(SDIM::VMState& state);
 
-		size_t PushInt64(SDIM::VMState& state, Int64 val);
+		void PushInt64(SDIM::VMState& state);
 			
-		size_t PushUInt8(SDIM::VMState& state, UInt8 val);
+		void PushUInt8(SDIM::VMState& state);
 		
-		size_t PushUInt16(SDIM::VMState& state, UInt16 val);
+		void PushUInt16(SDIM::VMState& state);
 			
-		size_t PushUInt32(SDIM::VMState& state, UInt32 val);
+		void PushUInt32(SDIM::VMState& state);
 			
-		size_t PushUInt64(SDIM::VMState& state, UInt64 val);
+		void PushUInt64(SDIM::VMState& state);
 			
-		size_t PushF32(SDIM::VMState& state, F32 val);
+		void PushF32(SDIM::VMState& state);
 			
-		size_t PushF64(SDIM::VMState& state, F64 val);
+		void PushF64(SDIM::VMState& state);
 
-		size_t PushPointer(SDIM::VMState& state, void* ptr);
+		void PushPointer(SDIM::VMState& state);
 		
-		size_t PushString(Stack& prog_stack);
+		void PushString(SDIM::VMState& state);
 
-		size_t PushStruct(Stack& prog_stack);
+		void PushStruct(SDIM::VMState& state);
 			
-		size_t PushClass(Stack& prog_stack);
+		void PushClass(SDIM::VMState& state);
 			
-		size_t LocalVar(Stack& prog_stack);
+		void LocalVar(SDIM::VMState& state);
 			
-		size_t Pop(Stack& prog_stack);
+		void Pop(SDIM::VMState& state);
 			
-		size_t PushLocal(Stack& prog_stack);
+		void PushLocal(SDIM::VMState& state);
 
-		size_t PushAddr(Stack& prog_stack);
+		void PushAddr(SDIM::VMState& state);
 
-		size_t Break();
+		void Break(SDIM::VMState& state);
 			
-		size_t PushStackCount(Stack& prog_stack);
+		void PushStackCount(SDIM::VMState& state);
 			
-		// size_t Dump();
+		// void Dump();
 			
-		// size_t Error();
+		// void Error();
 			
-		// size_t Halt();
+		void Halt(SDIM::VMState& state);
 			
-		// size_t Pause();
+		// void Pause();
 			
-		// size_t PushInfoString();
+		// void PushInfoString();
 	}
 }

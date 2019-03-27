@@ -5,23 +5,28 @@ namespace SDIM
 {
 	namespace Instructions
 	{
-		size_t NoOperation()
+		void NoOperation(SDIM::VMState& state)
 		{
 			SDIM::Utils::Log("NoOperation");
-			return opcode_size;
+			state.program_counter_ += opcode_size;
 		}
-		size_t VMCall(SDIM::VMState& state, UInt64 func_id)
+		void VMCall(SDIM::VMState& state)
 		{
+
+			UInt64 func_id = Utils::ReadUInt64Literal(state, state.program_counter_ + 1);
+			SDIM::Utils::Disassemble(SDIM::Utils::ConstructString("VMCall: ", func_id));
 			// TODO: Call VM functions here
 			if (func_id == 1)
 			{
 				state.program_stack_.PrintStackTop();
 			}
 			// size of opcode + size of func id
-			return opcode_size + sizeof(func_id);
+			state.program_counter_ += opcode_size + sizeof(func_id);
 		}
-		size_t Call(SDIM::VMState& state, UInt64 func_addr)
+		void Call(SDIM::VMState& state)
 		{
+			SDIM::Utils::Disassemble("Call");
+			UInt64 func_addr = Utils::ReadUInt64Literal(state, state.program_counter_ + 1);
 			SDIM::Utils::Log("Called function at address: ", func_addr, " Previous address: ", state.program_counter_);
 			SDIM::VarUnion var_un;
 			var_un.uint64 = state.program_counter_ + opcode_size + sizeof(func_addr);
@@ -29,29 +34,32 @@ namespace SDIM
 			state.program_counter_ = func_addr;
 			
 			// size of opcode + 64 bit address
-			return opcode_size + sizeof(func_addr);
+			state.program_counter_ += opcode_size + sizeof(func_addr);
 		}
-		size_t Jump(SDIM::VMState& state, UInt64 jump_addr)
+		void Jump(SDIM::VMState& state)
 		{
+			SDIM::Utils::Disassemble("Jump");
+			UInt64 jump_addr = Utils::ReadUInt64Literal(state, state.program_counter_ + 1);
 			// size of opcode + 64 bit address
 			state.program_counter_ = jump_addr;
-			return opcode_size + sizeof(jump_addr);
-		}
-		size_t JumpStack(SDIM::VMState& state)
-		{
 			
+		}
+		void JumpStack(SDIM::VMState& state)
+		{
+			SDIM::Utils::Disassemble("JumpStack");
 			SDIM::Variable var = state.program_stack_.Pop();
 			if (var.type != VariableType::UInt64)
 			{
 				SDIM::Utils::Log("Jump targets must be of type UInt64");
-				return opcode_size;
+				state.program_counter_ += opcode_size;
 			}
 			state.program_counter_ = var.as.uint64;
-			// no immediate value
-			return opcode_size;
+			
+			
 		}
-		size_t JumpTrueStack(SDIM::VMState& state)
+		void JumpTrueStack(SDIM::VMState& state)
 		{
+			SDIM::Utils::Disassemble("JumpTrueStack");
 			SDIM::Variable cond = state.program_stack_.Pop();
 			if (SDIM::IsTrue(cond))
 			{
@@ -59,19 +67,20 @@ namespace SDIM
 				if (var.type != VariableType::UInt64)
 				{
 					SDIM::Utils::Log("Jump targets must be of type UInt64");
-					return opcode_size;
+					state.program_counter_ += opcode_size;
 				}
 				state.program_counter_ = var.as.uint64;
 			}
 			else
 			{
 				SDIM::Variable discard = state.program_stack_.Pop();
+				state.program_counter_ += opcode_size;
 			}
-			// no immediate value
-			return opcode_size;
+			
 		}
-		size_t JumpFalseStack(SDIM::VMState& state)
+		void JumpFalseStack(SDIM::VMState& state)
 		{
+			SDIM::Utils::Disassemble("JumpFalseStack");
 			SDIM::Variable cond = state.program_stack_.Pop();
 			if (SDIM::IsFalse(cond))
 			{
@@ -79,121 +88,114 @@ namespace SDIM
 				if (var.type != VariableType::UInt64)
 				{
 					SDIM::Utils::Log("Jump targets must be of type UInt64");
-					return opcode_size;
+					state.program_counter_ += opcode_size;
 				}
 				state.program_counter_ = var.as.uint64;
 			}
 			else
 			{
 				SDIM::Variable discard = state.program_stack_.Pop();
+				state.program_counter_ += opcode_size;
 			}
-			// no immediate value
-			return opcode_size;
+		
 		}
-		size_t Return(SDIM::VMState& state)
+		void Return(SDIM::VMState& state)
 		{
+			SDIM::Utils::Disassemble("Return");
 			SDIM::Variable ret_addr = state.program_stack_.Pop();
 			if (ret_addr.type != VariableType::UInt64)
 			{
-				SDIM::Utils::Log("Return targets must be of type UInt64");
-				return opcode_size;
+				SDIM::Utils::Log("state.program_counter_ += targets must be of type UInt64");
+				state.program_counter_ += opcode_size;
 			}
 			state.program_counter_ = ret_addr.as.uint64;
-			// technically unnecessary as the opcode jumps back to a stored instruction address
-			return opcode_size;
+		
 		}
-		size_t JumpTrue(SDIM::VMState& state, UInt64 address)
+		void JumpTrue(SDIM::VMState& state, UInt64 address)
 		{
-			// opcode + size of immediate address
-			return opcode_size + sizeof(address);
+			
 		}
-		size_t JumpFalse(SDIM::VMState& state, UInt64 address)
+		void JumpFalse(SDIM::VMState& state, UInt64 address)
 		{
-			// opcode + size of immediate address
-			return opcode_size + sizeof(address);
+			
 		}
-		size_t CallTrue(SDIM::VMState& state, UInt64 address)
+		void CallTrue(SDIM::VMState& state, UInt64 address)
 		{
-			// opcode + size of immediate address
-			return opcode_size + sizeof(address);
+			
 		}
-		size_t CallFalse(SDIM::VMState& state, UInt64 address)
+		void CallFalse(SDIM::VMState& state, UInt64 address)
 		{
-			// opcode + size of immediate address
-			return opcode_size + sizeof(address);
+			
 		}
-		size_t CallTrueStack(SDIM::VMState& state)
+		void CallTrueStack(SDIM::VMState& state)
 		{
-			// opcode size
-			return opcode_size;
+			
 		}
-		size_t CallFalseStack(SDIM::VMState& state)
+		void CallFalseStack(SDIM::VMState& state)
 		{
-			// opcode size
-			return opcode_size;
+			
 		}
-		size_t NativeCall(SDIM::VMState& state)
+		void NativeCall(SDIM::VMState& state)
 		{
-			// opcode size as necessary information is stored on the stack
-			return opcode_size;
+			
 		}
-		size_t Less(SDIM::VMState& state)
+		void Less(SDIM::VMState& state)
 		{
 
-			return opcode_size;
+			
 		}
 
-		size_t LessEqual(SDIM::VMState& state)
+		void LessEqual(SDIM::VMState& state)
 		{
-			return size_t();
+
+		}
+		void Greater(SDIM::VMState& state)
+		{
+			
 		}
 
-		size_t Greater(SDIM::VMState& state)
+		void GreaterEqual(SDIM::VMState& state)
 		{
-			return size_t();
+			
 		}
 
-		size_t GreaterEqual(SDIM::VMState& state)
+		void Equal(SDIM::VMState& state)
 		{
-			return size_t();
+			
 		}
 
-		size_t Equal(SDIM::VMState& state)
+		void NotEqual(SDIM::VMState& state)
 		{
-			return size_t();
+			
 		}
 
-		size_t NotEqual(SDIM::VMState& state)
+		void Not(SDIM::VMState& state)
 		{
-			return size_t();
+			
 		}
 
-		size_t Not(SDIM::VMState& state)
+		void And(SDIM::VMState& state)
 		{
-			return size_t();
+			
 		}
 
-		size_t And(SDIM::VMState& state)
+		void Or(SDIM::VMState& state)
 		{
-			return size_t();
+			
 		}
 
-		size_t Or(SDIM::VMState& state)
+		void Xor(SDIM::VMState& state)
 		{
-			return size_t();
+			
 		}
 
-		size_t Xor(SDIM::VMState& state)
+		void Add(SDIM::VMState& state)
 		{
-			return size_t();
-		}
-
-		size_t Add(SDIM::VMState& state)
-		{
+			SDIM::Utils::Disassemble("Add");
 			if (state.program_stack_.Size() < 2)
 			{
 				SDIM::Utils::Log("Attemped add with: ", state.program_stack_.Size(), " elements");
-				return opcode_size;
+				state.program_counter_ += opcode_size;
 			}
 			SDIM::Variable rhs = state.program_stack_.Pop();
 			SDIM::Variable lhs = state.program_stack_.Pop();
@@ -208,193 +210,230 @@ namespace SDIM
 				}
 				state.program_stack_.Push(SDIM::Variable(lhs.type, var_un));
 			}
-			return opcode_size;
+			state.program_counter_ += opcode_size;
 		}
 
-		size_t Subtract(SDIM::VMState& state)
+		void Subtract(SDIM::VMState& state)
 		{
-			return size_t();
+			
 		}
 
-		size_t Multiply(SDIM::VMState& state)
+		void Multiply(SDIM::VMState& state)
 		{
-			return size_t();
+			
 		}
 
-		size_t BitwiseNot(SDIM::VMState& state)
+		void BitwiseNot(SDIM::VMState& state)
 		{
-			return size_t();
+			
 		}
 
-		size_t Divide(SDIM::VMState& state)
+		void Divide(SDIM::VMState& state)
 		{
-			return size_t();
+			
 		}
 
-		size_t Negate(SDIM::VMState& state)
+		void Negate(SDIM::VMState& state)
 		{
-			return size_t();
+			
 		}
 
-		size_t Modulo(SDIM::VMState& state)
+		void Modulo(SDIM::VMState& state)
 		{
-			return size_t();
+			
 		}
 
-		size_t PushInt8(SDIM::VMState& state, Int8 val)
+		void PushInt8(SDIM::VMState& state)
 		{
+			Int8 val = Utils::ReadInt8Literal(state, state.program_counter_ + 1);
+			SDIM::Utils::Disassemble(SDIM::Utils::ConstructString("PushInt8: ", val));
 			VarUnion var_un;
 			var_un.int8 = val;
 			SDIM::Variable var{ VariableType::Int8, var_un };
 			state.program_stack_.Push(var);
-			return opcode_size + sizeof(val);
+			state.program_counter_ += opcode_size + sizeof(val);
 		}
 
-		size_t PushInt16(SDIM::VMState& state, Int16 val)
+		void PushInt16(SDIM::VMState& state)
 		{
+			Int16 val = Utils::ReadInt16Literal(state, state.program_counter_ + 1);
+			SDIM::Utils::Disassemble(SDIM::Utils::ConstructString("PushInt16: ", val));
 			VarUnion var_un;
 			var_un.int16 = val;
 			SDIM::Variable var{ VariableType::Int16, var_un};
 			state.program_stack_.Push(var);
-			return opcode_size + sizeof(val);
+			state.program_counter_ += opcode_size + sizeof(val);
 		}
 
-		size_t PushInt32(SDIM::VMState& state, Int32 val)
+		void PushInt32(SDIM::VMState& state)
 		{
+			Int32 val = Utils::ReadInt32Literal(state, state.program_counter_ + 1);
+			SDIM::Utils::Disassemble(SDIM::Utils::ConstructString("PushInt32: ", val));
 			VarUnion var_un;
 			var_un.int32 = val;
 			SDIM::Variable var{ VariableType::Int32, var_un };
 			state.program_stack_.Push(var);
-			return opcode_size + sizeof(val);
+			state.program_counter_ += opcode_size + sizeof(val);
 		}
 
-		size_t PushInt64(SDIM::VMState& state, Int64 val)
+		void PushInt64(SDIM::VMState& state)
 		{
+			Int64 val = Utils::ReadInt64Literal(state, state.program_counter_ + 1);
+			SDIM::Utils::Disassemble(SDIM::Utils::ConstructString("PushInt64: ", val));
 			VarUnion var_un;
 			var_un.int64 = val;
 			SDIM::Variable var{ VariableType::Int64, var_un };
 			state.program_stack_.Push(var);
-			return opcode_size + sizeof(val);
+			state.program_counter_ += opcode_size + sizeof(val);
 		}
 
-		size_t PushUInt8(SDIM::VMState& state, UInt8 val)
+		void PushUInt8(SDIM::VMState& state)
 		{
+			UInt8 val = Utils::ReadUInt8Literal(state, state.program_counter_ + 1);
+			SDIM::Utils::Disassemble(SDIM::Utils::ConstructString("PushUInt8: ", val));
 			VarUnion var_un;
 			var_un.uint8 = val;
 			SDIM::Variable var{ VariableType::UInt8, var_un };
 			state.program_stack_.Push(var);
-			return opcode_size + sizeof(val);
+			state.program_counter_ += opcode_size + sizeof(val);
 		}
 
-		size_t PushUInt16(SDIM::VMState& state, UInt16 val)
+		void PushUInt16(SDIM::VMState& state)
 		{
+			UInt16 val = Utils::ReadUInt16Literal(state, state.program_counter_ + 1);
+			SDIM::Utils::Disassemble(SDIM::Utils::ConstructString("PushUInt16: ", val));
 			VarUnion var_un;
 			var_un.uint16 = val;
 			SDIM::Variable var{ VariableType::UInt16, var_un };
 			state.program_stack_.Push(var);
-			return opcode_size + sizeof(val);
+			state.program_counter_ += opcode_size + sizeof(val);
 		}
 
-		size_t PushUInt32(SDIM::VMState& state, UInt32 val)
+		void PushUInt32(SDIM::VMState& state)
 		{
+			UInt32 val = Utils::ReadUInt32Literal(state, state.program_counter_ + 1);
+			SDIM::Utils::Disassemble(SDIM::Utils::ConstructString("PushUInt32: ", val));
 			VarUnion var_un;
 			var_un.uint32 = val;
 			SDIM::Variable var{ VariableType::UInt32, var_un };
 			state.program_stack_.Push(var);
-			return opcode_size + sizeof(val);
+			state.program_counter_ += opcode_size + sizeof(val);
 		}
 
-		size_t PushUInt64(SDIM::VMState& state, UInt64 val)
+		void PushUInt64(SDIM::VMState& state)
 		{
+			UInt64 val = Utils::ReadUInt64Literal(state, state.program_counter_ + 1);
+			SDIM::Utils::Disassemble(SDIM::Utils::ConstructString("PushUInt64: ", val));
 			VarUnion var_un;
 			var_un.uint64 = val;
 			SDIM::Variable var{ VariableType::UInt64, var_un };
 			state.program_stack_.Push(var);
-			return opcode_size + sizeof(val);
+			state.program_counter_ += opcode_size + sizeof(val);
 		}
 
-		size_t PushF32(SDIM::VMState& state, F32 val)
+		void PushF32(SDIM::VMState& state)
 		{
+			F32 val = Utils::UInt32ToF32(Utils::ReadUInt32Literal(state, state.program_counter_ + 1));
+			SDIM::Utils::Disassemble(SDIM::Utils::ConstructString("PushF32: ", val));
 			VarUnion var_un;
 			var_un.f32 = val;
 			SDIM::Variable var{ VariableType::F32, var_un };
 			state.program_stack_.Push(var);
-			return opcode_size + sizeof(val);
+			state.program_counter_ += opcode_size + sizeof(val);
 		}
 
-		size_t PushF64(SDIM::VMState& state, F64 val)
+		void PushF64(SDIM::VMState& state)
 		{
+			F64 val = Utils::UInt64ToF64(Utils::ReadUInt64Literal(state, state.program_counter_ + 1));
+			SDIM::Utils::Disassemble(SDIM::Utils::ConstructString("PushF64: ", val));
 			VarUnion var_un;
 			var_un.f64 = val;
 			SDIM::Variable var{ VariableType::F64, var_un };
 			state.program_stack_.Push(var);
-			return opcode_size + sizeof(val);
+			state.program_counter_ += opcode_size + sizeof(val);
 		}
 
-		size_t PushPointer(SDIM::VMState& state, void * ptr)
+		void PushPointer(SDIM::VMState& state)
 		{
+			void* ptr = Utils::UInt64ToPtr(Utils::ReadUInt64Literal(state, state.program_counter_ + 1));
+			SDIM::Utils::Disassemble(SDIM::Utils::ConstructString("PushPointer: ", ptr));
 			VarUnion var_un;
 			var_un.ptr = ptr;
 			SDIM::Variable var{ VariableType::Pointer, var_un };
 			state.program_stack_.Push(var);
-			return opcode_size + sizeof(ptr);
+			state.program_counter_ += opcode_size + sizeof(ptr);
 		}
 
-		size_t PushString(SDIM::VMState& state)
+		void PushString(SDIM::VMState& state)
 		{
+			SDIM::Utils::Disassemble("PushString");
 			// not implemented yet
-			return opcode_size;
+			state.program_counter_ += opcode_size;
 		}
 
-		size_t PushStruct(SDIM::VMState& state)
+		void PushStruct(SDIM::VMState& state)
 		{
+			SDIM::Utils::Disassemble("PushStruct");
 			// not implemented yet
-			return opcode_size;
+			state.program_counter_ += opcode_size;
 		}
 
-		size_t PushClass(SDIM::VMState& state)
+		void PushClass(SDIM::VMState& state)
 		{
+			SDIM::Utils::Disassemble("PushClass");
 			// not implemented yet
-			return opcode_size;
+			state.program_counter_ += opcode_size;
 		}
 
-		size_t LocalVar(SDIM::VMState& state)
+		void LocalVar(SDIM::VMState& state)
 		{
+			SDIM::Utils::Disassemble("LocalVar");
 			// not implemented yet
-			return opcode_size;
+			state.program_counter_ += opcode_size;
 		}
 
-		size_t Pop(SDIM::VMState& state)
+		void Pop(SDIM::VMState& state)
 		{
+			SDIM::Utils::Disassemble("Pop");
 			state.program_stack_.Pop();
-			return opcode_size;
+			state.program_counter_ += opcode_size;
 		}
 
-		size_t PushLocal(SDIM::VMState& state)
+		void PushLocal(SDIM::VMState& state)
 		{
+			SDIM::Utils::Disassemble("PushLocal");
 			// not implemented yet
-			return opcode_size;
+			state.program_counter_ += opcode_size;
 		}
 
-		size_t PushAddr(SDIM::VMState& state)
+		void PushAddr(SDIM::VMState& state)
 		{
+			SDIM::Utils::Disassemble("PushAddr");
 			// not implemented yet
-			return opcode_size;
+			state.program_counter_ += opcode_size;
 		}
 
-		size_t Break()
+		void Break(SDIM::VMState& state)
 		{
+			SDIM::Utils::Disassemble("Break");
 			// not implemented yet
-			return opcode_size;
+			state.program_counter_ += opcode_size;
 		}
 
-		size_t PushStackCount(SDIM::VMState& state)
+		void PushStackCount(SDIM::VMState& state)
 		{
+			SDIM::Utils::Disassemble("PushStackCount");
 			VarUnion var_un;
 			var_un.uint64 = (UInt64)state.program_stack_.Size();
 			SDIM::Variable var{ VariableType::UInt64, var_un };
 			state.program_stack_.Push(var);
-			return opcode_size;
+			state.program_counter_ += opcode_size;
+		}
+
+		void Halt(SDIM::VMState & state)
+		{
+			SDIM::Utils::Disassemble("Halt");
+			state.running_ = false;
 		}
 		
 	}

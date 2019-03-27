@@ -85,4 +85,36 @@ namespace SDIM
 	{
 		return !IsTrue(var);
 	}
+	namespace Utils
+	{
+		F32 UInt32ToF32(UInt32 val)
+		{
+			static_assert(sizeof(UInt32) == sizeof(F32), "Size mismatch between F32 and UInt32");
+			// massive hack but it works well enough for now
+			union
+			{
+				UInt32 ui;
+				F32 f;
+			} mem_cast;
+			mem_cast.ui = val;
+			return mem_cast.f;
+		}
+		F64 UInt64ToF64(UInt64 val)
+		{
+			static_assert(sizeof(UInt64) == sizeof(F64), "Size mismatch between F64 and UInt64");
+			// massive hack but it works well enough for now 
+			union
+			{
+				UInt64 ui;
+				F64 f;
+			} mem_cast;
+			mem_cast.ui = val;
+			return mem_cast.f;
+		}
+		void * UInt64ToPtr(UInt64 val)
+		{
+			static_assert(sizeof(UInt64) == sizeof(void*), "Size mismatch between UInt64 and Pointer type");
+			return reinterpret_cast<void*>(val);
+		}
+	}
 }

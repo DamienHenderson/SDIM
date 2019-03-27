@@ -22,6 +22,13 @@ namespace SDIM
 			std::cout << "\n";
 		}
 
+		void Disassemble(const std::string & disasm)
+		{
+#ifdef SDIMVM_DEBUG
+			Log(disasm);
+#endif
+		}
+
 
 		
 	}

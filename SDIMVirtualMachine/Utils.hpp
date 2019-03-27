@@ -86,5 +86,6 @@ namespace SDIM
 			}
 		}
 
+		void Disassemble(const std::string& disasm);
 	}
 }

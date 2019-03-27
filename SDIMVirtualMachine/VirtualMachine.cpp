@@ -11,14 +11,25 @@ namespace SDIM
 		// 32k Variables 
 		// profile this to see if it's a good starting value
 		state_.program_stack_.Resize(32768);
+
+		for (size_t i = 0; i < MAX_OPCODES; i++)
+		{
+			// fill opcode table with NoOperation
+			opcode_table_[i] = SDIM::Instructions::NoOperation;
+		}
+
+		opcode_table_[static_cast<UInt8>(Instruction::VMCall)] = Instructions::VMCall;
+		opcode_table_[static_cast<UInt8>(Instruction::Add)] = Instructions::Add;
+		opcode_table_[static_cast<UInt8>(Instruction::PushUInt16)] = Instructions::PushUInt16;
+		opcode_table_[static_cast<UInt8>(Instruction::Halt)] = Instructions::Halt;
 	}
 
 
 	VirtualMachine::~VirtualMachine()
 	{
-		if (program_data_ != nullptr)
+		if (state_.program_data_ != nullptr)
 		{
-			delete[] program_data_;
+			delete[] state_.program_data_;
 		}
 	}
 
@@ -33,8 +44,8 @@ namespace SDIM
 		}
 
 		std::vector<char> file_data(std::istreambuf_iterator<char>(file), {});
-		program_data_ = new char[file_data.size()];
-		std::memcpy(program_data_, file_data.data(), file_data.size());
+		state_.program_data_ = new char[file_data.size()];
+		std::memcpy(state_.program_data_, file_data.data(), file_data.size());
 		state_.program_length_ = file_data.size();
 
 		state_.program_counter_ = 0;
@@ -52,17 +63,17 @@ namespace SDIM
 		{
 			SDIM::Utils::Log("Platform endianness is big endian");
 		}
-		if (program_data_ != nullptr)
+		if (state_.program_data_ != nullptr)
 		{
-			running_ = true;
-			while (running_)
+			state_.running_ = true;
+			while (state_.running_)
 			{
 				bool res = ExecuteNextOpcode();
 
 				if (!res)
 				{
 					// TODO: Error Handling
-					running_ = false;
+					state_.running_ = false;
 				}
 			}
 		}
@@ -73,57 +84,30 @@ namespace SDIM
 	{
 		if (state_.program_counter_ < state_.program_length_)
 		{
-			Instruction next_instruction = static_cast<Instruction>(static_cast<UInt8>(program_data_[state_.program_counter_]));
+			Instruction next_instruction = ReadNextInstruction();
 #ifdef SDIMVM_DEBUG
-			state_.program_stack_.PrintStack();
+			PrintState();
 #endif
-			// TODO: Optimise this as a big switch usually isn't optimal
-			// once all the functions are done i could make a function pointer table and address it with opcode ids
-			switch (next_instruction)
-			{
-			case Instruction::NOP:
-			{
-				size_t offset = SDIM::Instructions::NoOperation();
-				AdvanceInstructionPointer(offset);
-				return true;
-			}
-			case Instruction::VMCall:
-			{	
-				
-				UInt64 func_id = ReadUInt64Literal(state_.program_counter_ + 1);
-				size_t offset = SDIM::Instructions::VMCall(state_, func_id);
-				AdvanceInstructionPointer(offset);
-				
-				return true;
-			}
-			
-			case Instruction::Add:
-				AdvanceInstructionPointer(1);
-				Instructions::Add(state_);
-				SDIM::Utils::Log("Add Stack");
-				return true;
-			case Instruction::PushUInt16:
-			{
-				
-				UInt16 literal_value = ReadUInt16Literal(state_.program_counter_ + 1);
-				size_t offset = Instructions::PushUInt16(state_, literal_value);
-				AdvanceInstructionPointer(offset);
-				return true;
-			}
-			case Instruction::Halt:
-				SDIM::Utils::Log("Halt Reached");
-				return false;
-				
-			default:
-			
-				SDIM::Utils::Log("Unknown Opcode: ", static_cast<UInt8>(next_instruction));
-				AdvanceInstructionPointer(1);
-				return false;
-			
-			}
+			opcode_table_[static_cast<UInt8>(next_instruction)](state_);
+			return true;
 
 		}
 		return false;
+	}
+
+	void VirtualMachine::PrintState()
+	{
+		SDIM::Utils::Log("Program Data: ", std::string(state_.program_data_, state_.program_length_));
+		SDIM::Utils::Log("Program Length: ", state_.program_length_);
+		SDIM::Utils::Log("Program Counter: ", state_.program_counter_);
+		
+		state_.program_stack_.PrintStack();
+	}
+
+	Instruction VirtualMachine::ReadNextInstruction()
+	{
+		return static_cast<Instruction>(static_cast<UInt8>(state_.program_data_[state_.program_counter_]));
+		
 	}
 
 	

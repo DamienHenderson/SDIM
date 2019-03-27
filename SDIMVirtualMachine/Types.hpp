@@ -71,6 +71,10 @@ namespace SDIM
 
 	bool IsTrue(const SDIM::Variable& var);
 	bool IsFalse(const SDIM::Variable& var);
-
-	
+	namespace Utils
+	{
+		F32 UInt32ToF32(UInt32 val);
+		F64 UInt64ToF64(UInt64 val);
+		void* UInt64ToPtr(UInt64 val);
+	}
 }
