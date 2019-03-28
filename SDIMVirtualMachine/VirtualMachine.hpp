@@ -35,6 +35,8 @@ namespace SDIM
 		bool ExecuteNextOpcode();
 
 		void PrintState();
+
+		void PopulateOpcodeTable();
 		
 		Instruction ReadNextInstruction();
 

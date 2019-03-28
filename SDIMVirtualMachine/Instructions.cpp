@@ -1,6 +1,8 @@
 #include "Instructions.hpp"
 
 #include "Utils.hpp"
+
+#include <cassert>
 namespace SDIM
 {
 	namespace Instructions
@@ -111,33 +113,127 @@ namespace SDIM
 			state.program_counter_ = ret_addr.as.uint64;
 		
 		}
-		void JumpTrue(SDIM::VMState& state, UInt64 address)
+		void JumpTrue(SDIM::VMState& state)
 		{
-			
+			UInt64 jump_addr = Utils::ReadUInt64Literal(state, state.program_counter_ + 1);
+
+			const UInt64 opcode_offset = opcode_size + sizeof(jump_addr);
+
+			if (SDIM::IsTrue(state.program_stack_.Pop()))
+			{
+				state.program_counter_ = jump_addr;
+			}
+			else
+			{
+				state.program_counter_ += opcode_offset;
+			}
 		}
-		void JumpFalse(SDIM::VMState& state, UInt64 address)
+		void JumpFalse(SDIM::VMState& state)
 		{
-			
+			UInt64 jump_addr = Utils::ReadUInt64Literal(state, state.program_counter_ + 1);
+
+			const UInt64 opcode_offset = opcode_size + sizeof(jump_addr);
+
+			if (SDIM::IsFalse(state.program_stack_.Pop()))
+			{
+				state.program_counter_ = jump_addr;
+			}
+			else
+			{
+				state.program_counter_ += opcode_offset;
+			}
 		}
 		void CallTrue(SDIM::VMState& state, UInt64 address)
 		{
 			
+			UInt64 func_addr = Utils::ReadUInt64Literal(state, state.program_counter_ + 1);
+
+			const UInt64 opcode_offset = opcode_size + sizeof(func_addr);
+			
+			if (SDIM::IsTrue(state.program_stack_.Pop()))
+			{
+				VarUnion var_un;
+				var_un.uint64 = state.program_counter_ + opcode_offset;
+				state.program_stack_.Push(SDIM::Variable(VariableType::UInt64, var_un));
+				state.program_counter_ = func_addr;
+			}
+			else
+			{
+				state.program_counter_ += opcode_offset;
+			}
 		}
 		void CallFalse(SDIM::VMState& state, UInt64 address)
 		{
-			
+			UInt64 func_addr = Utils::ReadUInt64Literal(state, state.program_counter_ + 1);
+
+			const UInt64 opcode_offset = opcode_size + sizeof(func_addr);
+
+			if (SDIM::IsFalse(state.program_stack_.Pop()))
+			{
+				VarUnion var_un;
+				var_un.uint64 = state.program_counter_ + opcode_offset;
+				state.program_stack_.Push(SDIM::Variable(VariableType::UInt64, var_un));
+				state.program_counter_ = func_addr;
+			}
+			else
+			{
+				state.program_counter_ += opcode_offset;
+			}
 		}
 		void CallTrueStack(SDIM::VMState& state)
 		{
 			
+
+			const UInt64 opcode_offset = opcode_size;
+
+			if (SDIM::IsTrue(state.program_stack_.Pop()))
+			{
+				SDIM::Variable var = state.program_stack_.Pop();
+				assert("Call address in CallTrueStack must be of type UInt64" && var.type == VariableType::UInt64);
+				UInt64 func_addr = var.as.uint64;
+
+				VarUnion var_un;
+				var_un.uint64 = state.program_counter_ + opcode_offset;
+				state.program_stack_.Push(SDIM::Variable(VariableType::UInt64, var_un));
+				state.program_counter_ = func_addr;
+			}
+			else
+			{
+				SDIM::Variable var = state.program_stack_.Pop();
+				assert("Call address in CallTrueStack must be of type UInt64" && var.type == VariableType::UInt64);
+
+				state.program_counter_ += opcode_offset;
+			}
 		}
 		void CallFalseStack(SDIM::VMState& state)
 		{
-			
+			const UInt64 opcode_offset = opcode_size;
+
+			if (SDIM::IsFalse(state.program_stack_.Pop()))
+			{
+				SDIM::Variable var = state.program_stack_.Pop();
+				assert("Call address in CallTrueStack must be of type UInt64" && var.type == VariableType::UInt64);
+				UInt64 func_addr = var.as.uint64;
+
+				VarUnion var_un;
+				var_un.uint64 = state.program_counter_ + opcode_offset;
+				state.program_stack_.Push(SDIM::Variable(VariableType::UInt64, var_un));
+				state.program_counter_ = func_addr;
+			}
+			else
+			{
+				SDIM::Variable var = state.program_stack_.Pop();
+				assert("Call address in CallTrueStack must be of type UInt64" && var.type == VariableType::UInt64);
+
+				state.program_counter_ += opcode_offset;
+			}
 		}
 		void NativeCall(SDIM::VMState& state)
 		{
-			
+			// TODO: how to call C++ functions?
+			// could have functions stored in a table but that would impose a restriction on the function signature
+			// How do other languages handle this? Lua restricts you to a set function signature, chaiscript allows any signature
+			// try to aim for the chaiscript style
 		}
 		void Less(SDIM::VMState& state)
 		{

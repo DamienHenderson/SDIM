@@ -12,16 +12,9 @@ namespace SDIM
 		// profile this to see if it's a good starting value
 		state_.program_stack_.Resize(32768);
 
-		for (size_t i = 0; i < MAX_OPCODES; i++)
-		{
-			// fill opcode table with NoOperation
-			opcode_table_[i] = SDIM::Instructions::NoOperation;
-		}
-
-		opcode_table_[static_cast<UInt8>(Instruction::VMCall)] = Instructions::VMCall;
-		opcode_table_[static_cast<UInt8>(Instruction::Add)] = Instructions::Add;
-		opcode_table_[static_cast<UInt8>(Instruction::PushUInt16)] = Instructions::PushUInt16;
-		opcode_table_[static_cast<UInt8>(Instruction::Halt)] = Instructions::Halt;
+		
+		// Put all of the opcode handler functions into the opcode table
+		PopulateOpcodeTable();
 	}
 
 
@@ -102,6 +95,22 @@ namespace SDIM
 		SDIM::Utils::Log("Program Counter: ", state_.program_counter_);
 		
 		state_.program_stack_.PrintStack();
+	}
+
+	void VirtualMachine::PopulateOpcodeTable()
+	{
+		for (size_t i = 0; i < MAX_OPCODES; i++)
+		{
+			// fill opcode table with NoOperation
+			opcode_table_[i] = SDIM::Instructions::NoOperation;
+		}
+
+		opcode_table_[static_cast<UInt8>(Instruction::VMCall)] = Instructions::VMCall;
+		opcode_table_[static_cast<UInt8>(Instruction::Call)] = Instructions::Call;
+		opcode_table_[static_cast<UInt8>(Instruction::Jmp)] = Instructions::Jump;
+		opcode_table_[static_cast<UInt8>(Instruction::Add)] = Instructions::Add;
+		opcode_table_[static_cast<UInt8>(Instruction::PushUInt16)] = Instructions::PushUInt16;
+		opcode_table_[static_cast<UInt8>(Instruction::Halt)] = Instructions::Halt;
 	}
 
 	Instruction VirtualMachine::ReadNextInstruction()
