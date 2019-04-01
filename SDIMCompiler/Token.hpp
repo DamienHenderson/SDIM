@@ -9,8 +9,9 @@ namespace SDIM
 	enum class TokenType
 	{
 		// Keywords
-		If, Else, ElseIf, While, Do, True, False,
-		Break, Return, Module, Include,
+		If, Else, While, Do, True, False,
+		Break, Return, Module, Include, For, Auto, 
+		Null, Print, Class,
 
 		// Single character symbols
 		LeftBracket, RightBracket, LeftBrace, RightBrace, LeftSquareBracket, RightSquareBracket,
@@ -20,7 +21,7 @@ namespace SDIM
 		// Multiple character symbols
 		EqualEqual, BangEqual, TildeEqual, GreaterEqual, LessEqual, PlusEqual, MinusEqual, SlashEqual, AsteriskEqual,
 		PercentEqual, AmpersandEqual, VerticalBarEqual, CaretEqual, DoubleAmpersand,
-		DoubleVerticalBar, 
+		DoubleVerticalBar, LeftShift, RightShift,
 
 		// Miscellaneous
 		EOFToken, Identifier, NumericLiteral, StringLiteral, Unknown, Error

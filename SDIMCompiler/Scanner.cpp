@@ -44,6 +44,35 @@ namespace SDIM
 				// whitespace ends numeric literals and identifiers
 				if (current_token.token_type == TokenType::Identifier || current_token.token_type == TokenType::NumericLiteral)
 				{
+					// TODO: make this better using a radix tree
+					auto CheckKeyword = [&current_token](const std::string& match, TokenType type_on_match) -> void
+					{
+						LogString("Tested: " + current_token.lexeme +" against keyword: " + match);
+						if (current_token.lexeme == match)
+						{
+							LogString("Matched Keyword: " + match);
+							current_token.token_type = type_on_match;
+						}
+					};
+					// check if it matches keywords
+					CheckKeyword("if", TokenType::If);
+					CheckKeyword("else", TokenType::Else);
+					CheckKeyword("while", TokenType::While);
+					CheckKeyword("do", TokenType::Do);
+					CheckKeyword("true", TokenType::True);
+					CheckKeyword("false", TokenType::False);
+					CheckKeyword("break", TokenType::Break);
+					CheckKeyword("return", TokenType::Return);
+					CheckKeyword("module", TokenType::Module);
+					CheckKeyword("include", TokenType::Include);
+					CheckKeyword("for", TokenType::For);
+					CheckKeyword("auto", TokenType::Auto);
+					CheckKeyword("null", TokenType::Null);
+					CheckKeyword("print", TokenType::Print);
+					CheckKeyword("class", TokenType::Class);
+					
+
+
 					std::cout << "Extracted lexeme: " << current_token.lexeme << "\n";
 					tokens.push_back(current_token);
 					current_token = Token(TokenType::Unknown, "");
@@ -53,8 +82,36 @@ namespace SDIM
 			}
 			if (current_token.token_type == TokenType::Identifier && !IsIdentifier(current_char))
 			{
+				// TODO: make this better using a radix tree
+				auto CheckKeyword = [&current_token](const std::string& match, TokenType type_on_match) -> void
+				{
+					LogString("Tested: " + current_token.lexeme + " against keyword: " + match);
+					if (current_token.lexeme == match)
+					{
+						LogString("Matched Keyword: " + match);
+						current_token.token_type = type_on_match;
+					}
+				};
+				// check if it matches keywords
+				CheckKeyword("if", TokenType::If);
+				CheckKeyword("else", TokenType::Else);
+				CheckKeyword("while", TokenType::While);
+				CheckKeyword("do", TokenType::Do);
+				CheckKeyword("true", TokenType::True);
+				CheckKeyword("false", TokenType::False);
+				CheckKeyword("break", TokenType::Break);
+				CheckKeyword("return", TokenType::Return);
+				CheckKeyword("module", TokenType::Module);
+				CheckKeyword("include", TokenType::Include);
+				CheckKeyword("for", TokenType::For);
+				CheckKeyword("auto", TokenType::Auto);
+				CheckKeyword("null", TokenType::Null);
+				CheckKeyword("print", TokenType::Print);
+				CheckKeyword("class", TokenType::Class);
+
 				tokens.push_back(current_token);
 				std::cout << "Extracted lexeme: " << current_token.lexeme << "\n";
+
 				current_token = Token(TokenType::Unknown, "");
 
 			}
@@ -97,6 +154,12 @@ namespace SDIM
 					++i;
 					LogString("Extracted lexeme: <=");
 				}
+				if (MatchNext('<', i + 1))
+				{
+					tokens.push_back(Token(TokenType::LeftShift, "<<"));
+					++i;
+					LogString("Extracted lexeme: <<");
+				}
 				else
 				{
 					Token(TokenType::LessThan, ConvertToString(current_char));
@@ -109,6 +172,12 @@ namespace SDIM
 					tokens.push_back(Token(TokenType::GreaterEqual, ">="));
 					++i;
 					LogString("Extracted lexeme: >=");
+				}
+				if (MatchNext('>', i + 1))
+				{
+					tokens.push_back(Token(TokenType::RightShift, ">>"));
+					++i;
+					LogString("Extracted lexeme: >>");
 				}
 				else
 				{
@@ -339,6 +408,7 @@ namespace SDIM
 				break;
 			}
 		}
+		
 		// TODO: keywords
 		// TODO: identifiers (types and variables)
 		// TODO: literals
