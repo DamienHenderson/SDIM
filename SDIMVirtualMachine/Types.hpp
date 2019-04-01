@@ -66,6 +66,21 @@ namespace SDIM
 
 		Variable(VariableType var_type, VarUnion value) : type(var_type), as(value) {}
 
+		Variable(UInt8 val);
+		Variable(UInt16 val);
+		Variable(UInt32 val);
+		Variable(UInt64 val);
+
+		Variable(Int8 val);
+		Variable(Int16 val);
+		Variable(Int32 val);
+		Variable(Int64 val);
+
+		Variable(F32 val);
+		Variable(F64 val);
+		
+		Variable(void* val);
+
 		std::string ToString();
 	};
 
@@ -77,4 +92,7 @@ namespace SDIM
 		F64 UInt64ToF64(UInt64 val);
 		void* UInt64ToPtr(UInt64 val);
 	}
+
+	constexpr UInt8 True = 1;
+	constexpr UInt8 False = 0;
 }

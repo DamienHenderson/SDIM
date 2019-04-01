@@ -117,4 +117,59 @@ namespace SDIM
 			return reinterpret_cast<void*>(val);
 		}
 	}
+	Variable::Variable(UInt8 val)
+	{
+		type = VariableType::UInt8;
+		as.uint8 = val;
+	}
+	Variable::Variable(UInt16 val)
+	{
+		type = VariableType::UInt16;
+		as.uint16 = val;
+	}
+	Variable::Variable(UInt32 val)
+	{
+		type = VariableType::UInt32;
+		as.uint32 = val;
+	}
+	Variable::Variable(UInt64 val)
+	{
+		type = VariableType::UInt64;
+		as.uint64 = val;
+	}
+	Variable::Variable(Int8 val)
+	{
+		type = VariableType::Int8;
+		as.int8 = val;
+	}
+	Variable::Variable(Int16 val)
+	{
+		type = VariableType::Int16;
+		as.int16 = val;
+	}
+	Variable::Variable(Int32 val)
+	{
+		type = VariableType::Int32;
+		as.int32 = val;
+	}
+	Variable::Variable(Int64 val)
+	{
+		type = VariableType::Int64;
+		as.int64 = val;
+	}
+	Variable::Variable(F32 val)
+	{
+		type = VariableType::F32;
+		as.f32 = val;
+	}
+	Variable::Variable(F64 val)
+	{
+		type = VariableType::F64;
+		as.f64 = val;
+	}
+	Variable::Variable(void * val)
+	{
+		type = VariableType::Pointer;
+		as.ptr = val;
+	}
 }
