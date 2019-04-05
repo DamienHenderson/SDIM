@@ -1,6 +1,8 @@
 #include "VMState.hpp"
 
 #include "Utils.hpp"
+
+#include <cstdlib>
 namespace SDIM
 {
 
@@ -77,22 +79,34 @@ namespace SDIM
 
 		Int8 ReadInt8Literal(VMState & state, size_t location)
 		{
-			return static_cast<Int8>(ReadUInt8Literal(state, location));
+			UInt8 as_uint = ReadUInt8Literal(state, location);
+			Int8 result;
+			std::memcpy(&result, &as_uint, sizeof(result));
+			return result;
 		}
 
 		Int16 ReadInt16Literal(VMState & state, size_t location)
 		{
-			return static_cast<Int16>(ReadUInt16Literal(state, location));
+			UInt16 as_uint = ReadUInt16Literal(state, location);
+			Int16 result;
+			std::memcpy(&result, &as_uint, sizeof(result));
+			return result; return static_cast<Int16>(ReadUInt16Literal(state, location));
 		}
 
 		Int32 ReadInt32Literal(VMState & state, size_t location)
 		{
-			return static_cast<Int32>(ReadUInt32Literal(state, location));
+			UInt32 as_uint = ReadUInt32Literal(state, location);
+			Int32 result;
+			std::memcpy(&result, &as_uint, sizeof(result));
+			return result;
 		}
 
 		Int64 ReadInt64Literal(VMState & state, size_t location)
 		{
-			return static_cast<Int64>(ReadUInt64Literal(state, location));
+			UInt64 as_uint = ReadUInt64Literal(state, location);
+			Int64 result;
+			std::memcpy(&result, &as_uint, sizeof(result));
+			return result;
 		}
 		
 	}

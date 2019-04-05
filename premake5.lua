@@ -9,7 +9,31 @@ configurations {"Debug", "Release"}
 platforms {"x86", "x86_64"}
 
 
+project "SDIMCommon"
+    kind "StaticLib"
+    language "C++"
+    cppdialect "C++17"
+    location "%{prj.name}/"
+    targetdir("bin/" .. output_format .. "/%{prj.name}")
+    objdir("int/" .. output_format .. "/%{prj.name}")
 
+    files {"%{prj.name}/**.cpp", "%{prj.name}/**.hpp"}
+
+    filter "configurations:Debug"
+        defines {"SDIMC_DEBUG"}
+        symbols "On"
+    filter "configurations:Release"
+        defines {"SDIMC_RELEASE"}
+        optimize "On"
+    filter "platforms:x86"
+        architecture "x86"
+        defines {"SDIMC_X86"}
+    filter "platforms:x86_64"
+        architecture "x86_64"
+        defines {"SDIMC_X86_64"}
+    filter "system:windows"
+        systemversion(system_ver)
+    filter {}
 project "SDIMCompiler"
     kind "ConsoleApp"
     language "C++"
