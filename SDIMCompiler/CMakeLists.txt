@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.8)
 
 # TODO: add actual files here
-add_library(SDIMCompiler STATIC src/Compiler.cpp src/Scanner.cpp src/Token.cpp)
+add_library(SDIMCompiler STATIC src/Compiler.cpp src/Scanner.cpp src/Token.cpp src/LangUtils.cpp)
 
 target_include_directories(
     SDIMCompiler 

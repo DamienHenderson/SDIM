@@ -1,6 +1,6 @@
 #include "Scanner.hpp"
 
-#include "Utils.hpp"
+#include "LangUtils.hpp"
 
 // temp
 #include <iostream>
