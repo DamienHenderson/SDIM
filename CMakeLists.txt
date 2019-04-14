@@ -1,0 +1,14 @@
+cmake_minimum_required(VERSION 3.8)
+
+project(SDIM VERSION 0.1 LANGUAGES CXX)
+# Global compile options to enforce quality in my code
+if(MSVC)
+    add_compile_options(/W3 /WX)
+else()
+    add_compile_options(-Wpedantic -Wall -Werror)
+endif()
+
+add_subdirectory(SDIMCommon)
+add_subdirectory(SDIMCompiler)
+add_subdirectory(SDIMVirtualMachine)
+
