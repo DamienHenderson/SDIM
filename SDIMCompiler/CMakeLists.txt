@@ -13,4 +13,4 @@ target_compile_features(
     PUBLIC cxx_auto_type
     PRIVATE cxx_variadic_templates
 )
-target_link_libraries(SDIMCompiler PRIVATE SDIMCommon)
+target_link_libraries(SDIMCompiler PUBLIC SDIMCommon)

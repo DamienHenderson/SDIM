@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <cassert>
 
-#include "Utils.hpp"
+// #include "Utils.hpp"
 #include "Scanner.hpp"
 #include "Token.hpp"
 

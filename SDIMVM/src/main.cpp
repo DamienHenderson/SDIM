@@ -1,5 +1,4 @@
-#include "VirtualMachine.hpp"
-
+#include <VirtualMachine.hpp>
 #include <iostream>
 int main(int argc, char** argv)
 {

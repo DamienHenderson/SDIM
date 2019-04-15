@@ -11,4 +11,5 @@ endif()
 add_subdirectory(SDIMCommon)
 add_subdirectory(SDIMCompiler)
 add_subdirectory(SDIMVirtualMachine)
-
+add_subdirectory(SDIMC)
+add_subdirectory(SDIMVM)
