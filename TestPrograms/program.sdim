@@ -1,0 +1,9 @@
+module SDIM
+{
+    Int32 Main(String[] args)
+    {
+        String test = "A string literal";
+        Int32 num = 42;
+        return 0;
+    }
+}

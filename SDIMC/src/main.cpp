@@ -7,7 +7,7 @@
 // #include "Utils.hpp"
 #include "Scanner.hpp"
 #include "Token.hpp"
-
+#include "Compiler.hpp"
 #include <Utils.hpp>
 
 void PrintHelp()
@@ -24,13 +24,12 @@ int main(int argc, char** argv)
 	}
 	std::string compile_filename = argv[1];
 	std::cout << "Attempting to compile: " << compile_filename << "\n";
-	SDIM::Scanner scanner;
-	std::vector<SDIM::Token> tokens;
-
-	bool res = scanner.ScanFile(compile_filename, tokens);
+	SDIM::Compiler compiler;
+	std::vector<unsigned char> prog_data;
+	bool res = compiler.CompileFile(compile_filename, prog_data);
 	if (!res)
 	{
-		SDIM::Utils::Log("Failed to scan file\n");
+		std::cerr << "Failed to compile file: " << compile_filename << "\n";
 	}
 	// TODO: Move this into a function
 	for (int i = 1; i < argc; i++)

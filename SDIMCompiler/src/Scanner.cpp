@@ -48,7 +48,7 @@ namespace SDIM
 						LogString("Tested: " + current_token.lexeme + " against keyword: " + match);
 						if (current_token.lexeme == match)
 						{
-							LogString("Matched Keyword: " + match);
+							// LogString("Matched Keyword: " + match);
 							current_token.token_type = type_on_match;
 						}
 					};
@@ -71,7 +71,7 @@ namespace SDIM
 
 
 
-					std::cout << "Extracted lexeme: " << current_token.lexeme << "\n";
+					// std::cout << "Extracted lexeme: " << current_token.lexeme << "\n";
 					tokens.push_back(current_token);
 					current_token = Token(TokenType::Unknown, "");
 				}
@@ -86,7 +86,7 @@ namespace SDIM
 					LogString("Tested: " + current_token.lexeme + " against keyword: " + match);
 					if (current_token.lexeme == match)
 					{
-						LogString("Matched Keyword: " + match);
+						// LogString("Matched Keyword: " + match);
 						current_token.token_type = type_on_match;
 					}
 				};
@@ -108,7 +108,7 @@ namespace SDIM
 				CheckKeyword("class", TokenType::Class);
 
 				tokens.push_back(current_token);
-				std::cout << "Extracted lexeme: " << current_token.lexeme << "\n";
+				// std::cout << "Extracted lexeme: " << current_token.lexeme << "\n";
 
 				current_token = Token(TokenType::Unknown, "");
 
@@ -116,52 +116,52 @@ namespace SDIM
 			if (current_token.token_type == TokenType::NumericLiteral && !std::isdigit(current_char))
 			{
 				tokens.push_back(current_token);
-				std::cout << "Extracted lexeme: " << current_token.lexeme << "\n";
+				// std::cout << "Extracted lexeme: " << current_token.lexeme << "\n";
 				current_token = Token(TokenType::Unknown, "");
 			}
 			switch (current_char)
 			{
 			case '(':
 				tokens.push_back(Token(TokenType::LeftBracket, ConvertToString(current_char)));
-				LogString(std::string("Extracted lexeme: ") + current_char);
+				// LogString(std::string("Extracted lexeme: ") + current_char);
 				break;
 			case ')':
 				tokens.push_back(Token(TokenType::RightBracket, ConvertToString(current_char)));
-				LogString(std::string("Extracted lexeme: ") + current_char);
+				// LogString(std::string("Extracted lexeme: ") + current_char);
 				break;
 			case '{':
 				tokens.push_back(Token(TokenType::LeftBrace, ConvertToString(current_char)));
-				LogString(std::string("Extracted lexeme: ") + current_char);
+				// LogString(std::string("Extracted lexeme: ") + current_char);
 				break;
 			case '}':
 				tokens.push_back(Token(TokenType::RightBrace, ConvertToString(current_char)));
-				LogString(std::string("Extracted lexeme: ") + current_char);
+				// LogString(std::string("Extracted lexeme: ") + current_char);
 				break;
 			case '[':
 				tokens.push_back(Token(TokenType::LeftSquareBracket, ConvertToString(current_char)));
-				LogString(std::string("Extracted lexeme: ") + current_char);
+				// LogString(std::string("Extracted lexeme: ") + current_char);
 				break;
 			case ']':
 				tokens.push_back(Token(TokenType::RightSquareBracket, ConvertToString(current_char)));
-				LogString(std::string("Extracted lexeme: ") + current_char);
+				// LogString(std::string("Extracted lexeme: ") + current_char);
 				break;
 			case '<':
 				if (MatchNext('=', i + 1))
 				{
 					tokens.push_back(Token(TokenType::LessEqual, "<="));
 					++i;
-					LogString("Extracted lexeme: <=");
+					// LogString("Extracted lexeme: <=");
 				}
 				if (MatchNext('<', i + 1))
 				{
 					tokens.push_back(Token(TokenType::LeftShift, "<<"));
 					++i;
-					LogString("Extracted lexeme: <<");
+					// LogString("Extracted lexeme: <<");
 				}
 				else
 				{
 					tokens.push_back(Token(TokenType::LessThan, ConvertToString(current_char)));
-					LogString(std::string("Extracted lexeme: ") + current_char);
+					// LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
 			case '>':
@@ -169,43 +169,43 @@ namespace SDIM
 				{
 					tokens.push_back(Token(TokenType::GreaterEqual, ">="));
 					++i;
-					LogString("Extracted lexeme: >=");
+					// LogString("Extracted lexeme: >=");
 				}
 				if (MatchNext('>', i + 1))
 				{
 					tokens.push_back(Token(TokenType::RightShift, ">>"));
 					++i;
-					LogString("Extracted lexeme: >>");
+					// LogString("Extracted lexeme: >>");
 				}
 				else
 				{
 					tokens.push_back(Token(TokenType::GreaterThan, ConvertToString(current_char)));
-					LogString(std::string("Extracted lexeme: ") + current_char);
+					// LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
 			case ';':
 				tokens.push_back(Token(TokenType::SemiColon, ConvertToString(current_char)));
-				LogString(std::string("Extracted lexeme: ") + current_char);
+				// LogString(std::string("Extracted lexeme: ") + current_char);
 				break;
 			case ',':
 				tokens.push_back(Token(TokenType::Comma, ConvertToString(current_char)));
-				LogString(std::string("Extracted lexeme: ") + current_char);
+				// LogString(std::string("Extracted lexeme: ") + current_char);
 				break;
 			case '.':
 				tokens.push_back(Token(TokenType::Dot, ConvertToString(current_char)));
-				LogString(std::string("Extracted lexeme: ") + current_char);
+				// LogString(std::string("Extracted lexeme: ") + current_char);
 				break;
 			case '-':
 				if (MatchNext('=', i + 1))
 				{
 					tokens.push_back(Token(TokenType::MinusEqual, "-="));
 					++i;
-					LogString("Extracted lexeme: -=");
+					// LogString("Extracted lexeme: -=");
 				}
 				else
 				{
 					tokens.push_back(Token(TokenType::Minus, ConvertToString(current_char)));
-					LogString(std::string("Extracted lexeme: ") + current_char);
+					// LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
 			case '+':
@@ -213,12 +213,12 @@ namespace SDIM
 				{
 					tokens.push_back(Token(TokenType::PlusEqual, "+="));
 					++i;
-					LogString("Extracted lexeme: +=");
+					// LogString("Extracted lexeme: +=");
 				}
 				else
 				{
 					tokens.push_back(Token(TokenType::Plus, ConvertToString(current_char)));
-					LogString(std::string("Extracted lexeme: ") + current_char);
+					// LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
 			case '/':
@@ -226,12 +226,12 @@ namespace SDIM
 				{
 					tokens.push_back(Token(TokenType::SlashEqual, "/="));
 					++i;
-					LogString("Extracted lexeme: /=");
+					// LogString("Extracted lexeme: /=");
 				}
 				else
 				{
 					tokens.push_back(Token(TokenType::ForwardSlash, ConvertToString(current_char)));
-					LogString(std::string("Extracted lexeme: ") + current_char);
+					// LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
 			case '*':
@@ -239,12 +239,12 @@ namespace SDIM
 				{
 					tokens.push_back(Token(TokenType::AsteriskEqual, "*="));
 					++i;
-					LogString("Extracted lexeme: *=");
+					// LogString("Extracted lexeme: *=");
 				}
 				else
 				{
 					tokens.push_back(Token(TokenType::Asterisk, ConvertToString(current_char)));
-					LogString(std::string("Extracted lexeme: ") + current_char);
+					// LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
 			case '%':
@@ -252,12 +252,12 @@ namespace SDIM
 				{
 					tokens.push_back(Token(TokenType::PercentEqual, "%="));
 					++i;
-					LogString("Extracted lexeme: %=");
+					// LogString("Extracted lexeme: %=");
 				}
 				else
 				{
 					tokens.push_back(Token(TokenType::Percent, ConvertToString(current_char)));
-					LogString(std::string("Extracted lexeme: ") + current_char);
+					// LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
 			case '&':
@@ -265,18 +265,18 @@ namespace SDIM
 				{
 					tokens.push_back(Token(TokenType::AmpersandEqual, "&="));
 					++i;
-					LogString("Extracted lexeme: &=");
+					// LogString("Extracted lexeme: &=");
 				}
 				else if (MatchNext('|', i + 1))
 				{
 					tokens.push_back(Token(TokenType::DoubleAmpersand, "&&"));
 					++i;
-					LogString("Extracted lexeme: &&");
+					// LogString("Extracted lexeme: &&");
 				}
 				else
 				{
 					tokens.push_back(Token(TokenType::VerticalBar, ConvertToString(current_char)));
-					LogString(std::string("Extracted lexeme: ") + current_char);
+					// LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
 			case '|':
@@ -284,18 +284,18 @@ namespace SDIM
 				{
 					tokens.push_back(Token(TokenType::VerticalBarEqual, "|="));
 					++i;
-					LogString("Extracted lexeme: |=");
+					// LogString("Extracted lexeme: |=");
 				}
 				else if (MatchNext('|', i + 1))
 				{
 					tokens.push_back(Token(TokenType::DoubleVerticalBar, "||"));
 					++i;
-					LogString("Extracted lexeme: ||");
+					// LogString("Extracted lexeme: ||");
 				}
 				else
 				{
 					tokens.push_back(Token(TokenType::VerticalBar, ConvertToString(current_char)));
-					LogString(std::string("Extracted lexeme: ") + current_char);
+					// LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
 			case '^':
@@ -303,12 +303,12 @@ namespace SDIM
 				{
 					tokens.push_back(Token(TokenType::CaretEqual, "^="));
 					++i;
-					LogString("Extracted lexeme: ^=");
+					// LogString("Extracted lexeme: ^=");
 				}
 				else
 				{
 					tokens.push_back(Token(TokenType::Caret, ConvertToString(current_char)));
-					LogString(std::string("Extracted lexeme: ") + current_char);
+					// LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
 			case '!':
@@ -316,12 +316,12 @@ namespace SDIM
 				{
 					tokens.push_back(Token(TokenType::BangEqual, "!="));
 					++i;
-					LogString("Extracted lexeme: !=");
+					// LogString("Extracted lexeme: !=");
 				}
 				else
 				{
 					tokens.push_back(Token(TokenType::Bang, ConvertToString(current_char)));
-					LogString(std::string("Extracted lexeme: ") + current_char);
+					// LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
 			case '~':
@@ -329,12 +329,12 @@ namespace SDIM
 				{
 					tokens.push_back(Token(TokenType::TildeEqual, "~="));
 					++i;
-					LogString("Extracted lexeme: ~=");
+					// LogString("Extracted lexeme: ~=");
 				}
 				else
 				{
 					tokens.push_back(Token(TokenType::Tilde, ConvertToString(current_char)));
-					LogString(std::string("Extracted lexeme: ") + current_char);
+					// LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
 			case '=':
@@ -342,12 +342,12 @@ namespace SDIM
 				{
 					tokens.push_back(Token(TokenType::EqualEqual, "="));
 					++i;
-					LogString("Extracted lexeme: ==");
+					// LogString("Extracted lexeme: ==");
 				}
 				else
 				{
 					tokens.push_back(Token(TokenType::Equal, ConvertToString(current_char)));
-					LogString(std::string("Extracted lexeme: ") + current_char);
+					// LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
 			case '"':
@@ -363,7 +363,7 @@ namespace SDIM
 					else
 					{
 						tokens.push_back(current_token);
-						LogString("Extracted lexeme: " + current_token.lexeme);
+						// LogString("Extracted lexeme: " + current_token.lexeme);
 						current_token = Token(TokenType::Unknown, "");
 					}
 
@@ -406,10 +406,6 @@ namespace SDIM
 				break;
 			}
 		}
-
-		// TODO: keywords
-		// TODO: identifiers (types and variables)
-		// TODO: literals
 		return true;
 
 	}

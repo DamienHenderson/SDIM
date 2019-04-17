@@ -1,6 +1,7 @@
 #include "Compiler.hpp"
 #include "Scanner.hpp"
 #include "Utils.hpp"
+#include "Parser.hpp"
 namespace SDIM
 {
 	Compiler::Compiler()
@@ -21,7 +22,13 @@ namespace SDIM
 			SDIM::Utils::Log("Failed to scan program string\n");
 			return false;
 		}
-		(void)program_data;
+		Parser parser;
+		res = parser.Parse(tokens, program_data);
+		if (!res)
+		{
+			SDIM::Utils::Log("Failed to parse program string\n");
+			return false;
+		}
 		return true;
 	}
 	bool Compiler::CompileFile(const std::string& file_path, std::vector<unsigned char>& program_data)
@@ -31,10 +38,16 @@ namespace SDIM
 		bool res = scanner.ScanFile(file_path, tokens);
 		if (!res)
 		{
-			SDIM::Utils::Log("Failed to scan program string\n");
+			SDIM::Utils::Log("Failed to scan program file\n");
 			return false;
 		}
-		(void)program_data;
+		Parser parser;
+		res = parser.Parse(tokens, program_data);
+		if (!res)
+		{
+			SDIM::Utils::Log("Failed to parse program file\n");
+			return false;
+		}
 		return true;
 	}
 }
