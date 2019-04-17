@@ -26,7 +26,7 @@ namespace SDIM
 		};
 		// for keywords, identifiers and literals which may encompass several characters
 		Token current_token(TokenType::Unknown,"");
-		for (auto i = 0; i < file_contents.length(); i++)
+		for (size_t i = 0; i < file_contents.length(); i++)
 		{
 			char current_char = file_contents[i];
 			if (current_char == '\0')

@@ -16,7 +16,7 @@ namespace SDIM
 				SDIM::Utils::Log("Attempt to read immediate value which would read past the end of the program data");
 				return literal_value;
 			}
-			for (int i = 0; i < sizeof(literal_value); i++)
+			for (size_t i = 0; i < sizeof(literal_value); i++)
 			{
 				unsigned char read_byte = static_cast<unsigned char>(state.program_data_[location + i]);
 				literal_value |= read_byte << (i * 8);
@@ -33,7 +33,7 @@ namespace SDIM
 				SDIM::Utils::Log("Attempt to read immediate value which would read past the end of the program data");
 				return literal_value;
 			}
-			for (int i = 0; i < sizeof(literal_value); i++)
+			for (size_t i = 0; i < sizeof(literal_value); i++)
 			{
 				UInt8 read_byte = static_cast<unsigned char>(state.program_data_[location + i]);
 				literal_value |= read_byte << (i * 8);
@@ -50,7 +50,7 @@ namespace SDIM
 				SDIM::Utils::Log("Attempt to read immediate value which would read past the end of the program data");
 				return literal_value;
 			}
-			for (int i = 0; i < sizeof(literal_value); i++)
+			for (size_t i = 0; i < sizeof(literal_value); i++)
 			{
 				unsigned char read_byte = static_cast<unsigned char>(state.program_data_[location + i]);
 				literal_value |= read_byte << (i * 8);
