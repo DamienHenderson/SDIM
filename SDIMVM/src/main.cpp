@@ -1,24 +1,32 @@
 #include <VirtualMachine.hpp>
-#include <iostream>
+#include <Utils.hpp>
+
+#include <memory>
+
 int main(int argc, char** argv)
 {
-	SDIM::VirtualMachine vm;
-	bool res = vm.LoadFile("./program.bin");
+	if (argc < 2)
+	{
+		std::cout << "Usage: SDIMVM <filename>\n";
+		return -1;
+	}
+	std::unique_ptr<SDIM::VirtualMachine> vm = std::make_unique<SDIM::VirtualMachine>();
+	const char* file_name = argv[1];
+	bool res = vm->LoadFile(file_name);
 	if (!res)
 	{
-		std::cerr << "SDIM Virtual Machine failed to load file\n";
+		SDIM::Utils::Log("SDIM Virtual Machine failed to load file: ", file_name, "\n");
 		return 1;
 	}
-	res = vm.RunFile();
+	res = vm->RunFile();
 
 	if (!res)
 	{
-		std::cerr << "SDIM Virtual Machine encountered an error whilst running the program\n";
+		SDIM::Utils::Log("SDIM Virtual Machine encountered an error whilst running program: ", file_name, "\n");
 		return 2;
 	}
 
-	char in;
-	std::cin >> in;
+
 	
 	return 0;
 }

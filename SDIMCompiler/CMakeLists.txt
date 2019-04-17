@@ -10,7 +10,11 @@ target_include_directories(
 )
 target_compile_features(
     SDIMCompiler
-    PUBLIC cxx_auto_type
-    PRIVATE cxx_variadic_templates
+    PUBLIC cxx_std_17
 )
+
+IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
+    target_compile_definitions(SDIMVirtualMachine PUBLIC SDIMC_DEBUG)
+ENDIF(CMAKE_BUILD_TYPE MATCHES DEBUG)
+
 target_link_libraries(SDIMCompiler PUBLIC SDIMCommon)

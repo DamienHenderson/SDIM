@@ -46,7 +46,10 @@ namespace SDIM
 	{
 #ifdef SDIMC_DEBUG
 		std::cerr << message << "\n";
+#else
+		(void)message;
 #endif
+
 	}
 
 	std::string ConvertToString(char c)

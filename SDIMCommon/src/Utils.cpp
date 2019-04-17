@@ -26,6 +26,9 @@ namespace SDIM
 		{
 #ifdef SDIMVM_DEBUG
 			Log(disasm);
+#else
+			// avoid generating warnings
+			(void)disasm;
 #endif
 		}
 

@@ -81,7 +81,7 @@ namespace SDIM
 		if (state_.program_counter_ < state_.program_length_)
 		{
 			Instruction next_instruction = ReadNextInstruction();
-#ifdef _DEBUG
+#ifdef SDIMVM_DEBUG
 			PrintState();
 #endif
 			opcode_table_[static_cast<UInt8>(next_instruction)](state_);

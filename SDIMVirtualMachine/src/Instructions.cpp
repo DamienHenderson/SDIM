@@ -226,55 +226,56 @@ namespace SDIM
 			// could have functions stored in a table but that would impose a restriction on the function signature
 			// How do other languages handle this? Lua restricts you to a set function signature, chaiscript allows any signature
 			// try to aim for the chaiscript style
+			(void)state;
 		}
 		void Less(SDIM::VMState& state)
 		{
 
-			
+			(void)state;
 		}
 
 		void LessEqual(SDIM::VMState& state)
 		{
-
+			(void)state;
 		}
 		void Greater(SDIM::VMState& state)
 		{
-			
+			(void)state;
 		}
 
 		void GreaterEqual(SDIM::VMState& state)
 		{
-			
+			(void)state;
 		}
 
 		void Equal(SDIM::VMState& state)
 		{
-			
+			(void)state;
 		}
 
 		void NotEqual(SDIM::VMState& state)
 		{
-			
+			(void)state;
 		}
 
 		void Not(SDIM::VMState& state)
 		{
-			
+			(void)state;
 		}
 
 		void And(SDIM::VMState& state)
 		{
-			
+			(void)state;
 		}
 
 		void Or(SDIM::VMState& state)
 		{
-			
+			(void)state;
 		}
 
 		void Xor(SDIM::VMState& state)
 		{
-			
+			(void)state;
 		}
 
 		void Add(SDIM::VMState& state)
@@ -303,32 +304,35 @@ namespace SDIM
 
 		void Subtract(SDIM::VMState& state)
 		{
-			
+			(void)state;
 		}
 
 		void Multiply(SDIM::VMState& state)
 		{
-			
+			(void)state;
 		}
 
 		void BitwiseNot(SDIM::VMState& state)
 		{
-			
+			(void)state;
 		}
 
 		void Divide(SDIM::VMState& state)
 		{
-			
+			(void)state;
+
 		}
 
 		void Negate(SDIM::VMState& state)
 		{
-			
+			(void)state;
+
 		}
 
 		void Modulo(SDIM::VMState& state)
 		{
-			
+			(void)state;
+
 		}
 
 		void PushInt8(SDIM::VMState& state)

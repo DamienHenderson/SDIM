@@ -10,6 +10,5 @@ target_include_directories(
 )
 target_compile_features(
     SDIMCommon
-    PUBLIC cxx_auto_type
-    PRIVATE cxx_variadic_templates
+    PUBLIC cxx_std_17
 )

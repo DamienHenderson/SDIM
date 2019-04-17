@@ -37,7 +37,7 @@ namespace SDIM
 		Unknown
 	};
 
-	typedef union
+	union VarUnion
 	{
 		Int8  int8;
 		Int16 int16;
@@ -54,15 +54,17 @@ namespace SDIM
 		F64 f64;
 
 		void* ptr;
+		VarUnion() { ptr = nullptr; }
+	};
 
-	} VarUnion;
+	
 	struct Variable
 	{
 		VariableType type;
 
 		VarUnion as;
 
-		Variable() : type(SDIM::VariableType::Unknown) {}
+		Variable() : type(SDIM::VariableType::Unknown), as(SDIM::VarUnion()) {}
 
 		Variable(VariableType var_type, VarUnion value) : type(var_type), as(value) {}
 

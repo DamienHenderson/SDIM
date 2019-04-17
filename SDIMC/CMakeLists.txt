@@ -10,7 +10,6 @@ target_include_directories(
 )
 target_compile_features(
     SDIMC
-    PUBLIC cxx_auto_type
-    PRIVATE cxx_variadic_templates
+    PUBLIC cxx_std_17
 )
 target_link_libraries(SDIMC PRIVATE SDIMCompiler)

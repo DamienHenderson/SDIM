@@ -68,10 +68,10 @@ namespace SDIM
 				SDIM::Utils::Log("Attempt to read immediate value which would read past the end of the program data");
 				return literal_value;
 			}
-			for (int i = 0; i < sizeof(literal_value); i++)
+			for (size_t i = 0; i < sizeof(literal_value); i++)
 			{
 				unsigned char read_byte = static_cast<unsigned char>(state.program_data_[location + i]);
-				literal_value |= read_byte << (i * 8);
+				literal_value |= static_cast<UInt64>(read_byte) << (i * 8);
 			}
 
 			return literal_value;
@@ -90,7 +90,7 @@ namespace SDIM
 			UInt16 as_uint = ReadUInt16Literal(state, location);
 			Int16 result;
 			std::memcpy(&result, &as_uint, sizeof(result));
-			return result; return static_cast<Int16>(ReadUInt16Literal(state, location));
+			return result;
 		}
 
 		Int32 ReadInt32Literal(VMState & state, size_t location)

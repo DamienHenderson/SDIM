@@ -46,7 +46,7 @@ namespace SDIM
 		{
 			LogIntermediate(arg);
 			Log(args...);
-			if (sizeof...(args) == 0)
+			if constexpr (sizeof...(args) == 0)
 			{
 				TerminateLog();
 			}
@@ -76,7 +76,7 @@ namespace SDIM
 		{
 			std::string base = ConstructString(arg);
 			
-			if (sizeof...(args) == 0)
+			if constexpr(sizeof...(args) == 0)
 			{
 				return base;
 			}
