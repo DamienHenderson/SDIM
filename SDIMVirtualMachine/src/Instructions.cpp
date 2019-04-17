@@ -74,6 +74,7 @@ namespace SDIM
 			else
 			{
 				SDIM::Variable discard = state.program_stack_.Pop();
+				(void)discard;
 				state.program_counter_ += opcode_size;
 			}
 			
@@ -95,6 +96,7 @@ namespace SDIM
 			else
 			{
 				SDIM::Variable discard = state.program_stack_.Pop();
+				(void)discard;
 				state.program_counter_ += opcode_size;
 			}
 		
