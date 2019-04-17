@@ -15,26 +15,24 @@ namespace SDIM
 	{
 	}
 
-	bool Scanner::ScanFile(const std::string & path, std::vector<Token>& tokens)
+	bool Scanner::ScanString(const std::string& program, std::vector<Token>& tokens)
 	{
-		std::string file_contents = ReadWholeFile(path);
-		std::cout << file_contents << "\n";
-		
-		auto MatchNext = [&file_contents](char match, size_t idx) -> bool
+		std::string prog_string = program;
+		auto MatchNext = [&prog_string](char match, size_t idx) -> bool
 		{
-			return file_contents[idx] == match;
+			return prog_string[idx] == match;
 		};
 		// for keywords, identifiers and literals which may encompass several characters
-		Token current_token(TokenType::Unknown,"");
-		for (size_t i = 0; i < file_contents.length(); i++)
+		Token current_token(TokenType::Unknown, "");
+		for (size_t i = 0; i < program.length(); i++)
 		{
-			char current_char = file_contents[i];
+			char current_char = prog_string[i];
 			if (current_char == '\0')
 			{
 				// EOF
 				// emit compile error here if the eof is premature (not implemented yet)
-				
-				
+
+
 				tokens.push_back(Token(TokenType::EOFToken, ConvertToString(current_char)));
 				break;
 			}
@@ -45,9 +43,9 @@ namespace SDIM
 				if (current_token.token_type == TokenType::Identifier || current_token.token_type == TokenType::NumericLiteral)
 				{
 					// TODO: make this better using a radix tree
-					auto CheckKeyword = [&current_token](const std::string& match, TokenType type_on_match) -> void
+					auto CheckKeyword = [&current_token](const std::string & match, TokenType type_on_match) -> void
 					{
-						LogString("Tested: " + current_token.lexeme +" against keyword: " + match);
+						LogString("Tested: " + current_token.lexeme + " against keyword: " + match);
 						if (current_token.lexeme == match)
 						{
 							LogString("Matched Keyword: " + match);
@@ -70,7 +68,7 @@ namespace SDIM
 					CheckKeyword("null", TokenType::Null);
 					CheckKeyword("print", TokenType::Print);
 					CheckKeyword("class", TokenType::Class);
-					
+
 
 
 					std::cout << "Extracted lexeme: " << current_token.lexeme << "\n";
@@ -83,7 +81,7 @@ namespace SDIM
 			if (current_token.token_type == TokenType::Identifier && !IsIdentifier(current_char))
 			{
 				// TODO: make this better using a radix tree
-				auto CheckKeyword = [&current_token](const std::string& match, TokenType type_on_match) -> void
+				auto CheckKeyword = [&current_token](const std::string & match, TokenType type_on_match) -> void
 				{
 					LogString("Tested: " + current_token.lexeme + " against keyword: " + match);
 					if (current_token.lexeme == match)
@@ -162,7 +160,7 @@ namespace SDIM
 				}
 				else
 				{
-					Token(TokenType::LessThan, ConvertToString(current_char));
+					tokens.push_back(Token(TokenType::LessThan, ConvertToString(current_char)));
 					LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
@@ -181,7 +179,7 @@ namespace SDIM
 				}
 				else
 				{
-					Token(TokenType::GreaterThan, ConvertToString(current_char));
+					tokens.push_back(Token(TokenType::GreaterThan, ConvertToString(current_char)));
 					LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
@@ -206,7 +204,7 @@ namespace SDIM
 				}
 				else
 				{
-					Token(TokenType::Minus, ConvertToString(current_char));
+					tokens.push_back(Token(TokenType::Minus, ConvertToString(current_char)));
 					LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
@@ -219,7 +217,7 @@ namespace SDIM
 				}
 				else
 				{
-					Token(TokenType::Plus, ConvertToString(current_char));
+					tokens.push_back(Token(TokenType::Plus, ConvertToString(current_char)));
 					LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
@@ -232,7 +230,7 @@ namespace SDIM
 				}
 				else
 				{
-					Token(TokenType::ForwardSlash, ConvertToString(current_char));
+					tokens.push_back(Token(TokenType::ForwardSlash, ConvertToString(current_char)));
 					LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
@@ -245,7 +243,7 @@ namespace SDIM
 				}
 				else
 				{
-					Token(TokenType::Asterisk, ConvertToString(current_char));
+					tokens.push_back(Token(TokenType::Asterisk, ConvertToString(current_char)));
 					LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
@@ -258,7 +256,7 @@ namespace SDIM
 				}
 				else
 				{
-					Token(TokenType::Percent, ConvertToString(current_char));
+					tokens.push_back(Token(TokenType::Percent, ConvertToString(current_char)));
 					LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
@@ -277,7 +275,7 @@ namespace SDIM
 				}
 				else
 				{
-					Token(TokenType::VerticalBar, ConvertToString(current_char));
+					tokens.push_back(Token(TokenType::VerticalBar, ConvertToString(current_char)));
 					LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
@@ -296,7 +294,7 @@ namespace SDIM
 				}
 				else
 				{
-					Token(TokenType::VerticalBar, ConvertToString(current_char));
+					tokens.push_back(Token(TokenType::VerticalBar, ConvertToString(current_char)));
 					LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
@@ -309,7 +307,7 @@ namespace SDIM
 				}
 				else
 				{
-					Token(TokenType::Caret, ConvertToString(current_char));
+					tokens.push_back(Token(TokenType::Caret, ConvertToString(current_char)));
 					LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
@@ -322,7 +320,7 @@ namespace SDIM
 				}
 				else
 				{
-					Token(TokenType::Bang, ConvertToString(current_char));
+					tokens.push_back(Token(TokenType::Bang, ConvertToString(current_char)));
 					LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
@@ -335,7 +333,7 @@ namespace SDIM
 				}
 				else
 				{
-					Token(TokenType::Tilde, ConvertToString(current_char));
+					tokens.push_back(Token(TokenType::Tilde, ConvertToString(current_char)));
 					LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
@@ -348,7 +346,7 @@ namespace SDIM
 				}
 				else
 				{
-					Token(TokenType::Equal, ConvertToString(current_char));
+					tokens.push_back(Token(TokenType::Equal, ConvertToString(current_char)));
 					LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
@@ -357,7 +355,7 @@ namespace SDIM
 				{
 					// if the current lexeme is a string literal then a quote will finish it
 					// note that a preceding backslash will escape a string literal
-					if (i > 0 && file_contents[i - 1] == '\\')
+					if (i > 0 && prog_string[i - 1] == '\\')
 					{
 						// escape char here
 						current_token.lexeme += current_char;
@@ -373,10 +371,10 @@ namespace SDIM
 				else
 				{
 					current_token.token_type = TokenType::StringLiteral;
-					
+
 				}
 				break;
-			
+
 			default:
 				// TODO: remove once keywords and identifiers are processed
 				// LogString(std::string("Unknown char: ") + current_char);
@@ -388,7 +386,7 @@ namespace SDIM
 				{
 					current_token.lexeme += current_char;
 				}
-				else if(current_token.token_type == TokenType::Unknown && IsIdentifierStart(current_char))
+				else if (current_token.token_type == TokenType::Unknown && IsIdentifierStart(current_char))
 				{
 					current_token.token_type = TokenType::Identifier;
 					current_token.lexeme += current_char;
@@ -408,11 +406,20 @@ namespace SDIM
 				break;
 			}
 		}
-		
+
 		// TODO: keywords
 		// TODO: identifiers (types and variables)
 		// TODO: literals
 		return true;
+
 	}
 
+	bool Scanner::ScanFile(const std::string & path, std::vector<Token> & tokens)
+	{
+		std::string file_contents = ReadWholeFile(path);
+		std::cout << file_contents << "\n";
+
+		return ScanString(file_contents, tokens);
+
+	}
 }

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.8)
 
 # TODO: add actual files here
-add_library(SDIMVirtualMachine STATIC src/VirtualMachine.cpp src/VMState.cpp src/Instructions.cpp)
+add_library(SDIMVirtualMachine STATIC src/VirtualMachine.cpp src/VMState.cpp src/Instructions.cpp include/VirtualMachine.hpp include/VMState.hpp include/Instructions.hpp)
 
 target_include_directories(
     SDIMVirtualMachine 

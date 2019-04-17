@@ -16,7 +16,7 @@ int main(int argc, char** argv)
 	if (!res)
 	{
 		SDIM::Utils::Log("SDIM Virtual Machine failed to load file: ", file_name, "\n");
-		return 1;
+		return -1;
 	}
 	res = vm->RunFile();
 
