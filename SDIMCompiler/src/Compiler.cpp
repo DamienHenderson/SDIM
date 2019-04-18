@@ -2,6 +2,10 @@
 #include "Scanner.hpp"
 #include "Utils.hpp"
 #include "Parser.hpp"
+#include "Generator.hpp"
+#include "BytecodeGenerator.hpp"
+
+#include <fstream>
 namespace SDIM
 {
 	Compiler::Compiler()
@@ -23,7 +27,8 @@ namespace SDIM
 			return false;
 		}
 		Parser parser;
-		res = parser.Parse(tokens, program_data);
+		BytecodeGenerator gen;
+		res = parser.Parse(tokens, program_data, &gen);
 		if (!res)
 		{
 			SDIM::Utils::Log("Failed to parse program string\n");
@@ -42,12 +47,14 @@ namespace SDIM
 			return false;
 		}
 		Parser parser;
-		res = parser.Parse(tokens, program_data);
+		BytecodeGenerator gen;
+		res = parser.Parse(tokens, program_data, &gen);
 		if (!res)
 		{
 			SDIM::Utils::Log("Failed to parse program file\n");
 			return false;
 		}
+		
 		return true;
 	}
 }

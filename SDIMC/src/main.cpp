@@ -30,7 +30,16 @@ int main(int argc, char** argv)
 	if (!res)
 	{
 		std::cerr << "Failed to compile file: " << compile_filename << "\n";
+		return -1;
 	}
+	std::fstream test_file_refactor_this("test.bin", std::ios::out | std::ios::binary);
+	if (!test_file_refactor_this.good())
+	{
+		SDIM::Utils::Log("Failed to open test binary file\n");
+		return -1;
+	}
+	test_file_refactor_this.write((const char*)prog_data.data(), prog_data.size());
+	test_file_refactor_this.close();
 	// TODO: Move this into a function
 	for (int i = 1; i < argc; i++)
 	{

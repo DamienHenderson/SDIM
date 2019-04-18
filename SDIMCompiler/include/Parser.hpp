@@ -3,6 +3,8 @@
 #include "Token.hpp"
 
 #include <vector>
+
+#include "Generator.hpp"
 namespace SDIM
 {
 	class Parser
@@ -11,8 +13,9 @@ namespace SDIM
 		Parser();
 		~Parser();
 
-		// parses a program directly from a string
-		bool Parse(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data);
+		// parses a sequence of tokens into a complete bytecode program
+		bool Parse(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator);
+	private:
 		
 	};
 }

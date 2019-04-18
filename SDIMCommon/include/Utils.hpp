@@ -86,6 +86,32 @@ namespace SDIM
 			}
 		}
 
+		
+
 		void Disassemble(const std::string& disasm);
+
+		UInt8 InstructionToUInt8(Instruction instruction);
+
+		/// Converts integers to Little Endian to allow them to be written directly to disk
+		/// If the platform is Little Endian then nothing is done to the value
+		UInt16 UInt16ToLittleEndian(UInt16 value);
+
+		UInt32 UInt32ToLittleEndian(UInt32 value);
+		
+		UInt64 UInt64ToLittleEndian(UInt64 value);
+
+		// Implementation of the new C++20 std::bit_cast but made to work on C++17 and possibly earlier versions
+		template <typename To, typename From>
+		const To ByteCast(const From& value);
+		
+		template<typename To, typename From>
+		const To ByteCast(const From& src)
+		{
+			static_assert(sizeof(To) == sizeof(From) && std::is_trivially_copyable<From>::value && std::is_trivial<To>::value, "ByteCast must be called with 2 types of the same with the From type trivially copyable and the To type trivially constructible");
+			To dest;
+			std::memcpy(&dest, &src, sizeof(src));
+			return dest;
+		}
+
 	}
 }
