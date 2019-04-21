@@ -15,7 +15,7 @@ target_compile_features(
 )
 
 
-#target_compile_definitions(SDIMVirtualMachine PUBLIC $<$<CONFIG:DEBUG>:SDIMVM_DEBUG>)
+
 
 
 target_link_libraries(SDIMCompiler PUBLIC SDIMCommon)

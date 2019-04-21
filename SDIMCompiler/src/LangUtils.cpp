@@ -44,7 +44,7 @@ namespace SDIM
 
 	void LogString(const std::string & message)
 	{
-#ifdef SDIMC_DEBUG
+#ifdef SDIM_VERBOSE
 		std::cerr << message << "\n";
 #else
 		(void)message;

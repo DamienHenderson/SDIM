@@ -16,7 +16,21 @@ namespace SDIM
 		/// Unconditional Jump Instruction
 		/// Recommended use is for while loops and if statements specifically ones with else statements
 		virtual void WriteJumpInstruction(std::vector<unsigned char>& prog_data, UInt64 addr) = 0;
+		virtual void WriteJumpTrueInstruction(std::vector<unsigned char>& prog_data, UInt64 addr) = 0;
+		virtual void WriteJumpFalseInstruction(std::vector<unsigned char>& prog_data, UInt64 addr) = 0;
+		virtual void WriteJumpTrueStackInstruction(std::vector<unsigned char>& prog_data) = 0;
+		virtual void WriteJumpFalseStackInstruction(std::vector<unsigned char>& prog_data) = 0;
+		
 		virtual void WriteCallInstruction(std::vector<unsigned char>& prog_data, UInt64 addr) = 0;
+		virtual void WriteCallTrueInstruction(std::vector<unsigned char>& prog_data, UInt64 addr) = 0;
+		virtual void WriteCallFalseInstruction(std::vector<unsigned char>& prog_data, UInt64 addr) = 0;
+		virtual void WriteCallTrueStackInstruction(std::vector<unsigned char>& prog_data) = 0;
+		virtual void WriteCallFalseStackInstruction(std::vector<unsigned char>& prog_data) = 0;
+
+		virtual void WriteReturnInstruction(std::vector<unsigned char>& prog_data) = 0;
+
+		/// TODO: what args should this take, also on native platforms this should probably just do a normal call
+		// virtual void WriteNativeCall Instruction(std::vector<unsigned char>& prog_data) = 0;
 
 		virtual void WritePushUInt8Instruction(std::vector<unsigned char>& prog_data,	UInt8 value) = 0;
 		virtual void WritePushUInt16Instruction(std::vector<unsigned char>& prog_data,	UInt16 value) = 0;

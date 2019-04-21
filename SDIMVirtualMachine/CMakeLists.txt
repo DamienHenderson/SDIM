@@ -12,10 +12,6 @@ target_compile_features(
     SDIMVirtualMachine
     PUBLIC cxx_std_17
 )
-IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
-    target_compile_definitions(SDIMVirtualMachine PUBLIC SDIMVM_DEBUG)
-ENDIF(CMAKE_BUILD_TYPE MATCHES DEBUG)
-
 
 target_link_libraries(SDIMVirtualMachine PUBLIC SDIMCommon)
 

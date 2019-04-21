@@ -11,7 +11,18 @@ namespace SDIM
 		virtual ~BytecodeGenerator() {}
 
 		virtual void WriteJumpInstruction(std::vector<unsigned char>& prog_data, UInt64 addr) override;
+		virtual void WriteJumpTrueInstruction(std::vector<unsigned char>& prog_data, UInt64 addr) override;
+		virtual void WriteJumpFalseInstruction(std::vector<unsigned char>& prog_data, UInt64 addr) override;
+		virtual void WriteJumpTrueStackInstruction(std::vector<unsigned char>& prog_data) override;
+		virtual void WriteJumpFalseStackInstruction(std::vector<unsigned char>& prog_data) override;
+
 		virtual void WriteCallInstruction(std::vector<unsigned char>& prog_data, UInt64 addr) override;
+		virtual void WriteCallTrueInstruction(std::vector<unsigned char>& prog_data, UInt64 addr) override;
+		virtual void WriteCallFalseInstruction(std::vector<unsigned char>& prog_data, UInt64 addr) override;
+		virtual void WriteCallTrueStackInstruction(std::vector<unsigned char>& prog_data) override;
+		virtual void WriteCallFalseStackInstruction(std::vector<unsigned char>& prog_data) override;
+
+		virtual void WriteReturnInstruction(std::vector<unsigned char>& prog_data) override;
 
 		virtual void WritePushUInt8Instruction(std::vector<unsigned char>& prog_data,	UInt8 value) override;
 		virtual void WritePushUInt16Instruction(std::vector<unsigned char>& prog_data,	UInt16 value) override;

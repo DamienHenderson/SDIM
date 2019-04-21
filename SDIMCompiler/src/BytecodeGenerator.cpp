@@ -18,6 +18,42 @@ namespace SDIM
 		}
 
 	}
+	void BytecodeGenerator::WriteJumpTrueInstruction(std::vector<unsigned char>& prog_data, UInt64 addr)
+	{
+		UInt8 inst = Utils::InstructionToUInt8(Instruction::JmpT);
+		prog_data.push_back(inst);
+
+		UInt64 addr_little_endian = Utils::UInt64ToLittleEndian(addr);
+		// This cast is not very good i should see if i can do it in a better way
+		unsigned char* addr_bytes = (unsigned char*)& addr_little_endian;
+		for (size_t i = 0; i < sizeof(addr_little_endian); ++i)
+		{
+			prog_data.push_back(addr_bytes[i]);
+		}
+	}
+	void BytecodeGenerator::WriteJumpFalseInstruction(std::vector<unsigned char>& prog_data, UInt64 addr)
+	{
+		UInt8 inst = Utils::InstructionToUInt8(Instruction::JmpF);
+		prog_data.push_back(inst);
+
+		UInt64 addr_little_endian = Utils::UInt64ToLittleEndian(addr);
+		// This cast is not very good i should see if i can do it in a better way
+		unsigned char* addr_bytes = (unsigned char*)& addr_little_endian;
+		for (size_t i = 0; i < sizeof(addr_little_endian); ++i)
+		{
+			prog_data.push_back(addr_bytes[i]);
+		}
+	}
+	void BytecodeGenerator::WriteJumpTrueStackInstruction(std::vector<unsigned char>& prog_data)
+	{
+		UInt8 inst = Utils::InstructionToUInt8(Instruction::JmpTStack);
+		prog_data.push_back(inst);
+	}
+	void BytecodeGenerator::WriteJumpFalseStackInstruction(std::vector<unsigned char>& prog_data)
+	{
+		UInt8 inst = Utils::InstructionToUInt8(Instruction::JmpFStack);
+		prog_data.push_back(inst);
+	}
 	void BytecodeGenerator::WriteCallInstruction(std::vector<unsigned char>& prog_data, UInt64 addr)
 	{
 		UInt8 inst = Utils::InstructionToUInt8(Instruction::Call);
@@ -31,6 +67,47 @@ namespace SDIM
 			prog_data.push_back(addr_bytes[i]);
 		}
 
+	}
+	void BytecodeGenerator::WriteCallTrueInstruction(std::vector<unsigned char>& prog_data, UInt64 addr)
+	{
+		UInt8 inst = Utils::InstructionToUInt8(Instruction::CallT);
+		prog_data.push_back(inst);
+
+		UInt64 addr_little_endian = Utils::UInt64ToLittleEndian(addr);
+		// This cast is not very good i should see if i can do it in a better way
+		unsigned char* addr_bytes = (unsigned char*)& addr_little_endian;
+		for (size_t i = 0; i < sizeof(addr_little_endian); ++i)
+		{
+			prog_data.push_back(addr_bytes[i]);
+		}
+	}
+	void BytecodeGenerator::WriteCallFalseInstruction(std::vector<unsigned char>& prog_data, UInt64 addr)
+	{
+		UInt8 inst = Utils::InstructionToUInt8(Instruction::CallF);
+		prog_data.push_back(inst);
+
+		UInt64 addr_little_endian = Utils::UInt64ToLittleEndian(addr);
+		// This cast is not very good i should see if i can do it in a better way
+		unsigned char* addr_bytes = (unsigned char*)& addr_little_endian;
+		for (size_t i = 0; i < sizeof(addr_little_endian); ++i)
+		{
+			prog_data.push_back(addr_bytes[i]);
+		}
+	}
+	void BytecodeGenerator::WriteCallTrueStackInstruction(std::vector<unsigned char>& prog_data)
+	{
+		UInt8 inst = Utils::InstructionToUInt8(Instruction::CallTStack);
+		prog_data.push_back(inst);
+	}
+	void BytecodeGenerator::WriteCallFalseStackInstruction(std::vector<unsigned char>& prog_data)
+	{
+		UInt8 inst = Utils::InstructionToUInt8(Instruction::CallFStack);
+		prog_data.push_back(inst);
+	}
+	void BytecodeGenerator::WriteReturnInstruction(std::vector<unsigned char>& prog_data)
+	{
+		UInt8 inst = Utils::InstructionToUInt8(Instruction::Return);
+		prog_data.push_back(inst);
 	}
 	void BytecodeGenerator::WritePushUInt8Instruction(std::vector<unsigned char>& prog_data, UInt8 value)
 	{

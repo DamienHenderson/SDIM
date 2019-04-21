@@ -12,3 +12,5 @@ target_compile_features(
     SDIMCommon
     PUBLIC cxx_std_17
 )
+
+target_compile_definitions(SDIMCommon PUBLIC SDIM_VERBOSE=1)

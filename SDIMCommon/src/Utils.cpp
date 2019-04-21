@@ -24,7 +24,8 @@ namespace SDIM
 
 		void Disassemble(const std::string & disasm)
 		{
-#ifdef SDIMVM_DEBUG
+#ifdef SDIM_VERBOSE
+
 			Log(disasm);
 #else
 			// avoid generating warnings
