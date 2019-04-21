@@ -20,6 +20,9 @@ namespace SDIM
 	{
 		(void)program_data;
 		
+		
+		
+		
 		generator->WritePushUInt8Instruction(program_data, 42);
 		generator->WritePushUInt16Instruction(program_data, 42);
 		generator->WritePushUInt32Instruction(program_data, 42);
@@ -32,6 +35,8 @@ namespace SDIM
 
 		generator->WritePushF32Instruction(program_data, 42.42f);
 		generator->WritePushF64Instruction(program_data, 42.42);
+
+		generator->WriteHaltInstruction(program_data);
 
 		for (size_t idx = 0; idx < tokens.size(); ++idx)
 		{

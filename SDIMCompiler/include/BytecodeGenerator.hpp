@@ -11,6 +11,7 @@ namespace SDIM
 		virtual ~BytecodeGenerator() {}
 
 		virtual void WriteJumpInstruction(std::vector<unsigned char>& prog_data, UInt64 addr) override;
+		virtual void WriteCallInstruction(std::vector<unsigned char>& prog_data, UInt64 addr) override;
 
 		virtual void WritePushUInt8Instruction(std::vector<unsigned char>& prog_data,	UInt8 value) override;
 		virtual void WritePushUInt16Instruction(std::vector<unsigned char>& prog_data,	UInt16 value) override;
@@ -24,5 +25,7 @@ namespace SDIM
 
 		virtual void WritePushF32Instruction(std::vector<unsigned char>& prog_data,		F32 value) override;
 		virtual void WritePushF64Instruction(std::vector<unsigned char>& prog_data,		F64 value) override;
+		
+		virtual void WriteHaltInstruction(std::vector<unsigned char>& prog_data) override;
 	};
 }

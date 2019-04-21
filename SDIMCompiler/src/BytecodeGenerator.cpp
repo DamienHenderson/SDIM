@@ -18,6 +18,20 @@ namespace SDIM
 		}
 
 	}
+	void BytecodeGenerator::WriteCallInstruction(std::vector<unsigned char>& prog_data, UInt64 addr)
+	{
+		UInt8 inst = Utils::InstructionToUInt8(Instruction::Call);
+		prog_data.push_back(inst);
+
+		UInt64 addr_little_endian = Utils::UInt64ToLittleEndian(addr);
+		// This cast is not very good i should see if i can do it in a better way
+		unsigned char* addr_bytes = (unsigned char*)& addr_little_endian;
+		for (size_t i = 0; i < sizeof(addr_little_endian); ++i)
+		{
+			prog_data.push_back(addr_bytes[i]);
+		}
+
+	}
 	void BytecodeGenerator::WritePushUInt8Instruction(std::vector<unsigned char>& prog_data, UInt8 value)
 	{
 		UInt8 inst = Utils::InstructionToUInt8(Instruction::PushUInt8);
@@ -126,5 +140,10 @@ namespace SDIM
 		{
 			prog_data.push_back(value_bytes[i]);
 		}
+	}
+	void BytecodeGenerator::WriteHaltInstruction(std::vector<unsigned char>& prog_data)
+	{
+		UInt8 inst = Utils::InstructionToUInt8(Instruction::Halt);
+		prog_data.push_back(inst);
 	}
 }

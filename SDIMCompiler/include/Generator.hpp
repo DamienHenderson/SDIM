@@ -13,7 +13,10 @@ namespace SDIM
 		Generator() {}
 		virtual ~Generator() {}
 
+		/// Unconditional Jump Instruction
+		/// Recommended use is for while loops and if statements specifically ones with else statements
 		virtual void WriteJumpInstruction(std::vector<unsigned char>& prog_data, UInt64 addr) = 0;
+		virtual void WriteCallInstruction(std::vector<unsigned char>& prog_data, UInt64 addr) = 0;
 
 		virtual void WritePushUInt8Instruction(std::vector<unsigned char>& prog_data,	UInt8 value) = 0;
 		virtual void WritePushUInt16Instruction(std::vector<unsigned char>& prog_data,	UInt16 value) = 0;
@@ -27,5 +30,7 @@ namespace SDIM
 		
 		virtual void WritePushF32Instruction(std::vector<unsigned char>& prog_data,		F32 value) = 0;
 		virtual void WritePushF64Instruction(std::vector<unsigned char>& prog_data,		F64 value) = 0;
+
+		virtual void WriteHaltInstruction(std::vector<unsigned char>& prog_data) = 0;
 	};
 }

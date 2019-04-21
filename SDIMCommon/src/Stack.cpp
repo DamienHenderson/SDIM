@@ -19,7 +19,7 @@ namespace SDIM
 		if (stack_top_ + 1 >= stack_capacity_)
 		{
 			SDIM::Utils::Log("Resizing stack to accomodate push");
-			Resize(static_cast<size_t>(stack_capacity_ * 1.5f));
+			Resize(static_cast<size_t>(stack_capacity_ * 1.5));
 		}
 		data_[stack_top_++] = var;
 	}
