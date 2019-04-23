@@ -11,10 +11,13 @@ namespace SDIM
 	
 	VirtualMachine::VirtualMachine()
 	{
-		// 32k Variables 
+		// 32k stack Variables 
 		// profile this to see if it's a good starting value
 		state_.program_stack_.Resize(32768);
-
+		// 16k variable storage
+		// profile this to see if it's a good starting value
+		// this is used for the semi register based nature of the language
+		state_.variables_.Resize(16384);
 		
 		// Put all of the opcode handler functions into the opcode table
 		PopulateOpcodeTable();

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Stack.hpp"
+#include "VariableStorage.hpp"
 namespace SDIM
 {
 	struct VMState
@@ -10,6 +11,7 @@ namespace SDIM
 		size_t program_length_{ 0 };
 		Stack program_stack_;
 		SDIM::Variable accumulator_; // optimisation, might not be needed
+		SDIM::VariableStorage variables_;
 		bool running_{ false };
 	};
 
