@@ -48,6 +48,6 @@ int main(int argc, char** argv)
 			PrintHelp();
 		}
 	}
-
+	std::cout << "FNV1A hash of test is: " << SDIM::Utils::FNV1AHash("test", std::strlen("test")) << "\n";
 	return 0;
 }

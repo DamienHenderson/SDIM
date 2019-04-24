@@ -50,11 +50,17 @@ namespace SDIM
 	}
 	void HashTable::AddString(const char* string)
 	{
-		(void)string;
+		static_assert(sizeof(size_t) == sizeof(UInt64), "size_t is not the same size as UInt64");
+		UInt64 hash = SDIM::Utils::FNV1AHash(string, std::strlen(string));
+		UInt64 idx = hash % capacity_;
+		(void)idx;
+
 	}
 	const char* HashTable::GetString(const char* string)
 	{
-		(void)string;
+		UInt64 hash = SDIM::Utils::FNV1AHash(string, std::strlen(string));
+		UInt64 idx = hash % capacity_;
+		(void)idx;
 		return nullptr;
 	}
 }

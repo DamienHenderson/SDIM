@@ -113,5 +113,9 @@ namespace SDIM
 			return dest;
 		}
 
+		/// Returns the FNV1a Hash of a string
+		/// Note that this hash is not cryptographically secure so it should net be used for that purpose
+		UInt64 FNV1AHash(const char* str, size_t length);
+
 	}
 }

@@ -83,6 +83,26 @@ namespace SDIM
 			return (byte_0 << 56) | (byte_1 << 48) | (byte_2 << 40) | (byte_3 << 32) | (byte_4 << 24) | (byte_5 << 16) | (byte_6 << 8) | byte_7;
 		}
 
+		UInt64 FNV1AHash(const char* str, size_t length)
+		{
+			if (str == nullptr)
+			{
+				return ~(UInt64)0;
+			}
+			/// Values for 64 bit FNV1A
+			constexpr UInt64 fnv_prime = 1099511628211u;
+			constexpr UInt64 fnv_offset_basis = 14695981039346656037u;
+
+			UInt64 hash = fnv_offset_basis;
+			for (size_t i = 0; i < length; i++)
+			{
+				UInt64 next_byte = static_cast<UInt64>(str[i]);
+				hash ^= next_byte;
+				hash *= fnv_prime;
+			}
+			return hash;
+		}
+
 
 		
 	}
