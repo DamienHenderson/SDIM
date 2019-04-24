@@ -6,6 +6,7 @@
 #include "Utils.hpp"
 // #include "Types.hpp"
 
+
 namespace SDIM
 {
 	
@@ -21,6 +22,7 @@ namespace SDIM
 		
 		// Put all of the opcode handler functions into the opcode table
 		PopulateOpcodeTable();
+		
 	}
 
 
