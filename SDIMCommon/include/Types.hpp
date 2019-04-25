@@ -88,7 +88,7 @@ namespace SDIM
 
 		size_t GetTypeSize() const;
 
-		bool IsSameType(const Variable& other);
+		bool IsSameType(const Variable& other) const;
 
 		bool IsInteger() const;
 
@@ -96,9 +96,58 @@ namespace SDIM
 
 		bool IsFloat() const;
 
-		bool PromoteToRHSType(const Variable& rhs) const;
+		bool IsNumeric() const;
+
+		// can this variable be promoted to the type of the rhs
+		bool ShouldPromoteToOtherType(const Variable& other) const;
+		// Return a variable of the same type as the rhs variable made from this variable
+		Variable PromoteToOtherType(const Variable& other) const;
 	};
 
+	namespace Operators
+	{
+		/*
+		Less = 0x0F,
+		LessEqual = 0x10,
+		Greater = 0x11,
+		GreaterEqual = 0x12,
+		Equal = 0x13,
+		NotEqual = 0x14,
+		Not = 0x15,
+		And = 0x16, // Bitwise AND not logical AND
+		Or = 0x17,  // Bitwise OR not logical OR
+		Xor = 0x18, // Bitwise XOR not logical XOR
+		Add = 0x19,
+		Subtract = 0x1A,
+		Multiply = 0x1B,
+		BitwiseNot = 0x1C,
+		Divide = 0x1D,
+		Negate = 0x1E,
+		Modulo = 0x1F,
+		*/
+
+		// Logical Operators
+		bool Less(const Variable& lhs, const Variable& rhs);
+		bool LessEqual(const Variable& lhs, const Variable& rhs);
+		bool Greater(const Variable& lhs, const Variable& rhs);
+		bool GreaterEqual(const Variable& lhs, const Variable& rhs);
+		bool Equal(const Variable& lhs, const Variable& rhs);
+		bool NotEqual(const Variable& lhs, const Variable& rhs);
+
+		Variable Not(const Variable& var);
+
+		// Arithmetic Operators
+		Variable And(const Variable& lhs, const Variable& rhs);
+		Variable Or(const Variable& lhs, const Variable& rhs);
+		Variable Xor(const Variable& lhs, const Variable& rhs);
+		Variable Add(const Variable& lhs, const Variable& rhs);
+		Variable Subtract(const Variable& lhs, const Variable& rhs);
+		Variable Multiply(const Variable& lhs, const Variable& rhs);
+		Variable BitwiseNot(const Variable& var);
+		Variable Divide(const Variable& lhs, const Variable& rhs);
+		Variable Negate(const Variable& var);
+		Variable Modulo(const Variable& lhs, const Variable& rhs);
+	}
 	bool IsTrue(const SDIM::Variable& var);
 	bool IsFalse(const SDIM::Variable& var);
 	namespace Utils

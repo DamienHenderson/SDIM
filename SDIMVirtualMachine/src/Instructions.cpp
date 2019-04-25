@@ -232,52 +232,160 @@ namespace SDIM
 		}
 		void Less(SDIM::VMState& state)
 		{
+			SDIM::Utils::Disassemble("Less");
+			if (state.program_stack_.Size() < 2)
+			{
+				SDIM::Utils::Log("Attempted Less with: ", state.program_stack_.Size(), " elements");
+				state.program_counter_ += opcode_size;
+			}
+			SDIM::Variable rhs = state.program_stack_.Pop();
+			SDIM::Variable lhs = state.program_stack_.Pop();
 
-			(void)state;
+			state.program_stack_.Push(Operators::Less(lhs, rhs));
+
+			state.program_counter_ += opcode_size;
 		}
 
 		void LessEqual(SDIM::VMState& state)
 		{
-			(void)state;
+			SDIM::Utils::Disassemble("LessEqual");
+			if (state.program_stack_.Size() < 2)
+			{
+				SDIM::Utils::Log("Attempted LessEqual with: ", state.program_stack_.Size(), " elements");
+				state.program_counter_ += opcode_size;
+			}
+			SDIM::Variable rhs = state.program_stack_.Pop();
+			SDIM::Variable lhs = state.program_stack_.Pop();
+
+			state.program_stack_.Push(Operators::LessEqual(lhs, rhs));
+
+			state.program_counter_ += opcode_size;
 		}
 		void Greater(SDIM::VMState& state)
 		{
-			(void)state;
+			SDIM::Utils::Disassemble("Greater");
+			if (state.program_stack_.Size() < 2)
+			{
+				SDIM::Utils::Log("Attempted Greater with: ", state.program_stack_.Size(), " elements");
+				state.program_counter_ += opcode_size;
+			}
+			SDIM::Variable rhs = state.program_stack_.Pop();
+			SDIM::Variable lhs = state.program_stack_.Pop();
+
+			state.program_stack_.Push(Operators::Greater(lhs, rhs));
+
+			state.program_counter_ += opcode_size;
 		}
 
 		void GreaterEqual(SDIM::VMState& state)
 		{
-			(void)state;
+			SDIM::Utils::Disassemble("GreaterEqual");
+			if (state.program_stack_.Size() < 2)
+			{
+				SDIM::Utils::Log("Attempted GreaterEqual with: ", state.program_stack_.Size(), " elements");
+				state.program_counter_ += opcode_size;
+			}
+			SDIM::Variable rhs = state.program_stack_.Pop();
+			SDIM::Variable lhs = state.program_stack_.Pop();
+
+			state.program_stack_.Push(Operators::GreaterEqual(lhs, rhs));
+
+			state.program_counter_ += opcode_size;
 		}
 
 		void Equal(SDIM::VMState& state)
 		{
-			(void)state;
+			SDIM::Utils::Disassemble("Equal");
+			if (state.program_stack_.Size() < 2)
+			{
+				SDIM::Utils::Log("Attempted Equal with: ", state.program_stack_.Size(), " elements");
+				state.program_counter_ += opcode_size;
+			}
+			SDIM::Variable rhs = state.program_stack_.Pop();
+			SDIM::Variable lhs = state.program_stack_.Pop();
+
+			state.program_stack_.Push(Operators::Equal(lhs, rhs));
+
+			state.program_counter_ += opcode_size;
 		}
 
 		void NotEqual(SDIM::VMState& state)
 		{
-			(void)state;
+			SDIM::Utils::Disassemble("NotEqual");
+			if (state.program_stack_.Size() < 2)
+			{
+				SDIM::Utils::Log("Attempted NotEqual with: ", state.program_stack_.Size(), " elements");
+				state.program_counter_ += opcode_size;
+			}
+			SDIM::Variable rhs = state.program_stack_.Pop();
+			SDIM::Variable lhs = state.program_stack_.Pop();
+
+			state.program_stack_.Push(Operators::NotEqual(lhs, rhs));
+
+			state.program_counter_ += opcode_size;
 		}
 
 		void Not(SDIM::VMState& state)
 		{
-			(void)state;
+			SDIM::Utils::Disassemble("Not");
+			if (state.program_stack_.Size() < 1)
+			{
+				SDIM::Utils::Log("Attempted Not with: ", state.program_stack_.Size(), " elements");
+				state.program_counter_ += opcode_size;
+			}
+			SDIM::Variable lhs = state.program_stack_.Pop();
+
+			state.program_stack_.Push(Operators::Not(lhs));
+
+			state.program_counter_ += opcode_size;
 		}
 
 		void And(SDIM::VMState& state)
 		{
-			(void)state;
+			SDIM::Utils::Disassemble("And");
+			if (state.program_stack_.Size() < 2)
+			{
+				SDIM::Utils::Log("Attempted And with: ", state.program_stack_.Size(), " elements");
+				state.program_counter_ += opcode_size;
+			}
+			SDIM::Variable rhs = state.program_stack_.Pop();
+			SDIM::Variable lhs = state.program_stack_.Pop();
+
+			state.program_stack_.Push(Operators::And(lhs, rhs));
+
+			state.program_counter_ += opcode_size;
 		}
 
 		void Or(SDIM::VMState& state)
 		{
-			(void)state;
+			SDIM::Utils::Disassemble("Or");
+			if (state.program_stack_.Size() < 2)
+			{
+				SDIM::Utils::Log("Attempted Or with: ", state.program_stack_.Size(), " elements");
+				state.program_counter_ += opcode_size;
+			}
+			SDIM::Variable rhs = state.program_stack_.Pop();
+			SDIM::Variable lhs = state.program_stack_.Pop();
+
+			state.program_stack_.Push(Operators::Or(lhs, rhs));
+
+			state.program_counter_ += opcode_size;
 		}
 
 		void Xor(SDIM::VMState& state)
 		{
-			(void)state;
+			SDIM::Utils::Disassemble("Xor");
+			if (state.program_stack_.Size() < 2)
+			{
+				SDIM::Utils::Log("Attempted Xor with: ", state.program_stack_.Size(), " elements");
+				state.program_counter_ += opcode_size;
+			}
+			SDIM::Variable rhs = state.program_stack_.Pop();
+			SDIM::Variable lhs = state.program_stack_.Pop();
+
+			state.program_stack_.Push(Operators::Xor(lhs, rhs));
+
+			state.program_counter_ += opcode_size;
 		}
 
 		void Add(SDIM::VMState& state)
@@ -285,55 +393,111 @@ namespace SDIM
 			SDIM::Utils::Disassemble("Add");
 			if (state.program_stack_.Size() < 2)
 			{
-				SDIM::Utils::Log("Attemped add with: ", state.program_stack_.Size(), " elements");
+				SDIM::Utils::Log("Attempted Add with: ", state.program_stack_.Size(), " elements");
 				state.program_counter_ += opcode_size;
 			}
 			SDIM::Variable rhs = state.program_stack_.Pop();
 			SDIM::Variable lhs = state.program_stack_.Pop();
 
-			// no need to cast/promote types
-			if (rhs.type == lhs.type)
-			{
-				VarUnion var_un;
-				if (lhs.type == VariableType::UInt16)
-				{
-					var_un.uint16 = lhs.as.uint16 + rhs.as.uint16;
-				}
-				state.program_stack_.Push(SDIM::Variable(lhs.type, var_un));
-			}
+			state.program_stack_.Push(Operators::Add(lhs, rhs));
+
 			state.program_counter_ += opcode_size;
 		}
 
 		void Subtract(SDIM::VMState& state)
 		{
-			(void)state;
+			SDIM::Utils::Disassemble("Subtract");
+			if (state.program_stack_.Size() < 2)
+			{
+				SDIM::Utils::Log("Attempted Subtract with: ", state.program_stack_.Size(), " elements");
+				state.program_counter_ += opcode_size;
+			}
+			SDIM::Variable rhs = state.program_stack_.Pop();
+			SDIM::Variable lhs = state.program_stack_.Pop();
+
+			state.program_stack_.Push(Operators::Subtract(lhs, rhs));
+
+			state.program_counter_ += opcode_size;
 		}
 
 		void Multiply(SDIM::VMState& state)
 		{
-			(void)state;
+			SDIM::Utils::Disassemble("Multiply");
+			if (state.program_stack_.Size() < 2)
+			{
+				SDIM::Utils::Log("Attempted Multiply with: ", state.program_stack_.Size(), " elements");
+				state.program_counter_ += opcode_size;
+			}
+			SDIM::Variable rhs = state.program_stack_.Pop();
+			SDIM::Variable lhs = state.program_stack_.Pop();
+
+			state.program_stack_.Push(Operators::Multiply(lhs, rhs));
+
+			state.program_counter_ += opcode_size;
 		}
 
 		void BitwiseNot(SDIM::VMState& state)
 		{
-			(void)state;
+			SDIM::Utils::Disassemble("BitwiseNot");
+			if (state.program_stack_.Size() < 1)
+			{
+				SDIM::Utils::Log("Attempted BitwiseNot with: ", state.program_stack_.Size(), " elements");
+				state.program_counter_ += opcode_size;
+			}
+			SDIM::Variable lhs = state.program_stack_.Pop();
+
+			state.program_stack_.Push(Operators::BitwiseNot(lhs));
+
+			state.program_counter_ += opcode_size;
 		}
 
 		void Divide(SDIM::VMState& state)
 		{
-			(void)state;
+			SDIM::Utils::Disassemble("Divide");
+			if (state.program_stack_.Size() < 2)
+			{
+				SDIM::Utils::Log("Attempted Divide with: ", state.program_stack_.Size(), " elements");
+				state.program_counter_ += opcode_size;
+			}
+			SDIM::Variable rhs = state.program_stack_.Pop();
+			SDIM::Variable lhs = state.program_stack_.Pop();
+
+			state.program_stack_.Push(Operators::Divide(lhs, rhs));
+
+			state.program_counter_ += opcode_size;
 
 		}
 
 		void Negate(SDIM::VMState& state)
 		{
-			(void)state;
+			SDIM::Utils::Disassemble("Negate");
+			if (state.program_stack_.Size() < 1)
+			{
+				SDIM::Utils::Log("Attempted Negate with: ", state.program_stack_.Size(), " elements");
+				state.program_counter_ += opcode_size;
+			}
+			SDIM::Variable lhs = state.program_stack_.Pop();
+
+			state.program_stack_.Push(Operators::Negate(lhs));
+
+			state.program_counter_ += opcode_size;
 
 		}
 
 		void Modulo(SDIM::VMState& state)
 		{
-			(void)state;
+			SDIM::Utils::Disassemble("Modulo");
+			if (state.program_stack_.Size() < 2)
+			{
+				SDIM::Utils::Log("Attempted Modulo with: ", state.program_stack_.Size(), " elements");
+				state.program_counter_ += opcode_size;
+			}
+			SDIM::Variable rhs = state.program_stack_.Pop();
+			SDIM::Variable lhs = state.program_stack_.Pop();
+
+			state.program_stack_.Push(Operators::Modulo(lhs, rhs));
+
+			state.program_counter_ += opcode_size;
 
 		}
 

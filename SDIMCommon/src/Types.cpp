@@ -3,6 +3,8 @@
 #include <sstream>
 
 #include "Utils.hpp"
+
+#include <cmath>
 namespace SDIM
 {
 	constexpr size_t type_sizes[] = {
@@ -73,7 +75,7 @@ namespace SDIM
 	{
 		return type_sizes[static_cast<size_t>(type)];
 	}
-	bool Variable::IsSameType(const Variable& other)
+	bool Variable::IsSameType(const Variable & other) const
 	{
 		return type == other.type;
 	}
@@ -89,7 +91,953 @@ namespace SDIM
 	{
 		return type == VariableType::F32 || type == VariableType::F64;
 	}
-	
+
+	bool Variable::IsNumeric() const
+	{
+		return IsInteger() || IsUnsigned() || IsFloat();
+	}
+
+
+
+	bool Variable::ShouldPromoteToOtherType(const Variable & other) const
+	{
+		if (IsInteger() && other.IsInteger() && other.GetTypeSize() >= GetTypeSize())
+		{
+			return true;
+		}
+		if (IsUnsigned() && other.IsUnsigned() && other.GetTypeSize() >= GetTypeSize())
+		{
+			return true;
+		}
+		if (IsFloat() && other.IsFloat() && other.GetTypeSize() >= GetTypeSize())
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+
+
+	Variable Variable::PromoteToOtherType(const Variable & other) const
+	{
+		if (IsInteger() && other.IsInteger() && other.GetTypeSize() <= GetTypeSize())
+		{
+			return *this;
+		}
+		if (IsUnsigned() && other.IsUnsigned() && other.GetTypeSize() <= GetTypeSize())
+		{
+			return *this;
+		}
+		if (IsFloat() && other.IsFloat() && other.GetTypeSize() <= GetTypeSize())
+		{
+			return *this;
+		}
+
+		return Variable();
+
+	}
+
+	namespace Operators
+	{
+
+		// Logical Operators
+		namespace detail
+		{
+			bool LessInternal(const Variable& lhs, const Variable& rhs)
+			{
+				switch (lhs.type)
+				{
+					// unsigned 
+				case VariableType::UInt8:
+					return lhs.as.uint8 < rhs.as.uint8;
+				case VariableType::UInt16:
+					return lhs.as.uint16 < rhs.as.uint16;
+				case VariableType::UInt32:
+					return lhs.as.uint32 < rhs.as.uint32;
+				case VariableType::UInt64:
+					return lhs.as.uint64 < rhs.as.uint64;
+					// signed
+				case VariableType::Int8:
+					return lhs.as.int8 < rhs.as.int8;
+				case VariableType::Int16:
+					return lhs.as.int16 < rhs.as.int16;
+				case VariableType::Int32:
+					return lhs.as.int32 < rhs.as.int32;
+				case VariableType::Int64:
+					return lhs.as.int64 < rhs.as.int64;
+					// floating point
+				case VariableType::F32:
+					return lhs.as.f32 < rhs.as.f32;
+				case VariableType::F64:
+					return lhs.as.f64 < rhs.as.f64;
+					// pointers
+				case VariableType::Pointer:
+					return lhs.as.ptr < rhs.as.ptr;
+					// case VariableType::String:
+					//	return lhs.as.f64 < rhs.as.f64;
+				default:
+					// unknown type
+					return false;
+				}
+			}
+
+			bool GreaterInternal(const Variable& lhs, const Variable& rhs)
+			{
+				switch (lhs.type)
+				{
+					// unsigned 
+				case VariableType::UInt8:
+					return lhs.as.uint8 > rhs.as.uint8;
+				case VariableType::UInt16:
+					return lhs.as.uint16 > rhs.as.uint16;
+				case VariableType::UInt32:
+					return lhs.as.uint32 > rhs.as.uint32;
+				case VariableType::UInt64:
+					return lhs.as.uint64 > rhs.as.uint64;
+					// signed
+				case VariableType::Int8:
+					return lhs.as.int8 > rhs.as.int8;
+				case VariableType::Int16:
+					return lhs.as.int16 > rhs.as.int16;
+				case VariableType::Int32:
+					return lhs.as.int32 > rhs.as.int32;
+				case VariableType::Int64:
+					return lhs.as.int64 > rhs.as.int64;
+					// floating point
+				case VariableType::F32:
+					return lhs.as.f32 > rhs.as.f32;
+				case VariableType::F64:
+					return lhs.as.f64 > rhs.as.f64;
+					// pointers
+				case VariableType::Pointer:
+					return lhs.as.ptr > rhs.as.ptr;
+					// case VariableType::String:
+					//	return lhs.as.f64 > rhs.as.f64;
+				default:
+					// unknown type
+					return false;
+				}
+			}
+
+			bool EqualInternal(const Variable& lhs, const Variable& rhs)
+			{
+				switch (lhs.type)
+				{
+					// unsigned 
+				case VariableType::UInt8:
+					return lhs.as.uint8 == rhs.as.uint8;
+				case VariableType::UInt16:
+					return lhs.as.uint16 == rhs.as.uint16;
+				case VariableType::UInt32:
+					return lhs.as.uint32 == rhs.as.uint32;
+				case VariableType::UInt64:
+					return lhs.as.uint64 == rhs.as.uint64;
+					// signed
+				case VariableType::Int8:
+					return lhs.as.int8 == rhs.as.int8;
+				case VariableType::Int16:
+					return lhs.as.int16 == rhs.as.int16;
+				case VariableType::Int32:
+					return lhs.as.int32 == rhs.as.int32;
+				case VariableType::Int64:
+					return lhs.as.int64 == rhs.as.int64;
+					// floating point
+				case VariableType::F32:
+					return lhs.as.f32 == rhs.as.f32;
+				case VariableType::F64:
+					return lhs.as.f64 == rhs.as.f64;
+					// pointers
+				case VariableType::Pointer:
+					return lhs.as.ptr == rhs.as.ptr;
+					// case VariableType::String:
+					//	return lhs.as.f64 == rhs.as.f64;
+				default:
+					// unknown type
+					return false;
+				}
+			}
+			bool NotEqualInternal(const Variable& lhs, const Variable& rhs)
+			{
+				switch (lhs.type)
+				{
+					// unsigned 
+				case VariableType::UInt8:
+					return lhs.as.uint8 != rhs.as.uint8;
+				case VariableType::UInt16:
+					return lhs.as.uint16 != rhs.as.uint16;
+				case VariableType::UInt32:
+					return lhs.as.uint32 != rhs.as.uint32;
+				case VariableType::UInt64:
+					return lhs.as.uint64 != rhs.as.uint64;
+					// signed
+				case VariableType::Int8:
+					return lhs.as.int8 != rhs.as.int8;
+				case VariableType::Int16:
+					return lhs.as.int16 != rhs.as.int16;
+				case VariableType::Int32:
+					return lhs.as.int32 != rhs.as.int32;
+				case VariableType::Int64:
+					return lhs.as.int64 != rhs.as.int64;
+					// floating point
+				case VariableType::F32:
+					return lhs.as.f32 != rhs.as.f32;
+				case VariableType::F64:
+					return lhs.as.f64 != rhs.as.f64;
+					// pointers
+				case VariableType::Pointer:
+					return lhs.as.ptr != rhs.as.ptr;
+					// case VariableType::String:
+					//	return lhs.as.f64 != rhs.as.f64;
+				default:
+					// unknown type
+					return false;
+				}
+			}
+			Variable NotInternal(const Variable& var)
+			{
+				switch (var.type)
+				{
+					// unsigned 
+				case VariableType::UInt8:
+					return !var.as.uint8;
+				case VariableType::UInt16:
+					return !var.as.uint16;
+				case VariableType::UInt32:
+					return !var.as.uint32;
+				case VariableType::UInt64:
+					return !var.as.uint64;
+					// signed
+				case VariableType::Int8:
+					return !var.as.int8;
+				case VariableType::Int16:
+					return !var.as.int16;
+				case VariableType::Int32:
+					return !var.as.int32;
+				case VariableType::Int64:
+					return !var.as.int64;
+					// floating point
+				case VariableType::F32:
+					return !var.as.f32;
+				case VariableType::F64:
+					return !var.as.f64;
+					// pointers
+				case VariableType::Pointer:
+					return !var.as.ptr;
+					// case VariableType::String:
+					//	return var.as.f64 != rhs.as.f64;
+				default:
+					// unknown type
+					return false;
+				}
+			}
+			Variable AndInternal(const Variable& lhs, const Variable& rhs)
+			{
+				switch (lhs.type)
+				{
+					// unsigned 
+				case VariableType::UInt8:
+					return lhs.as.uint8& rhs.as.uint8;
+				case VariableType::UInt16:
+					return lhs.as.uint16& rhs.as.uint16;
+				case VariableType::UInt32:
+					return lhs.as.uint32& rhs.as.uint32;
+				case VariableType::UInt64:
+					return lhs.as.uint64& rhs.as.uint64;
+					// signed
+				case VariableType::Int8:
+					return lhs.as.int8& rhs.as.int8;
+				case VariableType::Int16:
+					return lhs.as.int16& rhs.as.int16;
+				case VariableType::Int32:
+					return lhs.as.int32& rhs.as.int32;
+				case VariableType::Int64:
+					return lhs.as.int64& rhs.as.int64;
+					// floating point
+					// below this point this operation is not applicable
+					// Runtime Errors below this point
+				case VariableType::F32:
+					return Variable();
+				case VariableType::F64:
+					return Variable();
+					// pointers
+				case VariableType::Pointer:
+					return Variable();
+				default:
+					// unknown type
+					return Variable();
+				}
+			}
+			Variable OrInternal(const Variable& lhs, const Variable& rhs)
+			{
+				switch (lhs.type)
+				{
+					// unsigned 
+				case VariableType::UInt8:
+					return lhs.as.uint8 | rhs.as.uint8;
+				case VariableType::UInt16:
+					return lhs.as.uint16 | rhs.as.uint16;
+				case VariableType::UInt32:
+					return lhs.as.uint32 | rhs.as.uint32;
+				case VariableType::UInt64:
+					return lhs.as.uint64 | rhs.as.uint64;
+					// signed
+				case VariableType::Int8:
+					return lhs.as.int8 | rhs.as.int8;
+				case VariableType::Int16:
+					return lhs.as.int16 | rhs.as.int16;
+				case VariableType::Int32:
+					return lhs.as.int32 | rhs.as.int32;
+				case VariableType::Int64:
+					return lhs.as.int64 | rhs.as.int64;
+					// floating point
+					// below this point this operation is not applicable
+					// Runtime Errors below this point
+				case VariableType::F32:
+					return Variable();
+				case VariableType::F64:
+					return Variable();
+					// pointers
+				case VariableType::Pointer:
+					return Variable();
+				default:
+					// unknown type
+					return Variable();
+				}
+			}
+			Variable XorInternal(const Variable& lhs, const Variable& rhs)
+			{
+				switch (lhs.type)
+				{
+					// unsigned 
+				case VariableType::UInt8:
+					return lhs.as.uint8^ rhs.as.uint8;
+				case VariableType::UInt16:
+					return lhs.as.uint16^ rhs.as.uint16;
+				case VariableType::UInt32:
+					return lhs.as.uint32^ rhs.as.uint32;
+				case VariableType::UInt64:
+					return lhs.as.uint64^ rhs.as.uint64;
+					// signed
+				case VariableType::Int8:
+					return lhs.as.int8^ rhs.as.int8;
+				case VariableType::Int16:
+					return lhs.as.int16^ rhs.as.int16;
+				case VariableType::Int32:
+					return lhs.as.int32^ rhs.as.int32;
+				case VariableType::Int64:
+					return lhs.as.int64^ rhs.as.int64;
+					// floating point
+					// below this point this operation is not applicable
+					// Runtime Errors below this point
+				case VariableType::F32:
+					return Variable();
+				case VariableType::F64:
+					return Variable();
+					// pointers
+				case VariableType::Pointer:
+					return Variable();
+				default:
+					// unknown type
+					return Variable();
+				}
+			}
+			Variable AddInternal(const Variable& lhs, const Variable& rhs)
+			{
+				switch (lhs.type)
+				{
+					// unsigned 
+				case VariableType::UInt8:
+					return lhs.as.uint8 + rhs.as.uint8;
+				case VariableType::UInt16:
+					return lhs.as.uint16 + rhs.as.uint16;
+				case VariableType::UInt32:
+					return lhs.as.uint32 + rhs.as.uint32;
+				case VariableType::UInt64:
+					return lhs.as.uint64 + rhs.as.uint64;
+					// signed
+				case VariableType::Int8:
+					return lhs.as.int8 + rhs.as.int8;
+				case VariableType::Int16:
+					return lhs.as.int16 + rhs.as.int16;
+				case VariableType::Int32:
+					return lhs.as.int32 + rhs.as.int32;
+				case VariableType::Int64:
+					return lhs.as.int64 + rhs.as.int64;
+					// floating point
+
+				case VariableType::F32:
+					return lhs.as.f32 + rhs.as.f32;
+				case VariableType::F64:
+					return lhs.as.f64 + rhs.as.f64;
+					// pointers
+				case VariableType::Pointer:
+					// pointer
+					return Variable();
+				default:
+					// unknown type
+					return Variable();
+				}
+			}
+			Variable SubtractInternal(const Variable& lhs, const Variable& rhs)
+			{
+				switch (lhs.type)
+				{
+					// unsigned 
+				case VariableType::UInt8:
+					return lhs.as.uint8 - rhs.as.uint8;
+				case VariableType::UInt16:
+					return lhs.as.uint16 - rhs.as.uint16;
+				case VariableType::UInt32:
+					return lhs.as.uint32 - rhs.as.uint32;
+				case VariableType::UInt64:
+					return lhs.as.uint64 - rhs.as.uint64;
+					// signed
+				case VariableType::Int8:
+					return lhs.as.int8 - rhs.as.int8;
+				case VariableType::Int16:
+					return lhs.as.int16 - rhs.as.int16;
+				case VariableType::Int32:
+					return lhs.as.int32 - rhs.as.int32;
+				case VariableType::Int64:
+					return lhs.as.int64 - rhs.as.int64;
+					// floating point
+
+				case VariableType::F32:
+					return lhs.as.f32 - rhs.as.f32;
+				case VariableType::F64:
+					return lhs.as.f64 - rhs.as.f64;
+					// pointers
+				case VariableType::Pointer:
+					// pointer
+					return Variable();
+				default:
+					// unknown type
+					return Variable();
+				}
+			}
+			Variable MultiplyInternal(const Variable& lhs, const Variable& rhs)
+			{
+				switch (lhs.type)
+				{
+					// unsigned 
+				case VariableType::UInt8:
+					return lhs.as.uint8* rhs.as.uint8;
+				case VariableType::UInt16:
+					return lhs.as.uint16* rhs.as.uint16;
+				case VariableType::UInt32:
+					return lhs.as.uint32* rhs.as.uint32;
+				case VariableType::UInt64:
+					return lhs.as.uint64* rhs.as.uint64;
+					// signed
+				case VariableType::Int8:
+					return lhs.as.int8* rhs.as.int8;
+				case VariableType::Int16:
+					return lhs.as.int16* rhs.as.int16;
+				case VariableType::Int32:
+					return lhs.as.int32* rhs.as.int32;
+				case VariableType::Int64:
+					return lhs.as.int64* rhs.as.int64;
+					// floating point
+
+				case VariableType::F32:
+					return lhs.as.f32* rhs.as.f32;
+				case VariableType::F64:
+					return lhs.as.f64* rhs.as.f64;
+					// pointers
+				case VariableType::Pointer:
+					// pointer
+					return Variable();
+				default:
+					// unknown type
+					return Variable();
+				}
+			}
+			Variable BitwiseNotInternal(const Variable& var)
+			{
+				switch (var.type)
+				{
+					// unsigned 
+				case VariableType::UInt8:
+					return ~var.as.uint8;
+				case VariableType::UInt16:
+					return ~var.as.uint16;
+				case VariableType::UInt32:
+					return ~var.as.uint32;
+				case VariableType::UInt64:
+					return ~var.as.uint64;
+					// signed
+				case VariableType::Int8:
+					return ~var.as.int8;
+				case VariableType::Int16:
+					return ~var.as.int16;
+				case VariableType::Int32:
+					return ~var.as.int32;
+				case VariableType::Int64:
+					return ~var.as.int64;
+					// floating point
+				case VariableType::F32:
+					return Variable();
+				case VariableType::F64:
+					return Variable();
+					// pointers
+				case VariableType::Pointer:
+					return Variable();
+					// case VariableType::String:
+					//	return var.as.f64 ~= rhs.as.f64;
+				default:
+					// unknown type
+					return false;
+				}
+			}
+			Variable DivideInternal(const Variable& lhs, const Variable& rhs)
+			{
+				switch (lhs.type)
+				{
+					// unsigned 
+				case VariableType::UInt8:
+					return lhs.as.uint8 / rhs.as.uint8;
+				case VariableType::UInt16:
+					return lhs.as.uint16 / rhs.as.uint16;
+				case VariableType::UInt32:
+					return lhs.as.uint32 / rhs.as.uint32;
+				case VariableType::UInt64:
+					return lhs.as.uint64 / rhs.as.uint64;
+					// signed
+				case VariableType::Int8:
+					return lhs.as.int8 / rhs.as.int8;
+				case VariableType::Int16:
+					return lhs.as.int16 / rhs.as.int16;
+				case VariableType::Int32:
+					return lhs.as.int32 / rhs.as.int32;
+				case VariableType::Int64:
+					return lhs.as.int64 / rhs.as.int64;
+					// floating point
+
+				case VariableType::F32:
+					return lhs.as.f32 / rhs.as.f32;
+				case VariableType::F64:
+					return lhs.as.f64 / rhs.as.f64;
+					// pointers
+				case VariableType::Pointer:
+					// pointer
+					return Variable();
+				default:
+					// unknown type
+					return Variable();
+				}
+			}
+			Variable NegateInternal(const Variable& var)
+			{
+				switch (var.type)
+				{
+					// unsigned 
+				case VariableType::UInt8:
+					return Variable();
+				case VariableType::UInt16:
+					return Variable();
+				case VariableType::UInt32:
+					return Variable();
+				case VariableType::UInt64:
+					return Variable();
+					// signed
+				case VariableType::Int8:
+					return -var.as.int8;
+				case VariableType::Int16:
+					return -var.as.int16;
+				case VariableType::Int32:
+					return -var.as.int32;
+				case VariableType::Int64:
+					return -var.as.int64;
+					// floating point
+				case VariableType::F32:
+					return -var.as.f32;
+				case VariableType::F64:
+					return -var.as.f64;
+					// pointers
+				case VariableType::Pointer:
+					return Variable();
+					// case VariableType::String:
+					//	return var.as.f64 -= rhs.as.f64;
+				default:
+					// unknown type
+					return false;
+				}
+			}
+			Variable ModuloInternal(const Variable& lhs, const Variable& rhs)
+			{
+				switch (lhs.type)
+				{
+					// unsigned 
+				case VariableType::UInt8:
+					return lhs.as.uint8% rhs.as.uint8;
+				case VariableType::UInt16:
+					return lhs.as.uint16% rhs.as.uint16;
+				case VariableType::UInt32:
+					return lhs.as.uint32% rhs.as.uint32;
+				case VariableType::UInt64:
+					return lhs.as.uint64% rhs.as.uint64;
+					// signed
+				case VariableType::Int8:
+					return lhs.as.int8% rhs.as.int8;
+				case VariableType::Int16:
+					return lhs.as.int16% rhs.as.int16;
+				case VariableType::Int32:
+					return lhs.as.int32% rhs.as.int32;
+				case VariableType::Int64:
+					return lhs.as.int64% rhs.as.int64;
+					// floating point
+
+				case VariableType::F32:
+					return std::fmodf(lhs.as.f32, rhs.as.f32);
+				case VariableType::F64:
+					return std::fmod(lhs.as.f64, rhs.as.f64);
+					// pointers
+				case VariableType::Pointer:
+					// pointer
+					return Variable();
+				default:
+					// unknown type
+					return Variable();
+				}
+			}
+		}
+		bool Less(const Variable& lhs, const Variable& rhs)
+		{
+			if (lhs.IsSameType(rhs))
+			{
+				return detail::LessInternal(lhs, rhs);
+			}
+			else
+			{
+				if (lhs.ShouldPromoteToOtherType(rhs))
+				{
+					Variable lhs_promoted = lhs.PromoteToOtherType(rhs);
+					return detail::LessInternal(lhs_promoted, rhs);
+				}
+				else if (rhs.ShouldPromoteToOtherType(lhs))
+				{
+					Variable rhs_promoted = rhs.PromoteToOtherType(lhs);
+					return detail::LessInternal(lhs, rhs_promoted);
+				}
+				else
+				{
+					// type mismatch
+					// TODO: Runtime Error here
+					return false;
+				}
+			}
+		}
+		bool LessEqual(const Variable& lhs, const Variable& rhs)
+		{
+			return Less(lhs, rhs) || Equal(lhs, rhs);
+		}
+		bool Greater(const Variable& lhs, const Variable& rhs)
+		{
+			if (lhs.IsSameType(rhs))
+			{
+				return detail::GreaterInternal(lhs, rhs);
+			}
+			else
+			{
+				if (lhs.ShouldPromoteToOtherType(rhs))
+				{
+					Variable lhs_promoted = lhs.PromoteToOtherType(rhs);
+					return detail::GreaterInternal(lhs_promoted, rhs);
+				}
+				else if (rhs.ShouldPromoteToOtherType(lhs))
+				{
+					Variable rhs_promoted = rhs.PromoteToOtherType(lhs);
+					return detail::GreaterInternal(lhs, rhs_promoted);
+				}
+				else
+				{
+					// type mismatch
+					// TODO: Runtime Error here
+					return false;
+				}
+			}
+		}
+		bool GreaterEqual(const Variable& lhs, const Variable& rhs)
+		{
+			return Greater(lhs, rhs) || Equal(lhs, rhs);
+		}
+		bool Equal(const Variable& lhs, const Variable& rhs)
+		{
+			if (lhs.IsSameType(rhs))
+			{
+				return detail::EqualInternal(lhs, rhs);
+			}
+			else
+			{
+				if (lhs.ShouldPromoteToOtherType(rhs))
+				{
+					Variable lhs_promoted = lhs.PromoteToOtherType(rhs);
+					return detail::EqualInternal(lhs_promoted, rhs);
+				}
+				else if (rhs.ShouldPromoteToOtherType(lhs))
+				{
+					Variable rhs_promoted = rhs.PromoteToOtherType(lhs);
+					return detail::EqualInternal(lhs, rhs_promoted);
+				}
+				else
+				{
+					// type mismatch
+					// TODO: Runtime Error here
+					return false;
+				}
+			}
+		}
+		bool NotEqual(const Variable& lhs, const Variable& rhs)
+		{
+			if (lhs.IsSameType(rhs))
+			{
+				return detail::NotEqualInternal(lhs, rhs);
+			}
+			else
+			{
+				if (lhs.ShouldPromoteToOtherType(rhs))
+				{
+					Variable lhs_promoted = lhs.PromoteToOtherType(rhs);
+					return detail::NotEqualInternal(lhs_promoted, rhs);
+				}
+				else if (rhs.ShouldPromoteToOtherType(lhs))
+				{
+					Variable rhs_promoted = rhs.PromoteToOtherType(lhs);
+					return detail::NotEqualInternal(lhs, rhs_promoted);
+				}
+				else
+				{
+					// type mismatch
+					// TODO: Runtime Error here
+					return false;
+				}
+			}
+		}
+		Variable Not(const Variable& var)
+		{
+			return detail::NotInternal(var);
+		}
+
+		// Arithmetic Operators
+		Variable And(const Variable& lhs, const Variable& rhs)
+		{
+			if (lhs.IsSameType(rhs))
+			{
+				return detail::AndInternal(lhs, rhs);
+			}
+			else
+			{
+				if (lhs.ShouldPromoteToOtherType(rhs))
+				{
+					Variable lhs_promoted = lhs.PromoteToOtherType(rhs);
+					return detail::AndInternal(lhs_promoted, rhs);
+				}
+				else if (rhs.ShouldPromoteToOtherType(lhs))
+				{
+					Variable rhs_promoted = rhs.PromoteToOtherType(lhs);
+					return detail::AndInternal(lhs, rhs_promoted);
+				}
+				else
+				{
+					// type mismatch
+					// TODO: Runtime Error here
+					return Variable();
+				}
+			}
+		}
+		Variable Or(const Variable& lhs, const Variable& rhs)
+		{
+			if (lhs.IsSameType(rhs))
+			{
+				return detail::OrInternal(lhs, rhs);
+			}
+			else
+			{
+				if (lhs.ShouldPromoteToOtherType(rhs))
+				{
+					Variable lhs_promoted = lhs.PromoteToOtherType(rhs);
+					return detail::OrInternal(lhs_promoted, rhs);
+				}
+				else if (rhs.ShouldPromoteToOtherType(lhs))
+				{
+					Variable rhs_promoted = rhs.PromoteToOtherType(lhs);
+					return detail::OrInternal(lhs, rhs_promoted);
+				}
+				else
+				{
+					// type mismatch
+					// TODO: Runtime Error here
+					return Variable();
+				}
+			}
+		}
+		Variable Xor(const Variable& lhs, const Variable& rhs)
+		{
+			if (lhs.IsSameType(rhs))
+			{
+				return detail::XorInternal(lhs, rhs);
+			}
+			else
+			{
+				if (lhs.ShouldPromoteToOtherType(rhs))
+				{
+					Variable lhs_promoted = lhs.PromoteToOtherType(rhs);
+					return detail::XorInternal(lhs_promoted, rhs);
+				}
+				else if (rhs.ShouldPromoteToOtherType(lhs))
+				{
+					Variable rhs_promoted = rhs.PromoteToOtherType(lhs);
+					return detail::XorInternal(lhs, rhs_promoted);
+				}
+				else
+				{
+					// type mismatch
+					// TODO: Runtime Error here
+					return Variable();
+				}
+			}
+		}
+		Variable Add(const Variable& lhs, const Variable& rhs)
+		{
+			if (lhs.IsSameType(rhs))
+			{
+				return detail::AddInternal(lhs, rhs);
+			}
+			else
+			{
+				if (lhs.ShouldPromoteToOtherType(rhs))
+				{
+					Variable lhs_promoted = lhs.PromoteToOtherType(rhs);
+					return detail::AddInternal(lhs_promoted, rhs);
+				}
+				else if (rhs.ShouldPromoteToOtherType(lhs))
+				{
+					Variable rhs_promoted = rhs.PromoteToOtherType(lhs);
+					return detail::AddInternal(lhs, rhs_promoted);
+				}
+				else
+				{
+					// type mismatch
+					// TODO: Runtime Error here
+					return Variable();
+				}
+			}
+		}
+		Variable Subtract(const Variable& lhs, const Variable& rhs)
+		{
+			if (lhs.IsSameType(rhs))
+			{
+				return detail::SubtractInternal(lhs, rhs);
+			}
+			else
+			{
+				if (lhs.ShouldPromoteToOtherType(rhs))
+				{
+					Variable lhs_promoted = lhs.PromoteToOtherType(rhs);
+					return detail::SubtractInternal(lhs_promoted, rhs);
+				}
+				else if (rhs.ShouldPromoteToOtherType(lhs))
+				{
+					Variable rhs_promoted = rhs.PromoteToOtherType(lhs);
+					return detail::SubtractInternal(lhs, rhs_promoted);
+				}
+				else
+				{
+					// type mismatch
+					// TODO: Runtime Error here
+					return Variable();
+				}
+			}
+		}
+		Variable Multiply(const Variable& lhs, const Variable& rhs)
+		{
+			if (lhs.IsSameType(rhs))
+			{
+				return detail::MultiplyInternal(lhs, rhs);
+			}
+			else
+			{
+				if (lhs.ShouldPromoteToOtherType(rhs))
+				{
+					Variable lhs_promoted = lhs.PromoteToOtherType(rhs);
+					return detail::MultiplyInternal(lhs_promoted, rhs);
+				}
+				else if (rhs.ShouldPromoteToOtherType(lhs))
+				{
+					Variable rhs_promoted = rhs.PromoteToOtherType(lhs);
+					return detail::MultiplyInternal(lhs, rhs_promoted);
+				}
+				else
+				{
+					// type mismatch
+					// TODO: Runtime Error here
+					return Variable();
+				}
+			}
+		}
+		Variable BitwiseNot(const Variable& var)
+		{
+			return detail::BitwiseNotInternal(var);
+		}
+		Variable Divide(const Variable& lhs, const Variable& rhs)
+		{
+			if (lhs.IsSameType(rhs))
+			{
+				return detail::DivideInternal(lhs, rhs);
+			}
+			else
+			{
+				if (lhs.ShouldPromoteToOtherType(rhs))
+				{
+					Variable lhs_promoted = lhs.PromoteToOtherType(rhs);
+					return detail::DivideInternal(lhs_promoted, rhs);
+				}
+				else if (rhs.ShouldPromoteToOtherType(lhs))
+				{
+					Variable rhs_promoted = rhs.PromoteToOtherType(lhs);
+					return detail::DivideInternal(lhs, rhs_promoted);
+				}
+				else
+				{
+					// type mismatch
+					// TODO: Runtime Error here
+					return Variable();
+				}
+			}
+		}
+		Variable Negate(const Variable& var)
+		{
+			return detail::NegateInternal(var);
+		}
+		Variable Modulo(const Variable& lhs, const Variable& rhs)
+		{
+			if (lhs.IsSameType(rhs))
+			{
+				return detail::ModuloInternal(lhs, rhs);
+			}
+			else
+			{
+				if (lhs.ShouldPromoteToOtherType(rhs))
+				{
+					Variable lhs_promoted = lhs.PromoteToOtherType(rhs);
+					return detail::ModuloInternal(lhs_promoted, rhs);
+				}
+				else if (rhs.ShouldPromoteToOtherType(lhs))
+				{
+					Variable rhs_promoted = rhs.PromoteToOtherType(lhs);
+					return detail::ModuloInternal(lhs, rhs_promoted);
+				}
+				else
+				{
+					// type mismatch
+					// TODO: Runtime Error here
+					return Variable();
+				}
+			}
+		}
+	}
+
 	bool IsTrue(const SDIM::Variable & var)
 	{
 		switch (var.type)
@@ -102,7 +1050,7 @@ namespace SDIM
 			return var.as.uint32 != 0;
 		case VariableType::UInt64:
 			return var.as.uint64 != 0;
-		
+
 		case VariableType::Int8:
 			return var.as.int8 != 0;
 		case VariableType::Int16:
@@ -153,7 +1101,7 @@ namespace SDIM
 			mem_cast.ui = val;
 			return mem_cast.f;
 		}
-		void * UInt64ToPtr(UInt64 val)
+		void* UInt64ToPtr(UInt64 val)
 		{
 			static_assert(sizeof(UInt64) == sizeof(void*), "Size mismatch between UInt64 and Pointer type");
 			return reinterpret_cast<void*>(val);
@@ -209,9 +1157,14 @@ namespace SDIM
 		type = VariableType::F64;
 		as.f64 = val;
 	}
-	Variable::Variable(void * val)
+	Variable::Variable(void* val)
 	{
 		type = VariableType::Pointer;
 		as.ptr = val;
 	}
+
+
+
+
 }
+
