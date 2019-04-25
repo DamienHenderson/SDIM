@@ -109,6 +109,92 @@ namespace SDIM
 		UInt8 inst = Utils::InstructionToUInt8(Instruction::Return);
 		prog_data.push_back(inst);
 	}
+	void BytecodeGenerator::WriteLessInstruction(std::vector<unsigned char>& prog_data)
+	{
+		UInt8 inst = Utils::InstructionToUInt8(Instruction::Less);
+		prog_data.push_back(inst);
+	}
+	void BytecodeGenerator::WriteLessEqualInstruction(std::vector<unsigned char>& prog_data)
+	{
+		UInt8 inst = Utils::InstructionToUInt8(Instruction::LessEqual);
+		prog_data.push_back(inst);
+	}
+	void BytecodeGenerator::WriteGreaterInstruction(std::vector<unsigned char>& prog_data)
+	{
+		UInt8 inst = Utils::InstructionToUInt8(Instruction::Greater);
+		prog_data.push_back(inst);
+	}
+	void BytecodeGenerator::WriteGreaterEqualInstruction(std::vector<unsigned char>& prog_data)
+	{
+		UInt8 inst = Utils::InstructionToUInt8(Instruction::GreaterEqual);
+		prog_data.push_back(inst);
+	}
+	void BytecodeGenerator::WriteEqualInstruction(std::vector<unsigned char>& prog_data)
+	{
+		UInt8 inst = Utils::InstructionToUInt8(Instruction::Equal);
+		prog_data.push_back(inst);
+	}
+	void BytecodeGenerator::WriteNotEqualInstruction(std::vector<unsigned char>& prog_data)
+	{
+		UInt8 inst = Utils::InstructionToUInt8(Instruction::NotEqual);
+		prog_data.push_back(inst);
+	}
+	void BytecodeGenerator::WriteNotInstruction(std::vector<unsigned char>& prog_data)
+	{
+		UInt8 inst = Utils::InstructionToUInt8(Instruction::Not);
+		prog_data.push_back(inst);
+	}
+	void BytecodeGenerator::WriteAndInstruction(std::vector<unsigned char>& prog_data)
+	{
+		UInt8 inst = Utils::InstructionToUInt8(Instruction::And);
+		prog_data.push_back(inst);
+	}
+	void BytecodeGenerator::WriteOrInstruction(std::vector<unsigned char>& prog_data)
+	{
+		UInt8 inst = Utils::InstructionToUInt8(Instruction::Or);
+		prog_data.push_back(inst);
+
+	}
+	void BytecodeGenerator::WriteXorInstruction(std::vector<unsigned char>& prog_data)
+	{
+		UInt8 inst = Utils::InstructionToUInt8(Instruction::Xor);
+		prog_data.push_back(inst);
+	}
+	void BytecodeGenerator::WriteBitwiseNotInstruction(std::vector<unsigned char>& prog_data)
+	{
+		UInt8 inst = Utils::InstructionToUInt8(Instruction::BitwiseNot);
+		prog_data.push_back(inst);
+	}
+	void BytecodeGenerator::WriteAddInstruction(std::vector<unsigned char>& prog_data)
+	{
+		UInt8 inst = Utils::InstructionToUInt8(Instruction::Add);
+		prog_data.push_back(inst);
+	}
+	void BytecodeGenerator::WriteSubtractInstruction(std::vector<unsigned char>& prog_data)
+	{
+		UInt8 inst = Utils::InstructionToUInt8(Instruction::Subtract);
+		prog_data.push_back(inst);
+	}
+	void BytecodeGenerator::WriteMultiplyInstruction(std::vector<unsigned char>& prog_data)
+	{
+		UInt8 inst = Utils::InstructionToUInt8(Instruction::Multiply);
+		prog_data.push_back(inst);
+	}
+	void BytecodeGenerator::WriteDivideInstruction(std::vector<unsigned char>& prog_data)
+	{
+		UInt8 inst = Utils::InstructionToUInt8(Instruction::Divide);
+		prog_data.push_back(inst);
+	}
+	void BytecodeGenerator::WriteNegateInstruction(std::vector<unsigned char>& prog_data)
+	{
+		UInt8 inst = Utils::InstructionToUInt8(Instruction::Negate);
+		prog_data.push_back(inst);
+	}
+	void BytecodeGenerator::WriteModuloInstruction(std::vector<unsigned char>& prog_data)
+	{
+		UInt8 inst = Utils::InstructionToUInt8(Instruction::Modulo);
+		prog_data.push_back(inst);
+	}
 	void BytecodeGenerator::WritePushUInt8Instruction(std::vector<unsigned char>& prog_data, UInt8 value)
 	{
 		UInt8 inst = Utils::InstructionToUInt8(Instruction::PushUInt8);

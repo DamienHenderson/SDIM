@@ -29,8 +29,32 @@ namespace SDIM
 
 		virtual void WriteReturnInstruction(std::vector<unsigned char>& prog_data) = 0;
 
+		
+
 		/// TODO: what args should this take, also on native platforms this should probably just do a normal call
 		// virtual void WriteNativeCall Instruction(std::vector<unsigned char>& prog_data) = 0;
+		// Logical Operators
+		virtual void WriteLessInstruction(std::vector<unsigned char>& prog_data) = 0;
+		virtual void WriteLessEqualInstruction(std::vector<unsigned char>& prog_data) = 0;
+		virtual void WriteGreaterInstruction(std::vector<unsigned char>& prog_data) = 0;
+		virtual void WriteGreaterEqualInstruction(std::vector<unsigned char>& prog_data) = 0;
+		virtual void WriteEqualInstruction(std::vector<unsigned char>& prog_data) = 0;
+		virtual void WriteNotEqualInstruction(std::vector<unsigned char>& prog_data) = 0;
+		virtual void WriteNotInstruction(std::vector<unsigned char>& prog_data) = 0;
+		// Bitwise Operators
+		virtual void WriteAndInstruction(std::vector<unsigned char>& prog_data) = 0;
+		virtual void WriteOrInstruction(std::vector<unsigned char>& prog_data) = 0;
+		virtual void WriteXorInstruction(std::vector<unsigned char>& prog_data) = 0;
+		virtual void WriteBitwiseNotInstruction(std::vector<unsigned char>& prog_data) = 0;
+		// Arithmetic Operators
+		virtual void WriteAddInstruction(std::vector<unsigned char>& prog_data) = 0;
+		virtual void WriteSubtractInstruction(std::vector<unsigned char>& prog_data) = 0;
+		virtual void WriteMultiplyInstruction(std::vector<unsigned char>& prog_data) = 0;
+		virtual void WriteDivideInstruction(std::vector<unsigned char>& prog_data) = 0;
+		virtual void WriteNegateInstruction(std::vector<unsigned char>& prog_data) = 0;
+		virtual void WriteModuloInstruction(std::vector<unsigned char>& prog_data) = 0;
+		
+
 
 		virtual void WritePushUInt8Instruction(std::vector<unsigned char>& prog_data,	UInt8 value) = 0;
 		virtual void WritePushUInt16Instruction(std::vector<unsigned char>& prog_data,	UInt16 value) = 0;

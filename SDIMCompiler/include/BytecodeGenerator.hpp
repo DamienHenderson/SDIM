@@ -24,6 +24,27 @@ namespace SDIM
 
 		virtual void WriteReturnInstruction(std::vector<unsigned char>& prog_data) override;
 
+		// Logical Operators
+		virtual void WriteLessInstruction(std::vector<unsigned char>& prog_data) override;
+		virtual void WriteLessEqualInstruction(std::vector<unsigned char>& prog_data) override;
+		virtual void WriteGreaterInstruction(std::vector<unsigned char>& prog_data) override;
+		virtual void WriteGreaterEqualInstruction(std::vector<unsigned char>& prog_data) override;
+		virtual void WriteEqualInstruction(std::vector<unsigned char>& prog_data) override;
+		virtual void WriteNotEqualInstruction(std::vector<unsigned char>& prog_data) override;
+		virtual void WriteNotInstruction(std::vector<unsigned char>& prog_data) override;
+		// Bitwise Operators
+		virtual void WriteAndInstruction(std::vector<unsigned char>& prog_data) override;
+		virtual void WriteOrInstruction(std::vector<unsigned char>& prog_data) override;
+		virtual void WriteXorInstruction(std::vector<unsigned char>& prog_data) override;
+		virtual void WriteBitwiseNotInstruction(std::vector<unsigned char>& prog_data) override;
+		// Arithmetic Operators
+		virtual void WriteAddInstruction(std::vector<unsigned char>& prog_data) override;
+		virtual void WriteSubtractInstruction(std::vector<unsigned char>& prog_data) override;
+		virtual void WriteMultiplyInstruction(std::vector<unsigned char>& prog_data) override;
+		virtual void WriteDivideInstruction(std::vector<unsigned char>& prog_data) override;
+		virtual void WriteNegateInstruction(std::vector<unsigned char>& prog_data) override;
+		virtual void WriteModuloInstruction(std::vector<unsigned char>& prog_data) override;
+
 		virtual void WritePushUInt8Instruction(std::vector<unsigned char>& prog_data,	UInt8 value) override;
 		virtual void WritePushUInt16Instruction(std::vector<unsigned char>& prog_data,	UInt16 value) override;
 		virtual void WritePushUInt32Instruction(std::vector<unsigned char>& prog_data,	UInt32 value) override;
