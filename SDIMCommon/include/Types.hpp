@@ -34,6 +34,7 @@ namespace SDIM
 		F32,
 		F64,
 		Pointer,
+		String,
 		Unknown
 	};
 
@@ -85,7 +86,17 @@ namespace SDIM
 
 		std::string ToString();
 
+		size_t GetTypeSize() const;
+
 		bool IsSameType(const Variable& other);
+
+		bool IsInteger() const;
+
+		bool IsUnsigned() const;
+
+		bool IsFloat() const;
+
+		bool PromoteToRHSType(const Variable& rhs) const;
 	};
 
 	bool IsTrue(const SDIM::Variable& var);

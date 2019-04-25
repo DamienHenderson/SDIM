@@ -5,12 +5,33 @@
 #include "Utils.hpp"
 namespace SDIM
 {
+	constexpr size_t type_sizes[] = {
+		// unsigned types
+		sizeof(UInt8),
+		sizeof(UInt16),
+		sizeof(UInt32),
+		sizeof(UInt64),
+		// signed types
+		sizeof(Int8),
+		sizeof(Int16),
+		sizeof(Int32),
+		sizeof(Int64),
+		// floating point types
+		sizeof(F32),
+		sizeof(F64),
+		// Pointer types
+		sizeof(void*),
+		sizeof(char*),
+		// unknown
+		0
+
+	};
 	std::string Variable::ToString()
 	{
 		switch (type)
 		{
 		case SDIM::VariableType::UInt8:
-			return SDIM::Utils::ConstructString("UInt8: ", as.uint8);
+			return SDIM::Utils::ConstructString("UInt8: ", +as.uint8);
 
 		case SDIM::VariableType::UInt16:
 			return SDIM::Utils::ConstructString("UInt16: ", as.uint16);
@@ -22,7 +43,7 @@ namespace SDIM
 			return SDIM::Utils::ConstructString("UInt64: ", as.uint64);
 
 		case SDIM::VariableType::Int8:
-			return SDIM::Utils::ConstructString("Int8: ", as.int8);
+			return SDIM::Utils::ConstructString("Int8: ", +as.int8);
 
 		case SDIM::VariableType::Int16:
 			return SDIM::Utils::ConstructString("Int16: ", as.int16);
@@ -48,10 +69,27 @@ namespace SDIM
 			return SDIM::Utils::ConstructString("ERROR! Unknown Type");
 		}
 	}
+	size_t Variable::GetTypeSize() const
+	{
+		return type_sizes[static_cast<size_t>(type)];
+	}
 	bool Variable::IsSameType(const Variable& other)
 	{
 		return type == other.type;
 	}
+	bool Variable::IsInteger() const
+	{
+		return type == VariableType::Int8 || type == VariableType::Int16 || type == VariableType::Int32 || type == VariableType::Int64;
+	}
+	bool Variable::IsUnsigned() const
+	{
+		return type == VariableType::UInt8 || type == VariableType::UInt16 || type == VariableType::UInt32 || type == VariableType::UInt64;
+	}
+	bool Variable::IsFloat() const
+	{
+		return type == VariableType::F32 || type == VariableType::F64;
+	}
+	
 	bool IsTrue(const SDIM::Variable & var)
 	{
 		switch (var.type)
