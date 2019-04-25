@@ -35,6 +35,10 @@ namespace SDIM
 
 		generator->WritePushF32Instruction(program_data, 42.42f);
 		generator->WritePushF64Instruction(program_data, 42.42);
+		generator->WritePushF64Instruction(program_data, 42.42);
+		generator->WritePushF64Instruction(program_data, 42.42);
+		generator->WriteAddInstruction(program_data);
+		generator->WriteLessInstruction(program_data);
 
 		generator->WriteHaltInstruction(program_data);
 
