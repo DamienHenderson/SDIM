@@ -48,6 +48,10 @@ namespace SDIM
 			return SDIM::Utils::ConstructString("ERROR! Unknown Type");
 		}
 	}
+	bool Variable::IsSameType(const Variable& other)
+	{
+		return type == other.type;
+	}
 	bool IsTrue(const SDIM::Variable & var)
 	{
 		switch (var.type)

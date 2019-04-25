@@ -84,6 +84,8 @@ namespace SDIM
 		Variable(void* val);
 
 		std::string ToString();
+
+		bool IsSameType(const Variable& other);
 	};
 
 	bool IsTrue(const SDIM::Variable& var);

@@ -20,6 +20,8 @@ namespace SDIM
 		/// Get the address of the interned string equivalent to the string passed in
 		const char* GetString(const char* string);
 
+		/// Remove a string from the hash table
+		void RemoveString(const char* string);
 	private:
 		char** strings_{ nullptr };
 		size_t capacity_{ 0 };

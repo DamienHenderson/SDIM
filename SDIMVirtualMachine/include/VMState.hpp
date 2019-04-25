@@ -2,6 +2,7 @@
 
 #include "Stack.hpp"
 #include "VariableStorage.hpp"
+#include "HashTable.hpp"
 namespace SDIM
 {
 	struct VMState
@@ -12,6 +13,7 @@ namespace SDIM
 		Stack program_stack_;
 		SDIM::Variable accumulator_; // optimisation, might not be needed
 		SDIM::VariableStorage variables_;
+		SDIM::HashTable string_table_; // populate this on loading a program, strings should be in the file header
 		bool running_{ false };
 	};
 
