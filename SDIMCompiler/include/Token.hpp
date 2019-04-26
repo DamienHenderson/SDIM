@@ -30,6 +30,14 @@ namespace SDIM
 	namespace Utils
 	{
 		UInt64 TokenTypeToUInt64(TokenType token_type);
+		const char* TokenTypeToString(TokenType token_type);
+
+		bool IsBracket(TokenType token_type);
+
+		bool IsOpeningBracket(TokenType token_type);
+		bool IsClosingBracket(TokenType token_type);
+
+		bool IsMatchingBracketPair(TokenType opening, TokenType closing);
 	}
 	constexpr const char* token_type_strings[] =
 	{
@@ -49,7 +57,7 @@ namespace SDIM
 		"DoubleVerticalBar", "LeftShift", "RightShift", "PlusPlus", "MinusMinus",
 
 		// Miscellaneous
-		"EOFToken", "Identifier", "NumericLiteral", "StringLiteral", "Unknown", "Error"
+		"EOFToken", "Identifier", "NumericLiteral", "StringLiteral", "Unknown", "Error", "Last"
 	};
 
 	
