@@ -16,6 +16,8 @@ namespace SDIM
 		// parses a sequence of tokens into a complete bytecode program
 		bool Parse(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator);
 	private:
-		
+		bool ParseExpression(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator);
+
+		bool error_state_(false);
 	};
 }

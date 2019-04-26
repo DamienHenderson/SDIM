@@ -21,7 +21,7 @@ namespace SDIM
 		// Multiple character symbols
 		EqualEqual, BangEqual, TildeEqual, GreaterEqual, LessEqual, PlusEqual, MinusEqual, SlashEqual, AsteriskEqual,
 		PercentEqual, AmpersandEqual, VerticalBarEqual, CaretEqual, DoubleAmpersand,
-		DoubleVerticalBar, LeftShift, RightShift,
+		DoubleVerticalBar, LeftShift, RightShift, PlusPlus, MinusMinus,
 
 		// Miscellaneous
 		EOFToken, Identifier, NumericLiteral, StringLiteral, Unknown, Error
@@ -42,15 +42,14 @@ namespace SDIM
 		// Multiple character symbols
 		"EqualEqual", "BangEqual", "TildeEqual", "GreaterEqual", "LessEqual", "PlusEqual", "MinusEqual", "SlashEqual", "AsteriskEqual",
 		"PercentEqual", "AmpersandEqual", "VerticalBarEqual", "CaretEqual", "DoubleAmpersand",
-		"DoubleVerticalBar", "LeftShift", "RightShift",
+		"DoubleVerticalBar", "LeftShift", "RightShift", "PlusPlus", "MinusMinus",
 
 		// Miscellaneous
 		"EOFToken", "Identifier", "NumericLiteral", "StringLiteral", "Unknown", "Error"
 	};
 
 	
-	// TODO: Operator Precedence
-	// Base operator precedence off of C++ to surprise users the least
+
 
 
 	struct Token

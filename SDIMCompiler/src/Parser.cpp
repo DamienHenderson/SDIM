@@ -20,7 +20,10 @@ namespace SDIM
 	{
 		(void)program_data;
 		
-		
+		// Utilises pratt parsing 
+		// inspired by this webpage http://journal.stuffwithstuff.com/2011/03/19/pratt-parsers-expression-parsing-made-easy/
+		// also inspired by this webpage http://craftinginterpreters.com/compiling-expressions.html
+		// also inspired by other sources 
 		
 		
 		generator->WritePushUInt8Instruction(program_data, 42);
@@ -48,8 +51,7 @@ namespace SDIM
 
 			SDIM::Utils::Log("Token[", idx, "]: ", current_token.ToString(), "\n");
 		}
-		// default to success
-		return true;
+		return !error_state_;
 	}
 
 }

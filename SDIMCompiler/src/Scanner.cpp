@@ -202,6 +202,12 @@ namespace SDIM
 					++i;
 					// LogString("Extracted lexeme: -=");
 				}
+				if (MatchNext('-', i + 1))
+				{
+					tokens.push_back(Token(TokenType::MinusMinus, "--"));
+					++i;
+					// LogString("Extracted lexeme: +=");
+				}
 				else
 				{
 					tokens.push_back(Token(TokenType::Minus, ConvertToString(current_char)));
@@ -212,6 +218,12 @@ namespace SDIM
 				if (MatchNext('=', i + 1))
 				{
 					tokens.push_back(Token(TokenType::PlusEqual, "+="));
+					++i;
+					// LogString("Extracted lexeme: +=");
+				}
+				if (MatchNext('+', i + 1))
+				{
+					tokens.push_back(Token(TokenType::PlusPlus, "++"));
 					++i;
 					// LogString("Extracted lexeme: +=");
 				}
