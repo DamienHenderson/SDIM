@@ -66,7 +66,7 @@ namespace SDIM
 		if (current_token >= tokens.size())
 		{
 			Utils::Log("Reached end of tokens");
-			return false;
+			return true;
 		}
 		Token next_token = tokens[current_token];
 		Utils::Log("Parsing token ", next_token.ToString());
@@ -92,6 +92,70 @@ namespace SDIM
 			}
 			Utils::Log("Matched opening bracket ", Utils::TokenTypeToString(current_bracket), " with ", Utils::TokenTypeToString(next_token.token_type));
 			brackets_.pop();
+		}
+		if (next_token.token_type == TokenType::NumericLiteral)
+		{
+			// process float literals
+			Token expect_dot_token = tokens[current_token + 1];
+			std::string combined_number = next_token.lexeme;
+			if (expect_dot_token.token_type == TokenType::Dot)
+			{
+				combined_number += expect_dot_token.lexeme;
+				Token expect_num_literal_token = tokens[current_token + 2];
+				if (expect_num_literal_token.token_type == TokenType::NumericLiteral)
+				{
+					combined_number += expect_num_literal_token.lexeme;
+					// token is float literal
+					// look for f or d on the end
+					Token expect_f_or_d_token = tokens[current_token + 3];
+					if (expect_f_or_d_token.token_type == TokenType::Identifier)
+					{
+						if (expect_f_or_d_token.lexeme == "f")
+						{
+							// f32
+							F32 num_literal = static_cast<F32>(std::atof(combined_number.c_str()));
+							generator->WritePushF32Instruction(program_data, num_literal);
+							return ParseExpression(tokens, program_data, generator, current_token + 4);
+						}
+						else if (expect_f_or_d_token.lexeme == "d")
+						{
+							// f64
+							F64 num_literal = std::atof(combined_number.c_str());
+							generator->WritePushF64Instruction(program_data, num_literal);
+							return ParseExpression(tokens, program_data, generator, current_token + 4);
+						}
+						else
+						{
+							// Coincidental identifier at end
+							// TODO: make postscript types on numeric literals a feature of the scanner
+							Utils::Log("Unsupported type specifier ", expect_f_or_d_token.lexeme, " at end of floating point literal");
+							return ParseExpression(tokens, program_data, generator, current_token + 3);
+							
+						}
+						// missing end also defaults to f64
+					}
+					else
+					{
+						// F64
+						F64 num_literal = std::atof(combined_number.c_str());
+						generator->WritePushF64Instruction(program_data, num_literal);
+						return ParseExpression(tokens, program_data, generator, current_token + 3);
+					}
+				}
+				else
+				{
+					// malformed float literal
+					Utils::Log("Malformed float literal ", combined_number);
+					return false;
+				}
+			}
+			else
+			{
+				// Free Integer literals are of type Int32 by default with postscript characters added to the end to force a certain type
+				Int32 num_literal = std::atoi(combined_number.c_str());
+				generator->WritePushInt32Instruction(program_data, num_literal);
+				return ParseExpression(tokens, program_data, generator, current_token + 1);
+			}
 		}
 		return ParseExpression(tokens, program_data, generator, ++current_token);
 		// return true;
