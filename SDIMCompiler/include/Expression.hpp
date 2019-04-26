@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Types.hpp"
-
+#include "Generator.hpp"
+#include <vector>
 namespace SDIM
 {
 	enum class ExpressionType
@@ -13,14 +14,5 @@ namespace SDIM
 
 	};
 
-	class Expression
-	{
-	public:
-		Expression() {}
-		virtual ~Expression() {}
-
-		virtual UInt64 GetPrecedence() const = 0;
-
-		virtual UInt64 GetExpressionType() const = 0;
-	};
+	
 }

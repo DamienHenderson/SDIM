@@ -1,7 +1,9 @@
 #pragma once
 
 #include "Types.hpp"
+#include "Token.hpp"
 
+#include <array>
 namespace SDIM
 {
 	// TODO: Operator Precedence
@@ -41,6 +43,12 @@ namespace SDIM
 		// ,
 		constexpr UInt64 Comma = 17;
 		
+		constexpr UInt64 None = 18;
 	}
+	
+	
+	
+
+	
 	
 }

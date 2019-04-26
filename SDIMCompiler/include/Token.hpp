@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include "Types.hpp"
 namespace SDIM
 {
 
@@ -24,9 +25,12 @@ namespace SDIM
 		DoubleVerticalBar, LeftShift, RightShift, PlusPlus, MinusMinus,
 
 		// Miscellaneous
-		EOFToken, Identifier, NumericLiteral, StringLiteral, Unknown, Error
+		EOFToken, Identifier, NumericLiteral, StringLiteral, Unknown, Error, Last
 	};
-
+	namespace Utils
+	{
+		UInt64 TokenTypeToUInt64(TokenType token_type);
+	}
 	constexpr const char* token_type_strings[] =
 	{
 

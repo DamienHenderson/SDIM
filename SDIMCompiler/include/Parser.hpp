@@ -18,6 +18,6 @@ namespace SDIM
 	private:
 		bool ParseExpression(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator);
 
-		bool error_state_(false);
+		bool error_state_{ false };
 	};
 }
