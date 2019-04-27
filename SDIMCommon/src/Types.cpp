@@ -1106,6 +1106,10 @@ namespace SDIM
 			static_assert(sizeof(UInt64) == sizeof(void*), "Size mismatch between UInt64 and Pointer type");
 			return reinterpret_cast<void*>(val);
 		}
+		UInt8 VariableTypeToUInt8(VariableType var_type)
+		{
+			return static_cast<UInt8>(var_type);
+		}
 	}
 	Variable::Variable(UInt8 val)
 	{

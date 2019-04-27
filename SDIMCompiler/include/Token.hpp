@@ -76,6 +76,8 @@ namespace SDIM
 		}
 
 		std::string ToString() const;
+
+		// TODO: store line and column in tokens to make error messages from the compiler better
 	};
 
 }

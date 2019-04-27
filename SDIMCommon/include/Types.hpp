@@ -38,6 +38,29 @@ namespace SDIM
 		Unknown
 	};
 
+	constexpr const char* variable_type_strings[] =
+	{
+		"UInt8",
+		"UInt16",
+		"UInt32",
+		"UInt64",
+
+		"Int8",
+		"Int16",
+		"Int32",
+		"In64",
+
+		"F32",
+		"F64",
+		"Pointer",
+		"String",
+		"Unknown"
+
+	};
+	namespace Utils
+	{
+		UInt8 VariableTypeToUInt8(VariableType var_type);
+	}
 	union VarUnion
 	{
 		Int8  int8;

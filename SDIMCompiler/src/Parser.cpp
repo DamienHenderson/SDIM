@@ -157,6 +157,37 @@ namespace SDIM
 				return ParseExpression(tokens, program_data, generator, current_token + 1);
 			}
 		}
+		if (next_token.token_type == TokenType::Module)
+		{
+			// module so the following token should be an identifier
+			Token expect_module_token = tokens[current_token + 1];
+			if (expect_module_token.token_type == TokenType::Identifier)
+			{
+				// TODO: handle modules correctly
+				Utils::Log("Found module: ", expect_module_token.lexeme);
+				return ParseExpression(tokens, program_data, generator, current_token + 2);
+			}
+			else
+			{
+				// Module names must be an identifier
+				Utils::Log(expect_module_token.lexeme, " is not a valid name for a module");
+				return ParseExpression(tokens, program_data, generator, current_token + 1);
+			}
+			
+		}
+		if (next_token.token_type == TokenType::Identifier)
+		{
+			// test against built in types
+			for (UInt8 i = 0; i < Utils::VariableTypeToUInt8(VariableType::Unknown); i++)
+			{
+				if (next_token.lexeme == variable_type_strings[i])
+				{
+					Utils::Log("Found Type specifier for type: ", variable_type_strings[i]);
+					// TODO: process type specifier for function and variable declarations
+					return ParseExpression(tokens, program_data, generator, current_token + 1);
+				}
+			}
+		}
 		return ParseExpression(tokens, program_data, generator, ++current_token);
 		// return true;
 	}

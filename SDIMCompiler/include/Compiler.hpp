@@ -18,7 +18,7 @@ namespace SDIM
 		bool CompileFile(const std::string& file_path, std::vector<unsigned char>& program_data);
 	private:
 		// has the compiler encountered an error
-		bool error_state_{ false };
+		// bool error_state_{ false };
 
 
 	};
