@@ -1,4 +1,6 @@
 #pragma once
+// size_t because clang doesn't have it in global scope by default like VS
+#include <cstddef>
 
 namespace SDIM
 {

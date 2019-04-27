@@ -3,6 +3,7 @@
 #include "Utils.hpp"
 
 #include <cstdlib>
+
 namespace SDIM
 {
 	HashTable::HashTable()

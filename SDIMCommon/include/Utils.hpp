@@ -5,7 +5,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
-
+#include <cstring>
 namespace SDIM
 {
 	// TODO: move utils to shared SDIM common library and combine with general compiler utils

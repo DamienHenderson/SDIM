@@ -689,9 +689,9 @@ namespace SDIM
 					// floating point
 
 				case VariableType::F32:
-					return std::fmodf(lhs.as.f32, rhs.as.f32);
+					return fmodf(lhs.as.f32, rhs.as.f32);
 				case VariableType::F64:
-					return std::fmod(lhs.as.f64, rhs.as.f64);
+					return fmod(lhs.as.f64, rhs.as.f64);
 					// pointers
 				case VariableType::Pointer:
 					// pointer
