@@ -38,6 +38,7 @@ int main(int argc, char** argv)
 		SDIM::Utils::Log("Failed to open test binary file\n");
 		return -1;
 	}
+	
 	test_file_refactor_this.write((const char*)prog_data.data(), prog_data.size());
 	test_file_refactor_this.close();
 	// TODO: Move this into a function

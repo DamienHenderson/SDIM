@@ -309,4 +309,46 @@ namespace SDIM
 		UInt8 inst = Utils::InstructionToUInt8(Instruction::Halt);
 		prog_data.push_back(inst);
 	}
+	GeneratorType BytecodeGenerator::GetType() const
+	{
+		return GeneratorType::BytecodeGenerator;
+	}
+	BytecodeHeader& BytecodeGenerator::GetHeader()
+	{
+		return header_;
+	}
+	void WriteBytecodeHeader(BytecodeHeader header, std::vector<unsigned char>& prog_data)
+	{
+		// copy existing data
+		std::vector<unsigned char> prog_data_temp;
+
+		UInt64 entrypoint = Utils::UInt64ToLittleEndian(header.entrypoint_idx);
+		unsigned char* entrypoint_bytes = (unsigned char*)& entrypoint;
+		for (size_t i = 0; i < sizeof(entrypoint); i++)
+		{
+			prog_data_temp.push_back(entrypoint_bytes[i]);
+		}
+		// file.write((char*)& entrypoint, sizeof(entrypoint));
+
+		UInt64 comment_size = Utils::UInt64ToLittleEndian(header.file_comment.length());
+		unsigned char* comment_size_bytes = (unsigned char*)& comment_size;
+		for (size_t i = 0; i < sizeof(comment_size); i++)
+		{
+			prog_data_temp.push_back(comment_size_bytes[i]);
+		}
+
+		for (size_t i = 0; i < header.file_comment.length(); i++)
+		{
+			prog_data_temp.push_back(header.file_comment[i]);
+		}
+		// file.write((char*)& comment_size, sizeof(comment_size));
+		// file.write(header.file_comment.c_str(), header.file_comment.length());
+
+		for (auto c : prog_data)
+		{
+			prog_data_temp.push_back(c);
+		}
+
+		prog_data = prog_data_temp;
+	}
 }

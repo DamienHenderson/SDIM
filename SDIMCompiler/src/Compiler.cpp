@@ -29,6 +29,7 @@ namespace SDIM
 		Parser parser;
 		BytecodeGenerator gen;
 		res = parser.Parse(tokens, program_data, &gen);
+		WriteBytecodeHeader(gen.GetHeader(), program_data);
 		if (!res)
 		{
 			SDIM::Utils::Log("Failed to parse program string\n");
@@ -49,6 +50,7 @@ namespace SDIM
 		Parser parser;
 		BytecodeGenerator gen;
 		res = parser.Parse(tokens, program_data, &gen);
+		WriteBytecodeHeader(gen.GetHeader(), program_data);
 		if (!res)
 		{
 			SDIM::Utils::Log("Failed to parse program file\n");

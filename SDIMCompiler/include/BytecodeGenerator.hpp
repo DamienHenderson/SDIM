@@ -2,8 +2,18 @@
 
 #include "Generator.hpp"
 
+#include <string>
+#include <vector>
 namespace SDIM
 {
+	/// NOTE: this is not to be directly written to the bytecode file
+	/// instead a function should be used to write this
+	struct BytecodeHeader
+	{
+		UInt64 entrypoint_idx{ 0 };
+		std::string file_comment{ "Compiled SDIM Bytecode file" }; // encoded as a UInt64 length followed by the string
+	};
+	void WriteBytecodeHeader(BytecodeHeader header, std::vector<unsigned char>& prog_data);
 	class BytecodeGenerator : public Generator
 	{
 	public:
@@ -59,5 +69,11 @@ namespace SDIM
 		virtual void WritePushF64Instruction(std::vector<unsigned char>& prog_data,		F64 value) override;
 		
 		virtual void WriteHaltInstruction(std::vector<unsigned char>& prog_data) override;
+
+		virtual GeneratorType GetType() const override;
+
+		BytecodeHeader& GetHeader();
+	private:
+		BytecodeHeader header_;
 	};
 }

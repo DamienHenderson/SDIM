@@ -69,12 +69,17 @@ namespace SDIM
 
 	bool Parser::ParseExpression(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator, UInt64 current_token)
 	{
+		
 #ifdef SDIM_VERBOSE
 		for (const auto& it : scopes_)
 		{
+			// newlines between scopes
+			Utils::Log("");
+
 			it.PrintScope();
 		}
 #endif
+		
 		Utils::Log("");
 		if (tokens.empty())
 		{
@@ -223,6 +228,7 @@ namespace SDIM
 		}
 		if (next_token.token_type == TokenType::Identifier)
 		{
+			ScopingBlock& current_scope = scopes_.back();
 			// test against built in types
 			for (UInt8 i = 0; i < Utils::VariableTypeToUInt8(VariableType::Unknown); i++)
 			{
@@ -238,28 +244,33 @@ namespace SDIM
 						std::string var_name = expect_identifier_token.lexeme;
 
 						Token expect_bracket_or_equal_token = tokens[current_token + 2];
+						// TODO: process args
 						if (expect_bracket_or_equal_token.token_type == TokenType::LeftBracket)
 						{
 							// function
-							// this will be quite long winded
-							// can create scope here as args will be in the function scope
-							ScopingBlock func_scope(var_name);
-							scopes_.push_back(func_scope);
+							// add the left bracket to the bracket matching
 							brackets_.push(expect_bracket_or_equal_token.token_type);
-							// consume args
-							return ParseExpression(tokens, program_data, generator, current_token + 4);
 
+							size_t next_token_idx = 0;
+							bool res = ParseFunctionDeclaration(tokens, program_data, generator, current_token + 3, static_cast<VariableType>(i), var_name, next_token_idx);
+							if (!res)
+							{
+								// malformed function declaration
+							}
+							return ParseExpression(tokens, program_data, generator, next_token_idx);
 						}
 						else if (expect_bracket_or_equal_token.token_type == TokenType::Equal)
 						{
 							// var assignment
 							// need to verify validity of assignment
+							Utils::Log("Attempting declaration and assignment of ", var_name, " in scope ", current_scope.GetName());
+
 							return ParseExpression(tokens, program_data, generator, current_token + 4);
 						}
 						else if (expect_bracket_or_equal_token.token_type == TokenType::SemiColon)
 						{
 							// just declaration without initialisation
-							ScopingBlock& current_scope = scopes_.back();
+							// ScopingBlock& current_scope = scopes_.back();
 							Utils::Log("Attempting to add variable to scope ", current_scope.GetName());
 							bool res = current_scope.AddVariable(var_name, SDIM::Variable(static_cast<VariableType>(i)));
 							if (!res)
@@ -283,6 +294,67 @@ namespace SDIM
 		}
 		return ParseExpression(tokens, program_data, generator, ++current_token);
 		// return true;
+	}
+
+	bool Parser::ParseFunctionDeclaration(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator, UInt64 current_token, VariableType func_return, const std::string& func_name, size_t& next_token_idx)
+	{
+		(void)program_data;
+		(void)generator;
+		(void)func_return;
+		
+		// TODO: make this function handle function scope generating bytecode under a function
+		// Is that even necessary because the bytecode for a function will be written after the function declaration is processed anyway
+
+		// separate scopes for args and the function to allow redecleration of variables in function scope which exist in args scope
+		// this pattern follows the way C++ does it, not in terms of scope naming however
+		// the best part of this is the scope name doesn't even have to be unique so name collisions with other functions and modules are not an issue
+
+		constexpr char* entrypoint_name = "Main";
+
+		
+		ScopingBlock func_args_scope(func_name + "__ARGS__");
+		scopes_.push_back(func_args_scope);
+		
+
+		size_t current_consume_idx = current_token;
+		while (current_consume_idx < tokens.size())
+		{
+			Token consume = tokens[current_consume_idx];
+			if (consume.token_type == TokenType::RightBracket)
+			{
+				// end of args
+				// pop args scope
+				Utils::Log("Popping scope ", scopes_.back().GetName());
+				scopes_.pop_back();
+
+				brackets_.pop();
+			}
+			if (consume.token_type == TokenType::LeftBrace)
+			{
+				ScopingBlock func_scope(func_name);
+				scopes_.push_back(func_scope);
+				// start of function scope
+				brackets_.push(consume.token_type);
+				next_token_idx = current_consume_idx + 1;
+				if (func_name == entrypoint_name)
+				{
+					Utils::Log("Function declaration for entrypoint ", entrypoint_name, " TODO write this to the header for the bytecode program so it starts in the right place");
+					// TODO: adjust this to account for the header being written
+					// IDEA: could have the header as a known size so the VM reads the header data and then the program is 0 indexed from the start of the program not the start of the program file
+					size_t entrypoint_location = program_data.size();
+					if (generator->GetType() == GeneratorType::BytecodeGenerator)
+					{
+						BytecodeHeader& header = static_cast<BytecodeGenerator*>(generator)->GetHeader();
+						header.entrypoint_idx = entrypoint_location;
+					}
+				}
+				return true;
+			}
+
+			current_consume_idx++;
+		}
+		next_token_idx = current_token + 1;
+		return false;
 	}
 
 }

@@ -7,6 +7,10 @@
 // if I decide to generate native code then this might need a serious redesign
 namespace SDIM
 {
+	enum class GeneratorType
+	{
+		BytecodeGenerator
+	};
 	class Generator
 	{
 	public:
@@ -70,5 +74,7 @@ namespace SDIM
 		virtual void WritePushF64Instruction(std::vector<unsigned char>& prog_data,		F64 value) = 0;
 
 		virtual void WriteHaltInstruction(std::vector<unsigned char>& prog_data) = 0;
+
+		virtual GeneratorType GetType() const = 0;
 	};
 }
