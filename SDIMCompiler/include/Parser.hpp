@@ -4,7 +4,11 @@
 
 #include <vector>
 #include <stack>
+#include <random>
+#include <memory>
+
 #include "Generator.hpp"
+#include "ScopingBlock.hpp"
 namespace SDIM
 {
 	class Parser
@@ -22,5 +26,12 @@ namespace SDIM
 		
 		// used for bracket matching
 		std::stack<TokenType> brackets_;
+
+		std::vector<ScopingBlock> scopes_;
+
+		
+		std::unique_ptr<std::default_random_engine> rng_{ nullptr };
+
+		std::uniform_int_distribution<UInt64> distribution_;
 	};
 }

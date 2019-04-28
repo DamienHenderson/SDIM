@@ -48,7 +48,7 @@ namespace SDIM
 		"Int8",
 		"Int16",
 		"Int32",
-		"In64",
+		"Int64",
 
 		"F32",
 		"F64",
@@ -90,6 +90,9 @@ namespace SDIM
 
 		Variable() : type(SDIM::VariableType::Unknown), as(SDIM::VarUnion()) {}
 
+		/// Initialise with type but not initial value for the compiler's use
+		Variable(VariableType var_type) : type(var_type), as(SDIM::VarUnion()) {}
+
 		Variable(VariableType var_type, VarUnion value) : type(var_type), as(value) {}
 
 		Variable(UInt8 val);
@@ -107,7 +110,7 @@ namespace SDIM
 		
 		Variable(void* val);
 
-		std::string ToString();
+		std::string ToString() const;
 
 		size_t GetTypeSize() const;
 

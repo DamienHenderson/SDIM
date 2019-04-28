@@ -2,6 +2,8 @@
 
 #include <Utils.hpp>
 
+#include <random>
+
 #include "BytecodeGenerator.hpp"
 #include "OperatorPrecedence.hpp"
 namespace SDIM
@@ -9,6 +11,9 @@ namespace SDIM
 
 	Parser::Parser()
 	{
+		rng_ = std::make_unique<std::default_random_engine>((std::random_device())());
+		
+		
 	}
 
 
@@ -18,7 +23,13 @@ namespace SDIM
 
 	bool Parser::Parse(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator)
 	{
-		(void)program_data;
+		if (!scopes_.empty())
+		{
+			scopes_.clear();
+		}
+		// add global scope which is entirely disconnected from a scope and refers to anything not within a set of curly braces
+		ScopingBlock global("Global");
+		scopes_.push_back(global);
 		
 		// Utilises pratt parsing 
 		// inspired by this webpage http://journal.stuffwithstuff.com/2011/03/19/pratt-parsers-expression-parsing-made-easy/
@@ -58,6 +69,13 @@ namespace SDIM
 
 	bool Parser::ParseExpression(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator, UInt64 current_token)
 	{
+#ifdef SDIM_VERBOSE
+		for (const auto& it : scopes_)
+		{
+			it.PrintScope();
+		}
+#endif
+		Utils::Log("");
 		if (tokens.empty())
 		{
 			Utils::Log("No Tokens found in compilation input");
@@ -70,10 +88,16 @@ namespace SDIM
 		}
 		Token next_token = tokens[current_token];
 		Utils::Log("Parsing token ", next_token.ToString());
-
+		// TODO: move all of these into functions to make this tidier
 		if (Utils::IsOpeningBracket(next_token.token_type))
 		{
 			brackets_.push(next_token.token_type);
+			if (next_token.token_type == TokenType::LeftBrace)
+			{
+				
+				ScopingBlock anonymous_block(Utils::ConstructString("AnonymousScope", distribution_(*rng_)));
+				scopes_.push_back(anonymous_block);
+			}
 			return ParseExpression(tokens, program_data, generator, ++current_token);
 		}
 		else if (Utils::IsClosingBracket(next_token.token_type))
@@ -91,6 +115,13 @@ namespace SDIM
 				return false;
 			}
 			Utils::Log("Matched opening bracket ", Utils::TokenTypeToString(current_bracket), " with ", Utils::TokenTypeToString(next_token.token_type));
+			if (next_token.token_type == TokenType::RightBrace)
+			{
+				// close scope
+				ScopingBlock closed_scope = scopes_.back();
+				Utils::Log("Closed Scoping block ", closed_scope.GetName());
+				scopes_.pop_back();
+			}
 			brackets_.pop();
 		}
 		if (next_token.token_type == TokenType::NumericLiteral)
@@ -163,9 +194,24 @@ namespace SDIM
 			Token expect_module_token = tokens[current_token + 1];
 			if (expect_module_token.token_type == TokenType::Identifier)
 			{
-				// TODO: handle modules correctly
-				Utils::Log("Found module: ", expect_module_token.lexeme);
-				return ParseExpression(tokens, program_data, generator, current_token + 2);
+				
+				Token expect_left_brace = tokens[current_token + 2];
+				if (expect_left_brace.token_type == TokenType::LeftBrace)
+				{
+					brackets_.push(expect_left_brace.token_type);
+					// correctly formed module statement
+					scopes_.push_back(ScopingBlock(expect_module_token.lexeme));
+					// TODO: handle modules correctly
+					Utils::Log("Found module: ", expect_module_token.lexeme);
+
+					return ParseExpression(tokens, program_data, generator, current_token + 3);
+				}
+				else
+				{
+					Utils::Log("Malformed module declaration ", expect_module_token.lexeme);
+					return ParseExpression(tokens, program_data, generator, current_token + 2);
+				}
+				
 			}
 			else
 			{
@@ -183,6 +229,53 @@ namespace SDIM
 				if (next_token.lexeme == variable_type_strings[i])
 				{
 					Utils::Log("Found Type specifier for type: ", variable_type_strings[i]);
+
+					Token expect_identifier_token = tokens[current_token + 1];
+
+					if (expect_identifier_token.token_type == TokenType::Identifier)
+					{
+						// found identifier for type declaration good
+						std::string var_name = expect_identifier_token.lexeme;
+
+						Token expect_bracket_or_equal_token = tokens[current_token + 2];
+						if (expect_bracket_or_equal_token.token_type == TokenType::LeftBracket)
+						{
+							// function
+							// this will be quite long winded
+							// can create scope here as args will be in the function scope
+							ScopingBlock func_scope(var_name);
+							scopes_.push_back(func_scope);
+							brackets_.push(expect_bracket_or_equal_token.token_type);
+							// consume args
+							return ParseExpression(tokens, program_data, generator, current_token + 4);
+
+						}
+						else if (expect_bracket_or_equal_token.token_type == TokenType::Equal)
+						{
+							// var assignment
+							// need to verify validity of assignment
+							return ParseExpression(tokens, program_data, generator, current_token + 4);
+						}
+						else if (expect_bracket_or_equal_token.token_type == TokenType::SemiColon)
+						{
+							// just declaration without initialisation
+							ScopingBlock& current_scope = scopes_.back();
+							Utils::Log("Attempting to add variable to scope ", current_scope.GetName());
+							bool res = current_scope.AddVariable(var_name, SDIM::Variable(static_cast<VariableType>(i)));
+							if (!res)
+							{
+								Utils::Log("Attempt to redeclare ", var_name);
+							}
+							Utils::Log("Added variable ", var_name, " to scope ", current_scope.GetName());
+							return ParseExpression(tokens, program_data, generator, current_token + 3);
+						}
+						else
+						{
+							Utils::Log("Malformed variable or function definition ", var_name);
+							// malformed
+							return ParseExpression(tokens, program_data, generator, current_token + 1);
+						}
+					}
 					// TODO: process type specifier for function and variable declarations
 					return ParseExpression(tokens, program_data, generator, current_token + 1);
 				}

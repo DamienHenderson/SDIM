@@ -28,7 +28,7 @@ namespace SDIM
 		0
 
 	};
-	std::string Variable::ToString()
+	std::string Variable::ToString() const
 	{
 		switch (type)
 		{
