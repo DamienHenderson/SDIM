@@ -58,9 +58,10 @@ namespace SDIM
 		Utils::Log(file_comment);
 		UInt64 header_size = comment_offset + comment_size;
 
+		UInt64 prog_size = file_data.size() - header_size;
 		state_.program_data_ = new char[file_data.size() - header_size];
-		std::memcpy(state_.program_data_, file_data.data() + header_size, file_data.size() - header_size);
-		state_.program_length_ = file_data.size();
+		std::memcpy(state_.program_data_, file_data.data() + header_size, prog_size);
+		state_.program_length_ = prog_size;
 
 		state_.program_counter_ = entrypoint;
 
