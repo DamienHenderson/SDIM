@@ -104,6 +104,7 @@ namespace SDIM
 		void Return(SDIM::VMState& state)
 		{
 			SDIM::Utils::Disassemble("Return");
+			SDIM::Variable func_return = state.program_stack_.Pop();
 			SDIM::Variable ret_addr = state.program_stack_.Pop();
 			if (ret_addr.type != VariableType::UInt64)
 			{
@@ -111,7 +112,7 @@ namespace SDIM
 				state.program_counter_ += opcode_size;
 				return;
 			}
-			
+			state.program_stack_.Push(func_return);
 			state.program_counter_ = ret_addr.as.uint64;
 		
 		}

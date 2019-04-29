@@ -45,11 +45,24 @@ namespace SDIM
 		}
 
 		std::vector<char> file_data(std::istreambuf_iterator<char>(file), {});
-		state_.program_data_ = new char[file_data.size()];
-		std::memcpy(state_.program_data_, file_data.data(), file_data.size());
+
+		UInt64 entrypoint = Utils::ReadUInt64Literal(file_data, 0);
+
+		UInt64 comment_size = Utils::ReadUInt64Literal(file_data, sizeof(entrypoint));
+		std::string file_comment{ "" };
+		UInt64 comment_offset = sizeof(entrypoint) + sizeof(comment_size);
+		for (UInt64 i = 0; i < comment_size; i++)
+		{
+			file_comment += file_data[i + comment_offset];
+		}
+		Utils::Log(file_comment);
+		UInt64 header_size = comment_offset + comment_size;
+
+		state_.program_data_ = new char[file_data.size() - header_size];
+		std::memcpy(state_.program_data_, file_data.data() + header_size, file_data.size() - header_size);
 		state_.program_length_ = file_data.size();
 
-		state_.program_counter_ = 0;
+		state_.program_counter_ = entrypoint;
 
 		return true;
 	}

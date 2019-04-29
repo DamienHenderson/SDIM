@@ -197,6 +197,10 @@ namespace SDIM
 			*/
 			
 			bool res = ParseNumericLiteral(next_token, program_data, generator);
+			if (!res)
+			{
+				Utils::Log("Failed to parse numeric literal");
+			}
 			// return ParseExpression(tokens, program_data, generator, current_token + 1);
 		}
 		if (next_token.token_type == TokenType::Module)
@@ -235,7 +239,16 @@ namespace SDIM
 		if (next_token.token_type == TokenType::Return)
 		{
 			// return
-			// return will need to process an expression stopping at a return statement
+			// return will need to process an expression stopping at a semicolon
+			// for now do it the hacky way
+			if (tokens[current_token + 1].token_type == TokenType::NumericLiteral && tokens[current_token + 2].token_type == TokenType::SemiColon)
+			{
+				bool res = ParseNumericLiteral(tokens[current_token + 1], program_data, generator);
+				if (!res)
+				{
+					Utils::Log("Failed to parse numeric literal following return statement");
+				}
+			}
 			generator->WriteReturnInstruction(program_data);
 		}
 		if (next_token.token_type == TokenType::Identifier)
@@ -399,6 +412,8 @@ namespace SDIM
 						BytecodeHeader& header = static_cast<BytecodeGenerator*>(generator)->GetHeader();
 						header.entrypoint_idx = entrypoint_location;
 					}
+					// temporary
+					generator->WriteCallInstruction(program_data, 0);
 				}
 				return true;
 			}

@@ -103,6 +103,17 @@ namespace SDIM
 			return hash;
 		}
 
+		UInt64 ReadUInt64Literal(const std::vector<char>& data, size_t idx)
+		{
+			UInt64 literal_value{ 0 };
+			for (size_t i = 0; i < sizeof(literal_value); i++)
+			{
+				unsigned char read_byte = static_cast<unsigned char>(data[idx + i]);
+				literal_value |= static_cast<UInt64>(read_byte) << (i * 8);
+			}
+			return literal_value;
+		}
+
 
 		
 	}

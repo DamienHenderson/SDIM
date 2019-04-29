@@ -6,6 +6,9 @@
 #include <iostream>
 #include <sstream>
 #include <cstring>
+#include <vector>
+#include <cstddef>
+
 namespace SDIM
 {
 	// TODO: move utils to shared SDIM common library and combine with general compiler utils
@@ -116,6 +119,9 @@ namespace SDIM
 		/// Returns the FNV1a Hash of a string
 		/// Note that this hash is not cryptographically secure so it should net be used for that purpose
 		UInt64 FNV1AHash(const char* str, size_t length);
+
+		/// Used by the VM to read the header
+		UInt64 ReadUInt64Literal(const std::vector<char>& data, size_t idx);
 
 	}
 }
