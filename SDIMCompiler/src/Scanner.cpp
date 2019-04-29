@@ -113,7 +113,7 @@ namespace SDIM
 				current_token = Token(TokenType::Unknown, "");
 
 			}
-			if (current_token.token_type == TokenType::NumericLiteral && !std::isdigit(current_char))
+			if (current_token.token_type == TokenType::NumericLiteral && !std::isdigit(current_char) && current_char != '.')
 			{
 				tokens.push_back(current_token);
 				// std::cout << "Extracted lexeme: " << current_token.lexeme << "\n";
@@ -192,6 +192,11 @@ namespace SDIM
 				// LogString(std::string("Extracted lexeme: ") + current_char);
 				break;
 			case '.':
+				if (current_token.token_type == TokenType::NumericLiteral)
+				{
+					current_token.lexeme += current_char;
+					break;
+				}
 				tokens.push_back(Token(TokenType::Dot, ConvertToString(current_char)));
 				// LogString(std::string("Extracted lexeme: ") + current_char);
 				break;

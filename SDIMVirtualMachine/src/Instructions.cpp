@@ -109,7 +109,9 @@ namespace SDIM
 			{
 				SDIM::Utils::Log("state.program_counter_ += targets must be of type UInt64");
 				state.program_counter_ += opcode_size;
+				return;
 			}
+			
 			state.program_counter_ = ret_addr.as.uint64;
 		
 		}

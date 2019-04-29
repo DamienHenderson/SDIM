@@ -131,6 +131,8 @@ namespace SDIM
 		}
 		if (next_token.token_type == TokenType::NumericLiteral)
 		{
+			/*
+			
 			// process float literals
 			Token expect_dot_token = tokens[current_token + 1];
 			std::string combined_number = next_token.lexeme;
@@ -192,6 +194,10 @@ namespace SDIM
 				generator->WritePushInt32Instruction(program_data, num_literal);
 				return ParseExpression(tokens, program_data, generator, current_token + 1);
 			}
+			*/
+			
+			bool res = ParseNumericLiteral(next_token, program_data, generator);
+			// return ParseExpression(tokens, program_data, generator, current_token + 1);
 		}
 		if (next_token.token_type == TokenType::Module)
 		{
@@ -225,6 +231,12 @@ namespace SDIM
 				return ParseExpression(tokens, program_data, generator, current_token + 1);
 			}
 			
+		}
+		if (next_token.token_type == TokenType::Return)
+		{
+			// return
+			// return will need to process an expression stopping at a return statement
+			generator->WriteReturnInstruction(program_data);
 		}
 		if (next_token.token_type == TokenType::Identifier)
 		{
@@ -278,6 +290,45 @@ namespace SDIM
 								Utils::Log("Attempt to redeclare ", var_name);
 							}
 							Utils::Log("Added variable ", var_name, " to scope ", current_scope.GetName());
+
+
+							switch (static_cast<VariableType>(i))
+							{
+							case VariableType::UInt8:
+								generator->WritePushUInt8Instruction(program_data, 0);
+								break;
+							case VariableType::UInt16:
+								generator->WritePushUInt16Instruction(program_data, 0);
+								break;
+							case VariableType::UInt32:
+								generator->WritePushUInt32Instruction(program_data, 0);
+								break;
+							case VariableType::UInt64:
+								generator->WritePushUInt64Instruction(program_data, 0);
+								break;
+
+							case VariableType::Int8:
+								generator->WritePushInt8Instruction(program_data, 0);
+								break;
+							case VariableType::Int16:
+								generator->WritePushInt16Instruction(program_data, 0);
+								break;
+							case VariableType::Int32:
+								generator->WritePushInt32Instruction(program_data, 0);
+								break;
+							case VariableType::Int64:
+								generator->WritePushInt64Instruction(program_data, 0);
+								break;
+
+							case VariableType::F32:
+								generator->WritePushF32Instruction(program_data, 0.0f);
+								break;
+							case VariableType::F64:
+								generator->WritePushF64Instruction(program_data, 0.0);
+								break;
+							default:
+								break;
+							}
 							return ParseExpression(tokens, program_data, generator, current_token + 3);
 						}
 						else
@@ -311,7 +362,8 @@ namespace SDIM
 
 		constexpr char* entrypoint_name = "Main";
 
-		
+		Utils::Log("Function ", func_name, " defined at bytecode address ", program_data.size());
+
 		ScopingBlock func_args_scope(func_name + "__ARGS__");
 		scopes_.push_back(func_args_scope);
 		
@@ -338,7 +390,7 @@ namespace SDIM
 				next_token_idx = current_consume_idx + 1;
 				if (func_name == entrypoint_name)
 				{
-					Utils::Log("Function declaration for entrypoint ", entrypoint_name, " TODO write this to the header for the bytecode program so it starts in the right place");
+					Utils::Log("Function declaration for entrypoint ", entrypoint_name, " at bytecode address ", program_data.size());
 					// TODO: adjust this to account for the header being written
 					// IDEA: could have the header as a known size so the VM reads the header data and then the program is 0 indexed from the start of the program not the start of the program file
 					size_t entrypoint_location = program_data.size();
@@ -355,6 +407,35 @@ namespace SDIM
 		}
 		next_token_idx = current_token + 1;
 		return false;
+	}
+
+	bool Parser::ParseNumericLiteral(const Token& current_token, std::vector<unsigned char>& program_data, Generator* generator)
+	{
+		if (current_token.lexeme.find(".") != current_token.lexeme.npos)
+		{
+			if (current_token.lexeme.find("f") != current_token.lexeme.npos)
+			{
+				// 32 bit float
+				F32 num = static_cast<F32>(std::atof(current_token.lexeme.c_str()));
+
+				generator->WritePushF32Instruction(program_data, num);
+			}
+			else
+			{
+				// 64 bit float
+				F64 num = std::atof(current_token.lexeme.c_str());
+
+				generator->WritePushF64Instruction(program_data, num);
+			}
+
+		}
+		else
+		{
+			// integer literal
+			Int64 num = std::atoll(current_token.lexeme.c_str());
+			generator->WritePushInt64Instruction(program_data, num);
+		}
+		return true;
 	}
 
 }
