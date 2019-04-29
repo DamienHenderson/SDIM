@@ -4,6 +4,8 @@
 #include "VariableStorage.hpp"
 #include "HashTable.hpp"
 
+#include <stack>
+
 namespace SDIM
 {
 	struct VMState
@@ -16,7 +18,7 @@ namespace SDIM
 		SDIM::VariableStorage variables_;
 		SDIM::HashTable string_table_; // populate this on loading a program, strings should be in the file header
 		bool running_{ false };
-
+		std::stack<UInt64> ret_addrs_;
 
 	};
 

@@ -7,6 +7,11 @@ namespace SDIM
 {
 	namespace Instructions
 	{
+		void PushReturnAddress(VMState& state, UInt64 addr)
+		{
+			state.ret_addrs_.push(addr);
+
+		}
 		void NoOperation(SDIM::VMState& state)
 		{
 			SDIM::Utils::Log("NoOperation");
@@ -27,14 +32,18 @@ namespace SDIM
 		}
 		void Call(SDIM::VMState& state)
 		{
+			
 			SDIM::Utils::Disassemble("Call");
 			UInt64 func_addr = Utils::ReadUInt64Literal(state, state.program_counter_ + 1);
+
+			const UInt64 opcode_offset = opcode_size + sizeof(func_addr);
+			
 			SDIM::Utils::Log("Called function at address: ", func_addr, " Previous address: ", state.program_counter_);
-			state.program_stack_.Push(SDIM::Variable(UInt64(state.program_counter_ + opcode_size + sizeof(func_addr))));
+			PushReturnAddress(state, state.program_counter_ + opcode_offset);
 			state.program_counter_ = func_addr;
 			
 			// size of opcode + 64 bit address
-			state.program_counter_ += opcode_size + sizeof(func_addr);
+			// state.program_counter_ += opcode_size + sizeof(func_addr);
 		}
 		void Jump(SDIM::VMState& state)
 		{
@@ -104,16 +113,15 @@ namespace SDIM
 		void Return(SDIM::VMState& state)
 		{
 			SDIM::Utils::Disassemble("Return");
-			SDIM::Variable func_return = state.program_stack_.Pop();
-			SDIM::Variable ret_addr = state.program_stack_.Pop();
-			if (ret_addr.type != VariableType::UInt64)
+			if (state.ret_addrs_.empty())
 			{
-				SDIM::Utils::Log("state.program_counter_ += targets must be of type UInt64");
-				state.program_counter_ += opcode_size;
+				Utils::Log("Attempting to return with empty return address stack");
+				state.running_ = false;
 				return;
 			}
-			state.program_stack_.Push(func_return);
-			state.program_counter_ = ret_addr.as.uint64;
+			UInt64 ret_addr = state.ret_addrs_.top();
+			state.ret_addrs_.pop();
+			state.program_counter_ = ret_addr;
 		
 		}
 		void JumpTrue(SDIM::VMState& state)
@@ -155,8 +163,8 @@ namespace SDIM
 			
 			if (SDIM::IsTrue(state.program_stack_.Pop()))
 			{
+				PushReturnAddress(state, UInt64(state.program_counter_ + opcode_offset));
 				
-				state.program_stack_.Push(SDIM::Variable(UInt64(state.program_counter_ + opcode_offset)));
 				state.program_counter_ = func_addr;
 			}
 			else
@@ -172,7 +180,7 @@ namespace SDIM
 
 			if (SDIM::IsFalse(state.program_stack_.Pop()))
 			{
-				state.program_stack_.Push(SDIM::Variable(UInt64(state.program_counter_ + opcode_offset)));
+				PushReturnAddress(state, UInt64(state.program_counter_ + opcode_offset));
 				state.program_counter_ = func_addr;
 			}
 			else
@@ -192,7 +200,7 @@ namespace SDIM
 				assert("Call address in CallTrueStack must be of type UInt64" && var.type == VariableType::UInt64);
 				UInt64 func_addr = var.as.uint64;
 
-				state.program_stack_.Push(SDIM::Variable(UInt64(state.program_counter_ + opcode_offset)));
+				PushReturnAddress(state, UInt64(state.program_counter_ + opcode_offset));
 				state.program_counter_ = func_addr;
 			}
 			else
@@ -214,7 +222,7 @@ namespace SDIM
 				UInt64 func_addr = var.as.uint64;
 
 				
-				state.program_stack_.Push(SDIM::Variable(UInt64(state.program_counter_ + opcode_offset)));
+				PushReturnAddress(state, UInt64(state.program_counter_ + opcode_offset));
 				state.program_counter_ = func_addr;
 			}
 			else
