@@ -24,7 +24,10 @@ namespace SDIM
 		/// existing data in tokens will be preserved
 		bool ScanFile(const std::string& path, std::vector<Token>& tokens);
 
-		
+	private:
+
+		Token CreateToken(TokenType type, const std::string& lexeme);
+		UInt64 line_{ 0 }, col_{ 0 };
 
 	};
 

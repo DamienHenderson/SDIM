@@ -35,8 +35,8 @@ namespace SDIM
 		// inspired by this webpage http://journal.stuffwithstuff.com/2011/03/19/pratt-parsers-expression-parsing-made-easy/
 		// also inspired by this webpage http://craftinginterpreters.com/compiling-expressions.html
 		// also inspired by other sources 
-		
-		return ParseModuleDeclaration(tokens, program_data, generator, 0);
+		current_token = 0;
+		return ParseModuleDeclaration(tokens, program_data, generator);
 		/*
 		generator->WritePushUInt8Instruction(program_data, 42);
 		generator->WritePushUInt16Instruction(program_data, 42);
@@ -67,11 +67,11 @@ namespace SDIM
 		*/
 	}
 
-	bool Parser::ParseModuleDeclaration(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator, UInt64 current_token)
+	bool Parser::ParseModuleDeclaration(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator)
 	{
 		if (tokens[current_token].token_type != TokenType::Module)
 		{
-			Utils::Log("SDIM Programs must start with a module declaration");
+			Error(tokens[current_token], "Expected module keyword");
 			return false;
 		}
 		// module so the following token should be an identifier
@@ -90,11 +90,11 @@ namespace SDIM
 
 				// TODO: ParseTopLevelScope Function
 				// Top level scopes should only contain functions
-				return ParseExpression(tokens, program_data, generator, current_token + 3);
+				return ParseExpression(tokens, program_data, generator);
 			}
 			else
 			{
-				Utils::Log("Malformed module declaration ", expect_module_name_token.lexeme);
+				Error(expect_module_name_token, "Expected { to open scoping block for module");
 				return false;
 			}
 
@@ -102,12 +102,12 @@ namespace SDIM
 		else
 		{
 			// Module names must be an identifier
-			Utils::Log(expect_module_name_token.lexeme, " is not a valid name for a module");
+			Error(expect_module_name_token, "Expected module name");
 			return false;
 		}
 	}
 
-	bool Parser::ParseExpression(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator, UInt64 current_token)
+	bool Parser::ParseExpression(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator)
 	{
 		
 #ifdef SDIM_VERBOSE
@@ -134,41 +134,7 @@ namespace SDIM
 		Token next_token = tokens[current_token];
 		Utils::Log("Parsing token ", next_token.ToString());
 		// TODO: move all of these into functions to make this tidier
-		if (Utils::IsOpeningBracket(next_token.token_type))
-		{
-			brackets_.push(next_token.token_type);
-			if (next_token.token_type == TokenType::LeftBrace)
-			{
-				
-				ScopingBlock anonymous_block(Utils::ConstructString("AnonymousScope", distribution_(*rng_)));
-				scopes_.push_back(anonymous_block);
-			}
-			return ParseExpression(tokens, program_data, generator, ++current_token);
-		}
-		else if (Utils::IsClosingBracket(next_token.token_type))
-		{
-			if (brackets_.empty())
-			{
-				Utils::Log("Closing bracket: ", next_token.lexeme, " found with no matching opening bracket");
-				return false;
-			}
-			TokenType current_bracket = brackets_.top();
-
-			if (!Utils::IsMatchingBracketPair(current_bracket, next_token.token_type))
-			{
-				Utils::Log("Expected matching bracket for ", Utils::TokenTypeToString(current_bracket), " but got ", Utils::TokenTypeToString(next_token.token_type), "Instead");
-				return false;
-			}
-			Utils::Log("Matched opening bracket ", Utils::TokenTypeToString(current_bracket), " with ", Utils::TokenTypeToString(next_token.token_type));
-			if (next_token.token_type == TokenType::RightBrace)
-			{
-				// close scope
-				ScopingBlock closed_scope = scopes_.back();
-				Utils::Log("Closed Scoping block ", closed_scope.GetName());
-				scopes_.pop_back();
-			}
-			brackets_.pop();
-		}
+		
 		if (next_token.token_type == TokenType::NumericLiteral)
 		{
 			/*
@@ -236,7 +202,7 @@ namespace SDIM
 			}
 			*/
 			
-			bool res = ParseNumericLiteral(next_token, program_data, generator);
+			bool res = ParseNumericLiteral(tokens, program_data, generator);
 			if (!res)
 			{
 				Utils::Log("Failed to parse numeric literal");
@@ -249,9 +215,12 @@ namespace SDIM
 			// return
 			// return will need to process an expression stopping at a semicolon
 			// for now do it the hacky way
+			// TODO: string returns?
+			// TODO: return value in variable
 			if (tokens[current_token + 1].token_type == TokenType::NumericLiteral && tokens[current_token + 2].token_type == TokenType::SemiColon)
 			{
-				bool res = ParseNumericLiteral(tokens[current_token + 1], program_data, generator);
+				Advance();
+				bool res = ParseNumericLiteral(tokens, program_data, generator);
 				if (!res)
 				{
 					Utils::Log("Failed to parse numeric literal following return statement");
@@ -284,21 +253,22 @@ namespace SDIM
 							// add the left bracket to the bracket matching
 							brackets_.push(expect_bracket_or_equal_token.token_type);
 
-							size_t next_token_idx = 0;
-							bool res = ParseFunctionDeclaration(tokens, program_data, generator, current_token + 3, static_cast<VariableType>(i), var_name, next_token_idx);
+							// size_t next_token_idx = 0;
+							bool res = ParseFunctionDeclaration(tokens, program_data, generator, static_cast<VariableType>(i), var_name);
 							if (!res)
 							{
 								// malformed function declaration
 							}
-							return ParseExpression(tokens, program_data, generator, next_token_idx);
+							return ParseExpression(tokens, program_data, generator);
 						}
 						else if (expect_bracket_or_equal_token.token_type == TokenType::Equal)
 						{
 							// var assignment
 							// need to verify validity of assignment
 							Utils::Log("Attempting declaration and assignment of ", var_name, " in scope ", current_scope.GetName());
-
-							return ParseExpression(tokens, program_data, generator, current_token + 4);
+							// temporary
+							current_token += 4;
+							return ParseExpression(tokens, program_data, generator);
 						}
 						else if (expect_bracket_or_equal_token.token_type == TokenType::SemiColon)
 						{
@@ -350,26 +320,27 @@ namespace SDIM
 							default:
 								break;
 							}
-							return ParseExpression(tokens, program_data, generator, current_token + 3);
+							return ParseExpression(tokens, program_data, generator);
 						}
 						else
 						{
 							Utils::Log("Malformed variable or function definition ", var_name);
 							// malformed
-							return ParseExpression(tokens, program_data, generator, current_token + 1);
+							return ParseExpression(tokens, program_data, generator);
 						}
 					}
 					// TODO: process type specifier for function and variable declarations
-					return ParseExpression(tokens, program_data, generator, current_token + 1);
+					return ParseExpression(tokens, program_data, generator);
 				}
 			}
 		}
-		return ParseExpression(tokens, program_data, generator, ++current_token);
+		++current_token;
+		return ParseExpression(tokens, program_data, generator);
 		// return true;
 	}
 
 	
-	bool Parser::ParseFunctionDeclaration(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator, UInt64 current_token, VariableType func_return, const std::string& func_name, size_t& next_token_idx)
+	bool Parser::ParseFunctionDeclaration(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator, VariableType func_return, const std::string& func_name)
 	{
 		(void)program_data;
 		(void)generator;
@@ -409,7 +380,7 @@ namespace SDIM
 				scopes_.push_back(func_scope);
 				// start of function scope
 				brackets_.push(consume.token_type);
-				next_token_idx = current_consume_idx + 1;
+				// next_token_idx = current_consume_idx + 1;
 				if (func_name == entrypoint_name)
 				{
 					Utils::Log("Function declaration for entrypoint ", entrypoint_name, " at bytecode address ", program_data.size());
@@ -430,25 +401,26 @@ namespace SDIM
 
 			current_consume_idx++;
 		}
-		next_token_idx = current_token + 1;
+		// next_token_idx = current_token + 1;
 		return false;
 	}
 
-	bool Parser::ParseNumericLiteral(const Token& current_token, std::vector<unsigned char>& program_data, Generator* generator)
+	bool Parser::ParseNumericLiteral(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator)
 	{
-		if (current_token.lexeme.find(".") != current_token.lexeme.npos)
+		Token token = tokens[current_token];
+		if (token.lexeme.find(".") != token.lexeme.npos)
 		{
-			if (current_token.lexeme.find("f") != current_token.lexeme.npos)
+			if (token.lexeme.find("f") != token.lexeme.npos)
 			{
 				// 32 bit float
-				F32 num = static_cast<F32>(std::atof(current_token.lexeme.c_str()));
+				F32 num = static_cast<F32>(std::atof(token.lexeme.c_str()));
 
 				generator->WritePushF32Instruction(program_data, num);
 			}
 			else
 			{
 				// 64 bit float
-				F64 num = std::atof(current_token.lexeme.c_str());
+				F64 num = std::atof(token.lexeme.c_str());
 
 				generator->WritePushF64Instruction(program_data, num);
 			}
@@ -457,20 +429,175 @@ namespace SDIM
 		else
 		{
 			// integer literal
-			Int64 num = std::atoll(current_token.lexeme.c_str());
+			Int64 num = std::atoll(token.lexeme.c_str());
 			generator->WritePushInt64Instruction(program_data, num);
 		}
 		return true;
 	}
 
-	bool Parser::ParseVariableDeclaration(VariableType type, const Token& current_token, std::vector<unsigned char>& program_data, Generator* generator)
+	bool Parser::ParseVariableDeclaration(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator)
 	{
+		(void)tokens;
+		(void)program_data;
+		(void)generator;
+
 		return false;
 	}
 
-	bool Parser::ParseAssignment(VariableType type, const Token& current_token, std::vector<unsigned char>& program_data, Generator* generator)
+	bool Parser::ParseAssignment(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator)
 	{
+		(void)tokens;
+		(void)program_data;
+		(void)generator;
 		return false;
+	}
+
+	bool Parser::ParseGrouping(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator)
+	{
+		bool res = ParseExpression(tokens, program_data, generator);
+		if (!res)
+		{
+			return false;
+		}
+		bool close_bracket = MatchToken(tokens[current_token], TokenType::RightBracket);
+		if (!close_bracket)
+		{
+			Error(tokens[current_token], "Expected closing right bracket in grouped expression");
+			return false;
+		}
+		Advance();
+		return true;
+	}
+
+	bool Parser::ParseUnary(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator)
+	{
+		TokenType op_type = tokens[current_token].token_type;
+		// evaluate the rest of the expression the unary operator is operating on
+		bool res = ParseExpression(tokens, program_data, generator);
+		if (!res)
+		{
+			return false;
+		}
+
+		if (op_type == TokenType::Minus)
+		{
+			generator->WriteNegateInstruction(program_data);
+			return true;
+		}
+		else if (op_type == TokenType::MinusMinus)
+		{
+			generator->WritePushInt64Instruction(program_data, -1);
+			generator->WriteSubtractInstruction(program_data);
+			return true;
+		}
+		else if (op_type == TokenType::PlusPlus)
+		{
+			generator->WritePushUInt64Instruction(program_data, 1);
+			generator->WriteAddInstruction(program_data);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+		
+	}
+
+	bool Parser::ConsumeToken(const std::vector<SDIM::Token>& tokens, TokenType expect, const char* error_message)
+	{
+		Token consume = tokens[current_token];
+		if (consume.token_type == expect)
+		{
+			// handle brackets here
+			// bool res = HandleBrackets(tokens);
+			// if (!res)
+			// {
+			// 	return false;
+			// }
+			Advance();
+			return true;
+		}
+
+		Error(tokens[current_token], error_message);
+		
+		return false;
+	}
+	/*
+	bool Parser::HandleBrackets(const std::vector<SDIM::Token>& tokens)
+	{
+		
+		Token token = tokens[current_token];
+		if (Utils::IsOpeningBracket(token.token_type))
+		{
+			brackets_.push(token.token_type);
+			
+			return true;
+		}
+		else if (Utils::IsClosingBracket(token.token_type))
+		{
+			if (brackets_.empty())
+			{
+				Utils::Log("Closing bracket: ", token.lexeme, " found with no matching opening bracket");
+				return false;
+			}
+			TokenType current_bracket = brackets_.top();
+
+			if (!Utils::IsMatchingBracketPair(current_bracket, token.token_type))
+			{
+				Utils::Log("Expected matching bracket for ", Utils::TokenTypeToString(current_bracket), " but got ", Utils::TokenTypeToString(token.token_type), "Instead");
+				return false;
+			}
+			Utils::Log("Matched opening bracket ", Utils::TokenTypeToString(current_bracket), " with ", Utils::TokenTypeToString(token.token_type));
+			if (token.token_type == TokenType::RightBrace)
+			{
+				// close scope
+				ScopingBlock closed_scope = scopes_.back();
+				Utils::Log("Closed Scoping block ", closed_scope.GetName());
+				scopes_.pop_back();
+			}
+			brackets_.pop();
+		}
+		return false;
+	}
+	*/
+	bool Parser::MatchToken(const Token& token, TokenType expect)
+	{
+		return token.token_type == expect;
+	}
+
+	void Parser::Advance()
+	{
+		++current_token;
+	}
+
+	bool Parser::IsBuiltInType(const Token& token)
+	{
+		for (UInt8 i = 0; i < Utils::VariableTypeToUInt8(VariableType::Unknown); i++)
+		{
+			if (token.lexeme == variable_type_strings[i])
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	void Parser::Error(const Token& at, const char* message)
+	{
+		
+		Utils::Log("[ERROR] line(", at.line, "):column(", at.col, ") ", message);
+	}
+
+	VariableType Parser::TokenToVariableType(const Token& token)
+	{
+		for (UInt8 i = 0; i < Utils::VariableTypeToUInt8(VariableType::Unknown); i++)
+		{
+			if (token.lexeme == variable_type_strings[i])
+			{
+				return static_cast<VariableType>(i);
+			}
+		}
+		return VariableType::Unknown;
 	}
 
 }

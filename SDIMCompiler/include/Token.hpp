@@ -70,6 +70,8 @@ namespace SDIM
 
 		std::string lexeme;
 
+		UInt64 line{ 0 }, col{ 0 };
+
 		Token(TokenType type, const std::string& lexeme_value) : token_type(type), lexeme(lexeme_value)
 		{
 

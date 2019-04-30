@@ -17,6 +17,7 @@ namespace SDIM
 
 	bool Scanner::ScanString(const std::string& program, std::vector<Token>& tokens)
 	{
+		
 		std::string prog_string = program;
 		auto MatchNext = [&prog_string](char match, size_t idx) -> bool
 		{
@@ -26,14 +27,16 @@ namespace SDIM
 		Token current_token(TokenType::Unknown, "");
 		for (size_t i = 0; i < program.length(); i++)
 		{
+
 			char current_char = prog_string[i];
+			++col_;
 			if (current_char == '\0')
 			{
 				// EOF
 				// emit compile error here if the eof is premature (not implemented yet)
 
 
-				tokens.push_back(Token(TokenType::EOFToken, ConvertToString(current_char)));
+				tokens.push_back(CreateToken(TokenType::EOFToken, ConvertToString(current_char)));
 				break;
 			}
 			// String literals may contain whitespace
@@ -73,9 +76,14 @@ namespace SDIM
 
 					// std::cout << "Extracted lexeme: " << current_token.lexeme << "\n";
 					tokens.push_back(current_token);
-					current_token = Token(TokenType::Unknown, "");
+					current_token = CreateToken(TokenType::Unknown, "");
 				}
 				// skip whitespace
+				if (current_char == '\n')
+				{
+					++line_;
+					col_ = 0;
+				}
 				continue;
 			}
 			if (current_token.token_type == TokenType::Identifier && !IsIdentifier(current_char))
@@ -110,85 +118,85 @@ namespace SDIM
 				tokens.push_back(current_token);
 				// std::cout << "Extracted lexeme: " << current_token.lexeme << "\n";
 
-				current_token = Token(TokenType::Unknown, "");
+				current_token = CreateToken(TokenType::Unknown, "");
 
 			}
 			if (current_token.token_type == TokenType::NumericLiteral && !std::isdigit(current_char) && current_char != '.')
 			{
 				tokens.push_back(current_token);
 				// std::cout << "Extracted lexeme: " << current_token.lexeme << "\n";
-				current_token = Token(TokenType::Unknown, "");
+				current_token = CreateToken(TokenType::Unknown, "");
 			}
 			switch (current_char)
 			{
 			case '(':
-				tokens.push_back(Token(TokenType::LeftBracket, ConvertToString(current_char)));
+				tokens.push_back(CreateToken(TokenType::LeftBracket, ConvertToString(current_char)));
 				// LogString(std::string("Extracted lexeme: ") + current_char);
 				break;
 			case ')':
-				tokens.push_back(Token(TokenType::RightBracket, ConvertToString(current_char)));
+				tokens.push_back(CreateToken(TokenType::RightBracket, ConvertToString(current_char)));
 				// LogString(std::string("Extracted lexeme: ") + current_char);
 				break;
 			case '{':
-				tokens.push_back(Token(TokenType::LeftBrace, ConvertToString(current_char)));
+				tokens.push_back(CreateToken(TokenType::LeftBrace, ConvertToString(current_char)));
 				// LogString(std::string("Extracted lexeme: ") + current_char);
 				break;
 			case '}':
-				tokens.push_back(Token(TokenType::RightBrace, ConvertToString(current_char)));
+				tokens.push_back(CreateToken(TokenType::RightBrace, ConvertToString(current_char)));
 				// LogString(std::string("Extracted lexeme: ") + current_char);
 				break;
 			case '[':
-				tokens.push_back(Token(TokenType::LeftSquareBracket, ConvertToString(current_char)));
+				tokens.push_back(CreateToken(TokenType::LeftSquareBracket, ConvertToString(current_char)));
 				// LogString(std::string("Extracted lexeme: ") + current_char);
 				break;
 			case ']':
-				tokens.push_back(Token(TokenType::RightSquareBracket, ConvertToString(current_char)));
+				tokens.push_back(CreateToken(TokenType::RightSquareBracket, ConvertToString(current_char)));
 				// LogString(std::string("Extracted lexeme: ") + current_char);
 				break;
 			case '<':
 				if (MatchNext('=', i + 1))
 				{
-					tokens.push_back(Token(TokenType::LessEqual, "<="));
+					tokens.push_back(CreateToken(TokenType::LessEqual, "<="));
 					++i;
 					// LogString("Extracted lexeme: <=");
 				}
 				if (MatchNext('<', i + 1))
 				{
-					tokens.push_back(Token(TokenType::LeftShift, "<<"));
+					tokens.push_back(CreateToken(TokenType::LeftShift, "<<"));
 					++i;
 					// LogString("Extracted lexeme: <<");
 				}
 				else
 				{
-					tokens.push_back(Token(TokenType::LessThan, ConvertToString(current_char)));
+					tokens.push_back(CreateToken(TokenType::LessThan, ConvertToString(current_char)));
 					// LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
 			case '>':
 				if (MatchNext('=', i + 1))
 				{
-					tokens.push_back(Token(TokenType::GreaterEqual, ">="));
+					tokens.push_back(CreateToken(TokenType::GreaterEqual, ">="));
 					++i;
 					// LogString("Extracted lexeme: >=");
 				}
 				if (MatchNext('>', i + 1))
 				{
-					tokens.push_back(Token(TokenType::RightShift, ">>"));
+					tokens.push_back(CreateToken(TokenType::RightShift, ">>"));
 					++i;
 					// LogString("Extracted lexeme: >>");
 				}
 				else
 				{
-					tokens.push_back(Token(TokenType::GreaterThan, ConvertToString(current_char)));
+					tokens.push_back(CreateToken(TokenType::GreaterThan, ConvertToString(current_char)));
 					// LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
 			case ';':
-				tokens.push_back(Token(TokenType::SemiColon, ConvertToString(current_char)));
+				tokens.push_back(CreateToken(TokenType::SemiColon, ConvertToString(current_char)));
 				// LogString(std::string("Extracted lexeme: ") + current_char);
 				break;
 			case ',':
-				tokens.push_back(Token(TokenType::Comma, ConvertToString(current_char)));
+				tokens.push_back(CreateToken(TokenType::Comma, ConvertToString(current_char)));
 				// LogString(std::string("Extracted lexeme: ") + current_char);
 				break;
 			case '.':
@@ -197,173 +205,173 @@ namespace SDIM
 					current_token.lexeme += current_char;
 					break;
 				}
-				tokens.push_back(Token(TokenType::Dot, ConvertToString(current_char)));
+				tokens.push_back(CreateToken(TokenType::Dot, ConvertToString(current_char)));
 				// LogString(std::string("Extracted lexeme: ") + current_char);
 				break;
 			case '-':
 				if (MatchNext('=', i + 1))
 				{
-					tokens.push_back(Token(TokenType::MinusEqual, "-="));
+					tokens.push_back(CreateToken(TokenType::MinusEqual, "-="));
 					++i;
 					// LogString("Extracted lexeme: -=");
 				}
 				if (MatchNext('-', i + 1))
 				{
-					tokens.push_back(Token(TokenType::MinusMinus, "--"));
+					tokens.push_back(CreateToken(TokenType::MinusMinus, "--"));
 					++i;
 					// LogString("Extracted lexeme: +=");
 				}
 				else
 				{
-					tokens.push_back(Token(TokenType::Minus, ConvertToString(current_char)));
+					tokens.push_back(CreateToken(TokenType::Minus, ConvertToString(current_char)));
 					// LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
 			case '+':
 				if (MatchNext('=', i + 1))
 				{
-					tokens.push_back(Token(TokenType::PlusEqual, "+="));
+					tokens.push_back(CreateToken(TokenType::PlusEqual, "+="));
 					++i;
 					// LogString("Extracted lexeme: +=");
 				}
 				if (MatchNext('+', i + 1))
 				{
-					tokens.push_back(Token(TokenType::PlusPlus, "++"));
+					tokens.push_back(CreateToken(TokenType::PlusPlus, "++"));
 					++i;
 					// LogString("Extracted lexeme: +=");
 				}
 				else
 				{
-					tokens.push_back(Token(TokenType::Plus, ConvertToString(current_char)));
+					tokens.push_back(CreateToken(TokenType::Plus, ConvertToString(current_char)));
 					// LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
 			case '/':
 				if (MatchNext('=', i + 1))
 				{
-					tokens.push_back(Token(TokenType::SlashEqual, "/="));
+					tokens.push_back(CreateToken(TokenType::SlashEqual, "/="));
 					++i;
 					// LogString("Extracted lexeme: /=");
 				}
 				else
 				{
-					tokens.push_back(Token(TokenType::ForwardSlash, ConvertToString(current_char)));
+					tokens.push_back(CreateToken(TokenType::ForwardSlash, ConvertToString(current_char)));
 					// LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
 			case '*':
 				if (MatchNext('=', i + 1))
 				{
-					tokens.push_back(Token(TokenType::AsteriskEqual, "*="));
+					tokens.push_back(CreateToken(TokenType::AsteriskEqual, "*="));
 					++i;
 					// LogString("Extracted lexeme: *=");
 				}
 				else
 				{
-					tokens.push_back(Token(TokenType::Asterisk, ConvertToString(current_char)));
+					tokens.push_back(CreateToken(TokenType::Asterisk, ConvertToString(current_char)));
 					// LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
 			case '%':
 				if (MatchNext('=', i + 1))
 				{
-					tokens.push_back(Token(TokenType::PercentEqual, "%="));
+					tokens.push_back(CreateToken(TokenType::PercentEqual, "%="));
 					++i;
 					// LogString("Extracted lexeme: %=");
 				}
 				else
 				{
-					tokens.push_back(Token(TokenType::Percent, ConvertToString(current_char)));
+					tokens.push_back(CreateToken(TokenType::Percent, ConvertToString(current_char)));
 					// LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
 			case '&':
 				if (MatchNext('=', i + 1))
 				{
-					tokens.push_back(Token(TokenType::AmpersandEqual, "&="));
+					tokens.push_back(CreateToken(TokenType::AmpersandEqual, "&="));
 					++i;
 					// LogString("Extracted lexeme: &=");
 				}
 				else if (MatchNext('|', i + 1))
 				{
-					tokens.push_back(Token(TokenType::DoubleAmpersand, "&&"));
+					tokens.push_back(CreateToken(TokenType::DoubleAmpersand, "&&"));
 					++i;
 					// LogString("Extracted lexeme: &&");
 				}
 				else
 				{
-					tokens.push_back(Token(TokenType::VerticalBar, ConvertToString(current_char)));
+					tokens.push_back(CreateToken(TokenType::VerticalBar, ConvertToString(current_char)));
 					// LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
 			case '|':
 				if (MatchNext('=', i + 1))
 				{
-					tokens.push_back(Token(TokenType::VerticalBarEqual, "|="));
+					tokens.push_back(CreateToken(TokenType::VerticalBarEqual, "|="));
 					++i;
 					// LogString("Extracted lexeme: |=");
 				}
 				else if (MatchNext('|', i + 1))
 				{
-					tokens.push_back(Token(TokenType::DoubleVerticalBar, "||"));
+					tokens.push_back(CreateToken(TokenType::DoubleVerticalBar, "||"));
 					++i;
 					// LogString("Extracted lexeme: ||");
 				}
 				else
 				{
-					tokens.push_back(Token(TokenType::VerticalBar, ConvertToString(current_char)));
+					tokens.push_back(CreateToken(TokenType::VerticalBar, ConvertToString(current_char)));
 					// LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
 			case '^':
 				if (MatchNext('=', i + 1))
 				{
-					tokens.push_back(Token(TokenType::CaretEqual, "^="));
+					tokens.push_back(CreateToken(TokenType::CaretEqual, "^="));
 					++i;
 					// LogString("Extracted lexeme: ^=");
 				}
 				else
 				{
-					tokens.push_back(Token(TokenType::Caret, ConvertToString(current_char)));
+					tokens.push_back(CreateToken(TokenType::Caret, ConvertToString(current_char)));
 					// LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
 			case '!':
 				if (MatchNext('=', i + 1))
 				{
-					tokens.push_back(Token(TokenType::BangEqual, "!="));
+					tokens.push_back(CreateToken(TokenType::BangEqual, "!="));
 					++i;
 					// LogString("Extracted lexeme: !=");
 				}
 				else
 				{
-					tokens.push_back(Token(TokenType::Bang, ConvertToString(current_char)));
+					tokens.push_back(CreateToken(TokenType::Bang, ConvertToString(current_char)));
 					// LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
 			case '~':
 				if (MatchNext('=', i + 1))
 				{
-					tokens.push_back(Token(TokenType::TildeEqual, "~="));
+					tokens.push_back(CreateToken(TokenType::TildeEqual, "~="));
 					++i;
 					// LogString("Extracted lexeme: ~=");
 				}
 				else
 				{
-					tokens.push_back(Token(TokenType::Tilde, ConvertToString(current_char)));
+					tokens.push_back(CreateToken(TokenType::Tilde, ConvertToString(current_char)));
 					// LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
 			case '=':
 				if (MatchNext('=', i + 1))
 				{
-					tokens.push_back(Token(TokenType::EqualEqual, "="));
+					tokens.push_back(CreateToken(TokenType::EqualEqual, "="));
 					++i;
 					// LogString("Extracted lexeme: ==");
 				}
 				else
 				{
-					tokens.push_back(Token(TokenType::Equal, ConvertToString(current_char)));
+					tokens.push_back(CreateToken(TokenType::Equal, ConvertToString(current_char)));
 					// LogString(std::string("Extracted lexeme: ") + current_char);
 				}
 				break;
@@ -381,7 +389,7 @@ namespace SDIM
 					{
 						tokens.push_back(current_token);
 						// LogString("Extracted lexeme: " + current_token.lexeme);
-						current_token = Token(TokenType::Unknown, "");
+						current_token = CreateToken(TokenType::Unknown, "");
 					}
 
 				}
@@ -434,5 +442,13 @@ namespace SDIM
 
 		return ScanString(file_contents, tokens);
 
+	}
+	Token Scanner::CreateToken(TokenType type, const std::string& lexeme)
+	{
+		Token token(type, lexeme);
+		token.line = line_;
+		token.col = col_;
+
+		return token;
 	}
 }
