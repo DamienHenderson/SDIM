@@ -413,6 +413,7 @@ namespace SDIM
 						header.entrypoint_idx = entrypoint_location;
 					}
 					// temporary
+					generator->WritePushStringInstruction(program_data, "Test String");
 					generator->WriteCallInstruction(program_data, 0);
 				}
 				return true;

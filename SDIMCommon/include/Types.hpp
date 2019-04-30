@@ -61,6 +61,11 @@ namespace SDIM
 	{
 		UInt8 VariableTypeToUInt8(VariableType var_type);
 	}
+	struct String
+	{
+		UInt64 length;
+		char* str;
+	};
 	union VarUnion
 	{
 		Int8  int8;
@@ -78,6 +83,7 @@ namespace SDIM
 		F64 f64;
 
 		void* ptr;
+		String str;
 		VarUnion() { ptr = nullptr; }
 	};
 
@@ -109,6 +115,8 @@ namespace SDIM
 		Variable(F64 val);
 		
 		Variable(void* val);
+
+		Variable(char* val);
 
 		std::string ToString() const;
 

@@ -605,8 +605,22 @@ namespace SDIM
 		void PushString(SDIM::VMState& state)
 		{
 			SDIM::Utils::Disassemble("PushString");
-			// not implemented yet
-			state.program_counter_ += opcode_size;
+			UInt64 len = Utils::ReadUInt64Literal(state, state.program_counter_ + 1);
+			Utils::Log("PushString with length ", len);
+			UInt64 str_start_offset = sizeof(UInt64) + 1;
+			// TODO: stop this leaking memory somehow
+			char* str;
+			str = new char[len];
+			std::memset(str, 0, len);
+			for (UInt64 i = 0; i < len; i++)
+			{
+				
+				str[i] = Utils::ReadInt8Literal(state, i + state.program_counter_ + str_start_offset);
+				
+			}
+			
+			state.program_stack_.Push(SDIM::Variable(str));
+			state.program_counter_ += str_start_offset + len;
 		}
 
 		void PushStruct(SDIM::VMState& state)

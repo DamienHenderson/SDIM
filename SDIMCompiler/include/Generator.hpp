@@ -73,6 +73,8 @@ namespace SDIM
 		virtual void WritePushF32Instruction(std::vector<unsigned char>& prog_data,		F32 value) = 0;
 		virtual void WritePushF64Instruction(std::vector<unsigned char>& prog_data,		F64 value) = 0;
 
+		virtual void WritePushStringInstruction(std::vector<unsigned char>& prog_data, const char* value) = 0;
+
 		virtual void WriteHaltInstruction(std::vector<unsigned char>& prog_data) = 0;
 
 		virtual GeneratorType GetType() const = 0;

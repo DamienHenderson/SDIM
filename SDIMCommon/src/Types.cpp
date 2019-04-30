@@ -23,11 +23,17 @@ namespace SDIM
 		sizeof(F64),
 		// Pointer types
 		sizeof(void*),
-		sizeof(char*),
+		sizeof(UInt64) + sizeof(char*),
 		// unknown
 		0
 
 	};
+
+	std::ostream& operator<<(std::ostream& out, const SDIM::String& obj) {
+		out << obj.str;
+		return out;
+	}
+
 	std::string Variable::ToString() const
 	{
 		switch (type)
@@ -65,8 +71,8 @@ namespace SDIM
 		case SDIM::VariableType::Pointer:
 			return SDIM::Utils::ConstructString("Pointer: ", as.ptr);
 
-		case SDIM::VariableType::Unknown:
-			return SDIM::Utils::ConstructString("ERROR! Unknown Type");
+		case SDIM::VariableType::String:
+			return SDIM::Utils::ConstructString("String: ", as.str);
 		default:
 			return SDIM::Utils::ConstructString("ERROR! Unknown Type");
 		}
@@ -1165,6 +1171,15 @@ namespace SDIM
 	{
 		type = VariableType::Pointer;
 		as.ptr = val;
+	}
+
+	Variable::Variable(char* val)
+	{
+		String str;
+		str.length = std::strlen(val);
+		str.str = val;
+		as.str = str;
+		type = VariableType::String;
 	}
 
 
