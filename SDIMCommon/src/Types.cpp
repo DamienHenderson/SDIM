@@ -1117,6 +1117,7 @@ namespace SDIM
 			return static_cast<UInt8>(var_type);
 		}
 	}
+	
 	Variable::Variable(UInt8 val)
 	{
 		type = VariableType::UInt8;

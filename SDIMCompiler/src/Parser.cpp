@@ -36,7 +36,7 @@ namespace SDIM
 		// also inspired by this webpage http://craftinginterpreters.com/compiling-expressions.html
 		// also inspired by other sources 
 		
-		return ParseExpression(tokens, program_data, generator, 0);
+		return ParseModuleDeclaration(tokens, program_data, generator, 0);
 		/*
 		generator->WritePushUInt8Instruction(program_data, 42);
 		generator->WritePushUInt16Instruction(program_data, 42);
@@ -65,6 +65,46 @@ namespace SDIM
 		}
 		return !error_state_;
 		*/
+	}
+
+	bool Parser::ParseModuleDeclaration(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator, UInt64 current_token)
+	{
+		if (tokens[current_token].token_type != TokenType::Module)
+		{
+			Utils::Log("SDIM Programs must start with a module declaration");
+			return false;
+		}
+		// module so the following token should be an identifier
+		Token expect_module_name_token = tokens[current_token + 1];
+		if (expect_module_name_token.token_type == TokenType::Identifier)
+		{
+
+			Token expect_left_brace = tokens[current_token + 2];
+			if (expect_left_brace.token_type == TokenType::LeftBrace)
+			{
+				brackets_.push(expect_left_brace.token_type);
+				// correctly formed module statement
+				scopes_.push_back(ScopingBlock(expect_module_name_token.lexeme));
+				// TODO: handle modules correctly
+				Utils::Log("Found module: ", expect_module_name_token.lexeme);
+
+				// TODO: ParseTopLevelScope Function
+				// Top level scopes should only contain functions
+				return ParseExpression(tokens, program_data, generator, current_token + 3);
+			}
+			else
+			{
+				Utils::Log("Malformed module declaration ", expect_module_name_token.lexeme);
+				return false;
+			}
+
+		}
+		else
+		{
+			// Module names must be an identifier
+			Utils::Log(expect_module_name_token.lexeme, " is not a valid name for a module");
+			return false;
+		}
 	}
 
 	bool Parser::ParseExpression(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator, UInt64 current_token)
@@ -203,39 +243,7 @@ namespace SDIM
 			}
 			// return ParseExpression(tokens, program_data, generator, current_token + 1);
 		}
-		if (next_token.token_type == TokenType::Module)
-		{
-			// module so the following token should be an identifier
-			Token expect_module_token = tokens[current_token + 1];
-			if (expect_module_token.token_type == TokenType::Identifier)
-			{
-				
-				Token expect_left_brace = tokens[current_token + 2];
-				if (expect_left_brace.token_type == TokenType::LeftBrace)
-				{
-					brackets_.push(expect_left_brace.token_type);
-					// correctly formed module statement
-					scopes_.push_back(ScopingBlock(expect_module_token.lexeme));
-					// TODO: handle modules correctly
-					Utils::Log("Found module: ", expect_module_token.lexeme);
-
-					return ParseExpression(tokens, program_data, generator, current_token + 3);
-				}
-				else
-				{
-					Utils::Log("Malformed module declaration ", expect_module_token.lexeme);
-					return ParseExpression(tokens, program_data, generator, current_token + 2);
-				}
-				
-			}
-			else
-			{
-				// Module names must be an identifier
-				Utils::Log(expect_module_token.lexeme, " is not a valid name for a module");
-				return ParseExpression(tokens, program_data, generator, current_token + 1);
-			}
-			
-		}
+		
 		if (next_token.token_type == TokenType::Return)
 		{
 			// return
@@ -360,6 +368,7 @@ namespace SDIM
 		// return true;
 	}
 
+	
 	bool Parser::ParseFunctionDeclaration(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator, UInt64 current_token, VariableType func_return, const std::string& func_name, size_t& next_token_idx)
 	{
 		(void)program_data;
@@ -452,6 +461,16 @@ namespace SDIM
 			generator->WritePushInt64Instruction(program_data, num);
 		}
 		return true;
+	}
+
+	bool Parser::ParseVariableDeclaration(VariableType type, const Token& current_token, std::vector<unsigned char>& program_data, Generator* generator)
+	{
+		return false;
+	}
+
+	bool Parser::ParseAssignment(VariableType type, const Token& current_token, std::vector<unsigned char>& program_data, Generator* generator)
+	{
+		return false;
 	}
 
 }

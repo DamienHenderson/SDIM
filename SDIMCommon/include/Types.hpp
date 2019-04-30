@@ -96,6 +96,7 @@ namespace SDIM
 
 		Variable() : type(SDIM::VariableType::Unknown), as(SDIM::VarUnion()) {}
 
+		
 		/// Initialise with type but not initial value for the compiler's use
 		Variable(VariableType var_type) : type(var_type), as(SDIM::VarUnion()) {}
 

@@ -618,7 +618,21 @@ namespace SDIM
 				str[i] = Utils::ReadInt8Literal(state, i + state.program_counter_ + str_start_offset);
 				
 			}
-			
+			// below code doesn't work
+			// is there an issue with the hash table implementation?
+
+			/*
+			if (state.string_table_.Exists(str))
+			{
+				state.program_stack_.Push(SDIM::Variable((char*)state.string_table_.GetString(str)));
+			}
+			else
+			{
+				state.string_table_.AddString(str);
+				state.program_stack_.Push(SDIM::Variable((char*)state.string_table_.GetString(str)));
+				state.program_stack_.Push(SDIM::Variable(str));
+			}
+			*/
 			state.program_stack_.Push(SDIM::Variable(str));
 			state.program_counter_ += str_start_offset + len;
 		}
@@ -647,7 +661,8 @@ namespace SDIM
 		void Pop(SDIM::VMState& state)
 		{
 			SDIM::Utils::Disassemble("Pop");
-			state.program_stack_.Pop();
+			SDIM::Variable var = state.program_stack_.Pop();
+			(void)var;
 			state.program_counter_ += opcode_size;
 		}
 
