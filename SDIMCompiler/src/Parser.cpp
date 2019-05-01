@@ -503,6 +503,16 @@ namespace SDIM
 		
 	}
 
+	bool Parser::ParseArithmetic(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator)
+	{
+		// parse all of the arithmetic operators in SDIM
+		(void)tokens;
+		(void)program_data;
+		(void)generator;
+		// (void)current_precedence;
+		return false;
+	}
+
 	bool Parser::ConsumeToken(const std::vector<SDIM::Token>& tokens, TokenType expect, const char* error_message)
 	{
 		Token consume = tokens[current_token];
