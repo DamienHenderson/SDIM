@@ -212,7 +212,7 @@ namespace SDIM
 		CallT = 0x0A,
 		CallF = 0x0B,
 		CallTStack = 0x0C,
-		CallFStack = 0x0D,
+		CallFStack = 0x0D, 
 		NativeCall = 0x0E,
 		Less = 0x0F,
 		LessEqual = 0x10,

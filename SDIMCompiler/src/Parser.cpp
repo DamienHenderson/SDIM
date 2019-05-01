@@ -117,7 +117,19 @@ namespace SDIM
 	bool Parser::ParseExpression(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator)
 	{
 
-		return ParsePrecedence(tokens, program_data, generator, Precedence::Assignment);
+		bool res = ParsePrecedence(tokens, program_data, generator, Precedence::Assignment);
+		if (!res)
+		{
+			return false;
+		}
+		if (MatchToken(tokens[current_token], TokenType::SemiColon))
+		{
+			Advance();
+		}
+		return true;
+
+		// return ConsumeToken(tokens, TokenType::SemiColon, "Expected ;");
+
 		/*
 		/*
 #ifdef SDIM_VERBOSE
@@ -314,6 +326,7 @@ namespace SDIM
 
 		std::string func_name = expect_func_name.lexeme;
 
+		Utils::Log("Found func: ", func_name);
 		// TODO: make this function handle function scope generating bytecode under a function
 		// Is that even necessary because the bytecode for a function will be written after the function declaration is processed anyway
 
@@ -336,8 +349,9 @@ namespace SDIM
 		if (func_name == entrypoint_name)
 		{
 			// found main
+			Utils::Log("Found entrypoint at: ", program_data.size());
 			BytecodeGenerator* gen = (BytecodeGenerator*)generator;
-			gen->GetHeader().entrypoint_idx = program_data.size() - 1;
+			gen->GetHeader().entrypoint_idx = program_data.size();
 		}
 		ScopingBlock func_args_scope(func_name + "__ARGS__");
 		scopes_.push_back(func_args_scope);
@@ -374,7 +388,9 @@ namespace SDIM
 
 	bool Parser::ParseNumericLiteral(const std::vector<SDIM::Token> & tokens, std::vector<unsigned char> & program_data, Generator * generator)
 	{
-		Token token = tokens[current_token];
+		
+		Token token = tokens[current_token - 1];
+		Utils::Log("Numeric literal: ", token.lexeme);
 		if (token.lexeme.find(".") != token.lexeme.npos)
 		{
 			if (token.lexeme.find("f") != token.lexeme.npos)
@@ -404,14 +420,14 @@ namespace SDIM
 
 	bool Parser::ParseStringLiteral(const std::vector<SDIM::Token> & tokens, std::vector<unsigned char> & program_data, Generator * generator)
 	{
-		Token expect_string = tokens[current_token];
+		Token expect_string = tokens[current_token - 1];
 		if (!MatchToken(expect_string, TokenType::StringLiteral))
 		{
 			Error(expect_string, "Expected string literal");
 			return false;
 		}
 		generator->WritePushStringInstruction(program_data, expect_string.lexeme.c_str());
-		Advance();
+		// Advance();
 		return true;
 	}
 
@@ -429,7 +445,14 @@ namespace SDIM
 		(void)tokens;
 		(void)program_data;
 		(void)generator;
-		return false;
+
+		// TODO: handle assignment
+		bool res = ParseExpression(tokens, program_data, generator);
+		if (!res)
+		{
+			return false;
+		}
+		return true;
 	}
 
 	bool Parser::ParseGrouping(const std::vector<SDIM::Token> & tokens, std::vector<unsigned char> & program_data, Generator * generator)
@@ -451,7 +474,7 @@ namespace SDIM
 
 	bool Parser::ParseUnary(const std::vector<SDIM::Token> & tokens, std::vector<unsigned char> & program_data, Generator * generator)
 	{
-		TokenType op_type = tokens[current_token].token_type;
+		TokenType op_type = tokens[current_token - 1].token_type;
 		// evaluate the rest of the expression the unary operator is operating on
 		bool res = ParseExpression(tokens, program_data, generator);
 		if (!res)
@@ -492,7 +515,64 @@ namespace SDIM
 
 		// handle prefix expressions
 		// if(tokens[current_token])
+		Token prev = tokens[current_token];
+		Advance();
+		ParseFunc prefix_func = GetParseRule(prev.token_type).prefix;
+		if (prefix_func == nullptr)
+		{
+			Error(prev, "Expected prefix expression");
+			return false;
+		}
 
+		bool res = prefix_func(this, tokens, program_data, generator);
+		if (!res)
+		{
+			Error(prev, "Expected prefix expression");
+		}
+		while (current_precedence <= GetParseRule(tokens[current_token].token_type).prec)
+		{
+			Advance();
+			ParseFunc infix_func = GetParseRule(tokens[current_token - 1].token_type).infix;
+			infix_func(this, tokens, program_data, generator);
+
+		}
+		return true;
+	}
+
+	bool Parser::ParseReturn(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator)
+	{
+		Token op = tokens[current_token - 1];
+		if (op.token_type != TokenType::Return)
+		{
+			Error(op, "Expected return keyword");
+		}
+		// parse operators with higher precedence
+		bool res = ParseExpression(tokens, program_data, generator);
+		if (!res)
+		{
+			return false;
+		}
+		generator->WriteReturnInstruction(program_data);
+
+		return true;
+	}
+
+	bool Parser::ParseIdentifier(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator)
+	{
+		(void)tokens;
+		(void)program_data;
+		(void)generator;
+		Token expect_type_or_identifier = tokens[current_token - 1];
+		if (IsBuiltInType(expect_type_or_identifier))
+		{
+			Utils::Log("Found type specifier ", expect_type_or_identifier.lexeme);
+			ParseExpression(tokens, program_data, generator);
+		}
+		else if(expect_type_or_identifier.token_type == TokenType::Identifier)
+		{
+			Utils::Log("Found identifier ", expect_type_or_identifier.lexeme);
+			ParseExpression(tokens, program_data, generator);
+		}
 		return true;
 	}
 
@@ -502,13 +582,19 @@ namespace SDIM
 		Token op = tokens[current_token - 1];
 
 		// parse operators with higher precedence
-		ParsePrecedence(tokens, program_data, generator, GetPrecedence(op.token_type));
+		bool res = ParsePrecedence(tokens, program_data, generator, GetPrecedence(op.token_type));
+		if (!res)
+		{
+			return false;
+		}
 
+		Utils::Log("Wrote instruction for binary operator ", Utils::TokenTypeToString(op.token_type));
 		switch (op.token_type)
 		{
 			// arithmetic
 		case TokenType::Plus:
 			generator->WriteAddInstruction(program_data);
+			Utils::Log("Wrote add instruction");
 			return true;
 		case TokenType::Minus:
 			generator->WriteSubtractInstruction(program_data);
@@ -649,7 +735,7 @@ namespace SDIM
 	void Parser::Error(const Token & at, const char* message)
 	{
 
-		Utils::Log("[ERROR] line(", at.line, "):column(", at.col, ") ", message);
+		Utils::Log("[ERROR] line(", at.line, "):column(", at.col, ") near ", at.lexeme, ": ", message);
 	}
 
 	VariableType Parser::TokenToVariableType(const Token & token)
@@ -667,8 +753,8 @@ namespace SDIM
 #define DefParseRule(token, prefix, infix) {token, {infix, prefix, GetPrecedence(token)}}
 	ParseRule Parser::GetParseRule(TokenType token)
 	{
-		static const std::unordered_map<TokenType, ParseRule> parse_rules = 
-		{ 
+		static const std::unordered_map<TokenType, ParseRule> parse_rules =
+		{
 			// brackets
 			DefParseRule(TokenType::LeftBracket, &Parser::ParseGrouping, nullptr),
 			// {TokenType::LeftBracket, {nullptr, &Parser::ParseGrouping, GetPrecedence(TokenType::LeftBracket)} },
@@ -696,7 +782,14 @@ namespace SDIM
 			DefParseRule(TokenType::StringLiteral, &Parser::ParseStringLiteral, nullptr),
 			DefParseRule(TokenType::NumericLiteral, &Parser::ParseNumericLiteral, nullptr),
 
+			// Assignment
+			DefParseRule(TokenType::Equal, &Parser::ParseAssignment, nullptr),
 
+			// return
+			DefParseRule(TokenType::Return, &Parser::ParseReturn, nullptr),
+
+			// variables and types
+			DefParseRule(TokenType::Identifier, &Parser::ParseIdentifier, nullptr)
 		};
 		const auto& it = parse_rules.find(token);
 		if(it == parse_rules.cend())

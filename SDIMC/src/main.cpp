@@ -3,6 +3,7 @@
 #include <string>
 #include <cstdint>
 #include <cassert>
+#include <filesystem>
 
 // #include "Utils.hpp"
 #include "Scanner.hpp"
@@ -22,6 +23,7 @@ int main(int argc, char** argv)
 		std::cerr << "Expected compilation filename and options but got no command line args\n";
 		return 1;
 	}
+	SDIM::Utils::Log("Current dir: ", std::filesystem::current_path());
 	std::string compile_filename = argv[1];
 	std::cout << "Attempting to compile: " << compile_filename << "\n";
 	SDIM::Compiler compiler;
@@ -30,7 +32,7 @@ int main(int argc, char** argv)
 	if (!res)
 	{
 		std::cerr << "Failed to compile file: " << compile_filename << "\n";
-		return -1;
+		// return -1;
 	}
 	std::fstream test_file_refactor_this("test.bin", std::ios::out | std::ios::binary);
 	if (!test_file_refactor_this.good())
