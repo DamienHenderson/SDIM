@@ -95,6 +95,11 @@ namespace SDIM
 		return true;
 	}
 
+	SDIM::Variable VirtualMachine::GetVariable(size_t idx)
+	{
+		return state_.program_stack_.GetVariable(idx);
+	}
+
 	bool VirtualMachine::ExecuteNextOpcode()
 	{
 		if (state_.program_counter_ < state_.program_length_)

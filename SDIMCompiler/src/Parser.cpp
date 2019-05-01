@@ -52,7 +52,10 @@ namespace SDIM
 		// also inspired by this webpage http://craftinginterpreters.com/compiling-expressions.html
 		// also inspired by other sources 
 		current_token = 0;
-		return ParseModuleDeclaration(tokens, program_data, generator);
+		bool res = ParseModuleDeclaration(tokens, program_data, generator);
+
+		generator->WriteHaltInstruction(program_data);
+		return res;
 		/*
 		generator->WritePushUInt8Instruction(program_data, 42);
 		generator->WritePushUInt16Instruction(program_data, 42);

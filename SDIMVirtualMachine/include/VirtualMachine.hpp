@@ -24,6 +24,9 @@ namespace SDIM
 		// Run the file which is currently loaded into memory
 		bool RunFile();
 
+		// one way interop between SDIM and host application
+		SDIM::Variable GetVariable(size_t idx);
+
 	private: 
 		
 		

@@ -33,6 +33,8 @@ namespace SDIM
 		/// Returns the number of elements in the stack
 		size_t Size() const;
 
+		SDIM::Variable GetVariable(size_t idx);
+
 		void PrintStackTop() const;
 
 		void PrintStack() const;

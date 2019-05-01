@@ -11,6 +11,8 @@
 #include "Compiler.hpp"
 #include <Utils.hpp>
 
+#include <string>
+
 void PrintHelp()
 {
 	std::cout << "SDIM Compiler\n";
@@ -23,6 +25,14 @@ int main(int argc, char** argv)
 		std::cerr << "Expected compilation filename and options but got no command line args\n";
 		return 1;
 	}
+	std::string outfile = "out.bin";
+	if (argc > 3)
+	{
+		if (std::string(argv[2]) == "-o")
+		{
+			outfile = argv[3];
+		}
+	}
 	SDIM::Utils::Log("Current dir: ", std::filesystem::current_path());
 	std::string compile_filename = argv[1];
 	std::cout << "Attempting to compile: " << compile_filename << "\n";
@@ -34,7 +44,7 @@ int main(int argc, char** argv)
 		std::cerr << "Failed to compile file: " << compile_filename << "\n";
 		// return -1;
 	}
-	std::fstream test_file_refactor_this("test.bin", std::ios::out | std::ios::binary);
+	std::fstream test_file_refactor_this(outfile, std::ios::out | std::ios::binary);
 	if (!test_file_refactor_this.good())
 	{
 		SDIM::Utils::Log("Failed to open test binary file\n");

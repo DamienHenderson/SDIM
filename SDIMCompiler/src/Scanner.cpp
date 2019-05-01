@@ -22,11 +22,12 @@ namespace SDIM
 		{
 			return prog_string[idx] == match;
 		};
-		auto AddToken = [](std::vector<Token> & token_vec, const Token& token) -> Token
+		auto AddToken = [this](std::vector<Token> & token_vec, const Token& token) -> Token
 		{
 #ifdef SDIM_VERBOSE
 			Utils::Log("Added token ", token.ToString());
 #endif
+			
 			token_vec.push_back(token);
 
 			return Token(TokenType::Unknown, "");
