@@ -6,14 +6,24 @@
 #include <stack>
 #include <random>
 #include <memory>
+#include <functional>
 
 #include "Generator.hpp"
 #include "ScopingBlock.hpp"
 #include "Stack.hpp"
+#include "OperatorPrecedence.hpp"
 
 namespace SDIM
 {
-	
+	class Parser;
+	using ParseFunc = std::function<bool(Parser*, const std::vector<Token>&, std::vector<unsigned char>&, Generator*)>;
+
+	struct ParseRule
+	{
+		ParseFunc infix;
+		ParseFunc prefix;
+		Precedence prec;
+	};
 	class Parser
 	{
 	public:
@@ -29,9 +39,11 @@ namespace SDIM
 		bool ParseExpression(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator);
 
 
-		bool ParseFunctionDeclaration(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator, VariableType func_return, const std::string& func_name);
+		bool ParseFunctionDeclaration(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator);
 
 		bool ParseNumericLiteral(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator);
+
+		bool ParseStringLiteral(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator);
 		
 		bool ParseVariableDeclaration(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator);
 
@@ -42,7 +54,10 @@ namespace SDIM
 
 		bool ParseUnary(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator);
 
-		bool ParseArithmetic(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator);
+		bool ParsePrecedence(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator, Precedence current_precedence);
+
+		bool BinaryExpression(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator, Precedence current_precedence);
+
 		// bool error_state_{ false };
 		
 		// used for bracket matching
@@ -74,5 +89,11 @@ namespace SDIM
 		VariableType TokenToVariableType(const Token& token);
 
 		UInt64 current_token{ 0 };
+
+		constexpr static ParseRule parse_rules[] =
+		{
+
+		}
+		ParseRule GetParseRule(TokenType token)
 	};
 }

@@ -5,7 +5,7 @@
 #include <random>
 
 #include "BytecodeGenerator.hpp"
-#include "OperatorPrecedence.hpp"
+
 namespace SDIM
 {
 
@@ -69,18 +69,20 @@ namespace SDIM
 
 	bool Parser::ParseModuleDeclaration(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator)
 	{
-		if (tokens[current_token].token_type != TokenType::Module)
+		Token expect_module_token = tokens[current_token++];
+
+		if (!MatchToken(expect_module_token, TokenType::Module))
 		{
-			Error(tokens[current_token], "Expected module keyword");
+			Error(expect_module_token, "Expected module keyword");
 			return false;
 		}
 		// module so the following token should be an identifier
-		Token expect_module_name_token = tokens[current_token + 1];
-		if (expect_module_name_token.token_type == TokenType::Identifier)
+		Token expect_module_name_token = tokens[current_token++];
+		if (MatchToken(expect_module_name_token, TokenType::Identifier))
 		{
 
-			Token expect_left_brace = tokens[current_token + 2];
-			if (expect_left_brace.token_type == TokenType::LeftBrace)
+			Token expect_left_brace = tokens[current_token++];
+			if (MatchToken(expect_left_brace, TokenType::LeftBrace))
 			{
 				brackets_.push(expect_left_brace.token_type);
 				// correctly formed module statement
@@ -90,7 +92,11 @@ namespace SDIM
 
 				// TODO: ParseTopLevelScope Function
 				// Top level scopes should only contain functions
-				return ParseExpression(tokens, program_data, generator);
+				while (ParseFunctionDeclaration(tokens, program_data, generator))
+				{
+
+				}
+				return ConsumeToken(tokens, TokenType::RightBrace, "Expected } before EOF token");
 			}
 			else
 			{
@@ -110,6 +116,9 @@ namespace SDIM
 	bool Parser::ParseExpression(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator)
 	{
 		
+		return ParsePrecedence(tokens, program_data, generator, Precedence::Assignment);
+		/*
+		/*
 #ifdef SDIM_VERBOSE
 		for (const auto& it : scopes_)
 		{
@@ -137,70 +146,6 @@ namespace SDIM
 		
 		if (next_token.token_type == TokenType::NumericLiteral)
 		{
-			/*
-			
-			// process float literals
-			Token expect_dot_token = tokens[current_token + 1];
-			std::string combined_number = next_token.lexeme;
-			if (expect_dot_token.token_type == TokenType::Dot)
-			{
-				combined_number += expect_dot_token.lexeme;
-				Token expect_num_literal_token = tokens[current_token + 2];
-				if (expect_num_literal_token.token_type == TokenType::NumericLiteral)
-				{
-					combined_number += expect_num_literal_token.lexeme;
-					// token is float literal
-					// look for f or d on the end
-					Token expect_f_or_d_token = tokens[current_token + 3];
-					if (expect_f_or_d_token.token_type == TokenType::Identifier)
-					{
-						if (expect_f_or_d_token.lexeme == "f")
-						{
-							// f32
-							F32 num_literal = static_cast<F32>(std::atof(combined_number.c_str()));
-							generator->WritePushF32Instruction(program_data, num_literal);
-							return ParseExpression(tokens, program_data, generator, current_token + 4);
-						}
-						else if (expect_f_or_d_token.lexeme == "d")
-						{
-							// f64
-							F64 num_literal = std::atof(combined_number.c_str());
-							generator->WritePushF64Instruction(program_data, num_literal);
-							return ParseExpression(tokens, program_data, generator, current_token + 4);
-						}
-						else
-						{
-							// Coincidental identifier at end
-							// TODO: make postscript types on numeric literals a feature of the scanner
-							Utils::Log("Unsupported type specifier ", expect_f_or_d_token.lexeme, " at end of floating point literal");
-							return ParseExpression(tokens, program_data, generator, current_token + 3);
-							
-						}
-						// missing end also defaults to f64
-					}
-					else
-					{
-						// F64
-						F64 num_literal = std::atof(combined_number.c_str());
-						generator->WritePushF64Instruction(program_data, num_literal);
-						return ParseExpression(tokens, program_data, generator, current_token + 3);
-					}
-				}
-				else
-				{
-					// malformed float literal
-					Utils::Log("Malformed float literal ", combined_number);
-					return false;
-				}
-			}
-			else
-			{
-				// Free Integer literals are of type Int32 by default with postscript characters added to the end to force a certain type
-				Int32 num_literal = std::atoi(combined_number.c_str());
-				generator->WritePushInt32Instruction(program_data, num_literal);
-				return ParseExpression(tokens, program_data, generator, current_token + 1);
-			}
-			*/
 			
 			bool res = ParseNumericLiteral(tokens, program_data, generator);
 			if (!res)
@@ -337,14 +282,36 @@ namespace SDIM
 		++current_token;
 		return ParseExpression(tokens, program_data, generator);
 		// return true;
+		*/
 	}
 
 	
-	bool Parser::ParseFunctionDeclaration(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator, VariableType func_return, const std::string& func_name)
+	bool Parser::ParseFunctionDeclaration(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator)
 	{
 		(void)program_data;
 		(void)generator;
-		(void)func_return;
+		
+		Token expect_type = tokens[current_token++];
+		if (!MatchToken(expect_type, TokenType::Identifier))
+		{
+			Error(expect_type, "Expected type specifier for function declaration");
+			return false;
+		}
+		VariableType func_return = TokenToVariableType(expect_type);
+		if (func_return == VariableType::Unknown)
+		{
+			Error(expect_type, "Expected type specifier for function declaration");
+			return false;
+		}
+
+		Token expect_func_name = tokens[current_token++];
+		if (!MatchToken(expect_type, TokenType::Identifier))
+		{
+			Error(expect_func_name, "Expected function name for function declaration");
+			return false;
+		}
+		
+		std::string func_name = expect_func_name.lexeme;
 		
 		// TODO: make this function handle function scope generating bytecode under a function
 		// Is that even necessary because the bytecode for a function will be written after the function declaration is processed anyway
@@ -353,56 +320,55 @@ namespace SDIM
 		// this pattern follows the way C++ does it, not in terms of scope naming however
 		// the best part of this is the scope name doesn't even have to be unique so name collisions with other functions and modules are not an issue
 
+		if (!ConsumeToken(tokens, TokenType::LeftBracket, "Expected left bracket for function declaration"))
+		{
+			return false;
+		}
+		if (!ConsumeToken(tokens, TokenType::RightBracket, "Expected right bracket to close function args list declaration"))
+		{
+			return false;
+		}
 		constexpr char* entrypoint_name = "Main";
 
-		Utils::Log("Function ", func_name, " defined at bytecode address ", program_data.size());
+		Utils::Log("Function ", variable_type_strings[static_cast<UInt8>(func_return)], " ", func_name, " defined at bytecode address ", program_data.size());
 
+		if (func_name == entrypoint_name)
+		{
+			// found main
+			BytecodeGenerator* gen = (BytecodeGenerator*)generator;
+			gen->GetHeader().entrypoint_idx = program_data.size() - 1;
+		}
 		ScopingBlock func_args_scope(func_name + "__ARGS__");
 		scopes_.push_back(func_args_scope);
 		
+		
+		// handle args list
+		
+		ScopingBlock func_scope(func_name);
 
-		size_t current_consume_idx = current_token;
-		while (current_consume_idx < tokens.size())
+		scopes_.push_back(func_scope);
+		
+		ConsumeToken(tokens, TokenType::LeftBrace, "Expected opening brace for function scope");
+		if (MatchToken(tokens[current_token + 1], TokenType::RightBrace))
 		{
-			Token consume = tokens[current_consume_idx];
-			if (consume.token_type == TokenType::RightBracket)
-			{
-				// end of args
-				// pop args scope
-				Utils::Log("Popping scope ", scopes_.back().GetName());
-				scopes_.pop_back();
-
-				brackets_.pop();
-			}
-			if (consume.token_type == TokenType::LeftBrace)
-			{
-				ScopingBlock func_scope(func_name);
-				scopes_.push_back(func_scope);
-				// start of function scope
-				brackets_.push(consume.token_type);
-				// next_token_idx = current_consume_idx + 1;
-				if (func_name == entrypoint_name)
-				{
-					Utils::Log("Function declaration for entrypoint ", entrypoint_name, " at bytecode address ", program_data.size());
-					// TODO: adjust this to account for the header being written
-					// IDEA: could have the header as a known size so the VM reads the header data and then the program is 0 indexed from the start of the program not the start of the program file
-					size_t entrypoint_location = program_data.size();
-					if (generator->GetType() == GeneratorType::BytecodeGenerator)
-					{
-						BytecodeHeader& header = static_cast<BytecodeGenerator*>(generator)->GetHeader();
-						header.entrypoint_idx = entrypoint_location;
-					}
-					// temporary
-					generator->WritePushStringInstruction(program_data, "Test String");
-					generator->WriteCallInstruction(program_data, 0);
-				}
-				return true;
-			}
-
-			current_consume_idx++;
+			Error(tokens[current_token + 1], "Expected function body");
+			return false;
 		}
+
+		bool res = ParseExpression(tokens, program_data, generator);
+		if (!res)
+		{
+			return false;
+		}
+		ConsumeToken(tokens, TokenType::RightBrace, "Expected closing brace for function scope");
+		// pop func scope
+		scopes_.pop_back();
+		
+		// pop args scope
+		scopes_.pop_back();
+
 		// next_token_idx = current_token + 1;
-		return false;
+		return true;
 	}
 
 	bool Parser::ParseNumericLiteral(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator)
@@ -432,6 +398,19 @@ namespace SDIM
 			Int64 num = std::atoll(token.lexeme.c_str());
 			generator->WritePushInt64Instruction(program_data, num);
 		}
+		return true;
+	}
+
+	bool Parser::ParseStringLiteral(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator)
+	{
+		Token expect_string = tokens[current_token];
+		if (!MatchToken(expect_string, TokenType::StringLiteral))
+		{
+			Error(expect_string, "Expected string literal");
+			return false;
+		}
+		generator->WritePushStringInstruction(program_data, expect_string.lexeme.c_str());
+		Advance();
 		return true;
 	}
 
@@ -503,15 +482,89 @@ namespace SDIM
 		
 	}
 
-	bool Parser::ParseArithmetic(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator)
+	bool Parser::ParsePrecedence(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator, Precedence current_precedence)
 	{
-		// parse all of the arithmetic operators in SDIM
 		(void)tokens;
 		(void)program_data;
 		(void)generator;
-		// (void)current_precedence;
+		(void)current_precedence;
+
+		// handle prefix expressions
+		// if(tokens[current_token])
+		
+		return true;
+	}
+
+	bool Parser::BinaryExpression(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator, Precedence current_precedence)
+	{
+		(void)current_precedence;
+		Token op = tokens[current_token - 1];
+
+		// parse operators with higher precedence
+		ParsePrecedence(tokens, program_data, generator, GetPrecedence(op.token_type));
+
+		switch (op.token_type)
+		{
+		// arithmetic
+		case TokenType::Plus:
+			generator->WriteAddInstruction(program_data);
+			return true;
+		case TokenType::Minus:
+			generator->WriteSubtractInstruction(program_data);
+			return true;
+		case TokenType::Asterisk:
+			generator->WriteMultiplyInstruction(program_data);
+			return true;
+		case TokenType::ForwardSlash:
+			generator->WriteDivideInstruction(program_data);
+			return true;
+		case TokenType::Percent:
+			generator->WriteModuloInstruction(program_data);
+			return true;
+		case TokenType::Ampersand:
+			generator->WriteAndInstruction(program_data);
+			return true;
+		case TokenType::VerticalBar:
+			generator->WriteOrInstruction(program_data);
+			return true;
+		case TokenType::Caret:
+			generator->WriteXorInstruction(program_data);
+			return true;
+			//logical
+		case TokenType::EqualEqual:
+			generator->WriteEqualInstruction(program_data);
+			return true;
+		case TokenType::BangEqual:
+			generator->WriteNotEqualInstruction(program_data);
+			return true;
+		case TokenType::Bang:
+			generator->WriteNotInstruction(program_data);
+			return true;
+			// relational
+		case TokenType::LessThan:
+			generator->WriteLessInstruction(program_data);
+			return true;
+		case TokenType::LessEqual:
+			generator->WriteLessEqualInstruction(program_data);
+			return true;
+		case TokenType::GreaterThan:
+			generator->WriteGreaterInstruction(program_data);
+			return true;
+		case TokenType::GreaterEqual:
+			generator->WriteGreaterEqualInstruction(program_data);
+			return true;
+		//case TokenType::Tilde:
+		//	generator->WriteBitwiseNotInstruction(program_data);
+
+
+		default:
+			Error(op, "Expected binary operator");
+			return false;
+		}
 		return false;
 	}
+
+
 
 	bool Parser::ConsumeToken(const std::vector<SDIM::Token>& tokens, TokenType expect, const char* error_message)
 	{
