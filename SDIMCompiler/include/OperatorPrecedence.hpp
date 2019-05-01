@@ -39,7 +39,7 @@ namespace SDIM
 		 Unary = 13,
 		 // --x, ++x
 		 Prefix = 13,
-		 // --x, x++
+		 // x--, x++
 		 Postfix = 14,
 		 // x()
 		 Call = 15,

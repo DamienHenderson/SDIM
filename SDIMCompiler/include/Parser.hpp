@@ -56,7 +56,7 @@ namespace SDIM
 
 		bool ParsePrecedence(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator, Precedence current_precedence);
 
-		bool BinaryExpression(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator, Precedence current_precedence);
+		bool BinaryExpression(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator);
 
 		// bool error_state_{ false };
 		
@@ -90,10 +90,7 @@ namespace SDIM
 
 		UInt64 current_token{ 0 };
 
-		constexpr static ParseRule parse_rules[] =
-		{
-
-		}
-		ParseRule GetParseRule(TokenType token)
+		
+		static ParseRule GetParseRule(TokenType token);
 	};
 }
