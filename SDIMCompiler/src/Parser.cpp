@@ -112,6 +112,7 @@ namespace SDIM
 				{
 
 				}
+				--current_token;
 				return ConsumeToken(tokens, TokenType::RightBrace, "Expected } before EOF token");
 			}
 			else
