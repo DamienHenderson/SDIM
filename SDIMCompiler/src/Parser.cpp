@@ -517,7 +517,7 @@ namespace SDIM
 			Advance();
 			return true;
 		}
-
+		
 		Error(tokens[current_token], error_message);
 		
 		return false;

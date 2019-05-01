@@ -48,7 +48,7 @@ namespace SDIM
 	
 	};
 	
-	
+	Precedence GetPrecedence(TokenType token_type);
 
 	
 	
