@@ -100,6 +100,21 @@ namespace SDIM
 		return state_.program_stack_.GetVariable(idx);
 	}
 
+	void VirtualMachine::SetVariable(Variable value, size_t idx)
+	{
+		state_.program_stack_.SetVariable(value, idx);
+	}
+
+	void VirtualMachine::PushVariable(Variable value)
+	{
+		state_.program_stack_.Push(value);
+	}
+
+	Variable VirtualMachine::PopVariable()
+	{
+		return state_.program_stack_.Pop();
+	}
+
 	bool VirtualMachine::ExecuteNextOpcode()
 	{
 		if (state_.program_counter_ < state_.program_length_)

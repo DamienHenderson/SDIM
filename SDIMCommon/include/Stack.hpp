@@ -35,6 +35,8 @@ namespace SDIM
 
 		SDIM::Variable GetVariable(size_t idx);
 
+		void SetVariable(Variable var, size_t idx);
+
 		void PrintStackTop() const;
 
 		void PrintStack() const;

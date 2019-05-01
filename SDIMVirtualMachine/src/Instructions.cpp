@@ -654,8 +654,10 @@ namespace SDIM
 		void LocalVar(SDIM::VMState& state)
 		{
 			SDIM::Utils::Disassemble("LocalVar");
-			// not implemented yet
-			state.program_counter_ += opcode_size;
+			
+			UInt64 id = Utils::ReadUInt64Literal(state, state.program_counter_ + 1);
+			state.variables_.SetVariable(id, state.program_stack_.Pop());
+			state.program_counter_ += opcode_size + sizeof(id);
 		}
 
 		void Pop(SDIM::VMState& state)
@@ -669,8 +671,10 @@ namespace SDIM
 		void PushLocal(SDIM::VMState& state)
 		{
 			SDIM::Utils::Disassemble("PushLocal");
-			// not implemented yet
-			state.program_counter_ += opcode_size;
+			
+			UInt64 id = Utils::ReadUInt64Literal(state, state.program_counter_ + 1);
+			state.program_stack_.Push(state.variables_.GetVariable(id));
+			state.program_counter_ += opcode_size + sizeof(id);
 		}
 
 		void PushAddr(SDIM::VMState& state)

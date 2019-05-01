@@ -69,6 +69,11 @@ namespace SDIM
 		virtual void WritePushF64Instruction(std::vector<unsigned char>& prog_data,		F64 value) override;
 
 		virtual void WritePushStringInstruction(std::vector<unsigned char>& prog_data, const char* value) override;
+
+		virtual void WritePushLocalInstruction(std::vector<unsigned char>& prog_data, UInt64 idx) override;
+
+		virtual void WriteLocalVarInstruction(std::vector<unsigned char>& prog_data, UInt64 idx) override;
+
 		
 		virtual void WriteHaltInstruction(std::vector<unsigned char>& prog_data) override;
 

@@ -18,6 +18,16 @@ namespace SDIM
 	class Parser;
 	using ParseFunc = std::function<bool(Parser*, const std::vector<Token>&, std::vector<unsigned char>&, Generator*)>;
 
+	struct Function
+	{
+		VariableType func_ret{ VariableType::Unknown };
+		// args types, don't have any values but they are used to indicate the expected types 
+		std::vector<Variable> args;
+		// bytecode address
+		UInt64 addr{ 0 };
+
+		std::string name;
+	};
 	struct ParseRule
 	{
 		ParseFunc infix;
@@ -77,6 +87,7 @@ namespace SDIM
 
 		std::uniform_int_distribution<UInt64> distribution_;
 
+		std::vector<Function> funcs_;
 		
 		bool ConsumeToken(const std::vector<SDIM::Token>& tokens, TokenType expect, const char* error_message);
 
@@ -94,7 +105,8 @@ namespace SDIM
 
 		UInt64 current_token{ 0 };
 
-		
+		std::unordered_map<std::string, UInt64> variables_;
+
 		static ParseRule GetParseRule(TokenType token);
 	};
 }

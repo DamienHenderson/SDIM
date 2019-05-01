@@ -348,7 +348,20 @@ namespace SDIM
 		}
 
 		std::string func_name = expect_func_name.lexeme;
+		Function func;
+		func.name = func_name;
+		for (const auto& it : funcs_)
+		{
+			if (it.name == func.name)
+			{
+				Error(expect_func_name, "Redefinition of previously defined function (SDIM does not currently support overloaded functions)");
+				return false;
+			}
+		}
+		func.addr = program_data.size();
+		func.func_ret = func_return;
 
+		funcs_.push_back(func);
 		Utils::Log("Found func: ", func_name);
 		// TODO: make this function handle function scope generating bytecode under a function
 		// Is that even necessary because the bytecode for a function will be written after the function declaration is processed anyway
@@ -361,6 +374,8 @@ namespace SDIM
 		{
 			return false;
 		}
+		// Parse args list here
+
 		if (!ConsumeToken(tokens, TokenType::RightBracket, "Expected right bracket to close function args list declaration"))
 		{
 			return false;
@@ -589,12 +604,46 @@ namespace SDIM
 		if (IsBuiltInType(expect_type_or_identifier))
 		{
 			Utils::Log("Found type specifier ", expect_type_or_identifier.lexeme);
-			ParseExpression(tokens, program_data, generator);
+			// var declaration
+			Token expect_var_name = GetToken(tokens, current_token);
+			if (!MatchToken(expect_var_name, TokenType::Identifier))
+			{
+				Error(expect_var_name, "Expected Identifier in variable declaration");
+				return false;
+			}
+			Token next_token = GetToken(tokens, current_token + 1);
+			if (MatchToken(next_token, TokenType::SemiColon))
+			{
+				ScopingBlock current_scope = scopes_.back();
+
+				// just declaration
+				Variable var(TokenToVariableType(expect_type_or_identifier));
+				generator->WriteLocalVarInstruction(program_data, variables_.size());
+				variables_.emplace(next_token.lexeme, variables_.size());
+				current_scope.AddVariable(next_token.lexeme, var);
+			}
+			bool res = ParsePrecedence(tokens, program_data, generator, Precedence::Assignment);
+			if (!res)
+			{
+				return false;
+			}
+			
 		}
 		else if(expect_type_or_identifier.token_type == TokenType::Identifier)
 		{
 			Utils::Log("Found identifier ", expect_type_or_identifier.lexeme);
-			ParseExpression(tokens, program_data, generator);
+			const auto& it = variables_.find(expect_type_or_identifier.lexeme);
+			if (it == variables_.end())
+			{
+				Error(expect_type_or_identifier, "Attempting to use value of undefined variable");
+				return false;
+			}
+			generator->WritePushLocalInstruction(program_data, it->second);
+			bool res = ParseExpression(tokens, program_data, generator);
+			if (!res)
+			{
+				return false;
+			}
 		}
 		return true;
 	}

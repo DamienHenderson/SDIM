@@ -75,6 +75,10 @@ namespace SDIM
 
 		virtual void WritePushStringInstruction(std::vector<unsigned char>& prog_data, const char* value) = 0;
 
+		virtual void WritePushLocalInstruction(std::vector<unsigned char>& prog_data, UInt64 idx) = 0;
+		
+		virtual void WriteLocalVarInstruction(std::vector<unsigned char>& prog_data, UInt64 idx) = 0;
+
 		virtual void WriteHaltInstruction(std::vector<unsigned char>& prog_data) = 0;
 
 		virtual GeneratorType GetType() const = 0;

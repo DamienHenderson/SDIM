@@ -72,6 +72,10 @@ namespace SDIM
 	{
 		return data_[idx];
 	}
+	void Stack::SetVariable(Variable var, size_t idx)
+	{
+		data_[idx] = var;
+	}
 	void Stack::PrintStackTop() const
 	{
 		SDIM::Variable top = Peek();

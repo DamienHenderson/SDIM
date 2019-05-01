@@ -322,6 +322,30 @@ namespace SDIM
 		}
 
 	}
+	void BytecodeGenerator::WritePushLocalInstruction(std::vector<unsigned char>& prog_data, UInt64 idx)
+	{
+		UInt8 inst = Utils::InstructionToUInt8(Instruction::PushLocal);
+		prog_data.push_back(inst);
+
+		
+		unsigned char* idx_bytes = (unsigned char*)& idx;
+		for (size_t i = 0; i < sizeof(idx); ++i)
+		{
+			prog_data.push_back(idx_bytes[i]);
+		}
+	}
+	void BytecodeGenerator::WriteLocalVarInstruction(std::vector<unsigned char>& prog_data, UInt64 idx)
+	{
+		UInt8 inst = Utils::InstructionToUInt8(Instruction::LocalVar);
+		prog_data.push_back(inst);
+
+
+		unsigned char* idx_bytes = (unsigned char*)& idx;
+		for (size_t i = 0; i < sizeof(idx); ++i)
+		{
+			prog_data.push_back(idx_bytes[i]);
+		}
+	}
 	void BytecodeGenerator::WriteHaltInstruction(std::vector<unsigned char>& prog_data)
 	{
 		UInt8 inst = Utils::InstructionToUInt8(Instruction::Halt);

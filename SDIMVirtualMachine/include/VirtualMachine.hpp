@@ -24,8 +24,14 @@ namespace SDIM
 		// Run the file which is currently loaded into memory
 		bool RunFile();
 
-		// one way interop between SDIM and host application
-		SDIM::Variable GetVariable(size_t idx);
+		// vm host interop
+		Variable GetVariable(size_t idx);
+
+		void SetVariable(Variable value, size_t idx);
+
+		void PushVariable(Variable value);
+
+		Variable PopVariable();
 
 	private: 
 		
