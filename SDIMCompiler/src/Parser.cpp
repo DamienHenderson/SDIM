@@ -9,7 +9,16 @@
 
 namespace SDIM
 {
+	Token GetToken(const std::vector<Token>& tokens, size_t idx)
+	{
+		if (idx >= tokens.size())
+		{
+			Utils::Log("Attempted to read past end of tokens");
+			return Token(TokenType::Unknown, "");
 
+		}
+		return tokens[idx];
+	}
 	Parser::Parser()
 	{
 		rng_ = std::make_unique<std::default_random_engine>((std::random_device())());
@@ -24,6 +33,12 @@ namespace SDIM
 
 	bool Parser::Parse(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator)
 	{
+#ifdef SDIM_VERBOSE
+		for (const auto& token : tokens )
+		{
+			Utils::Log(token.ToString());
+		}
+#endif
 		if (!scopes_.empty())
 		{
 			scopes_.clear();
@@ -58,9 +73,9 @@ namespace SDIM
 
 		generator->WriteHaltInstruction(program_data);
 
-		for (size_t idx = 0; idx < tokens.size(); ++idx)
+		for (size_t idx = 0; idx < GetToken(tokens, .size(); ++idx)
 		{
-			Token current_token = tokens[idx];
+			Token current_token = GetToken(tokens, [idx];
 
 			SDIM::Utils::Log("Token[", idx, "]: ", current_token.ToString(), "\n");
 		}
@@ -70,7 +85,7 @@ namespace SDIM
 
 	bool Parser::ParseModuleDeclaration(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator)
 	{
-		Token expect_module_token = tokens[current_token++];
+		Token expect_module_token = GetToken(tokens, current_token++);
 
 		if (!MatchToken(expect_module_token, TokenType::Module))
 		{
@@ -78,11 +93,11 @@ namespace SDIM
 			return false;
 		}
 		// module so the following token should be an identifier
-		Token expect_module_name_token = tokens[current_token++];
+		Token expect_module_name_token = GetToken(tokens, current_token++);
 		if (MatchToken(expect_module_name_token, TokenType::Identifier))
 		{
 
-			Token expect_left_brace = tokens[current_token++];
+			Token expect_left_brace = GetToken(tokens, current_token++);
 			if (MatchToken(expect_left_brace, TokenType::LeftBrace))
 			{
 				brackets_.push(expect_left_brace.token_type);
@@ -122,7 +137,7 @@ namespace SDIM
 		{
 			return false;
 		}
-		if (MatchToken(tokens[current_token], TokenType::SemiColon))
+		if (MatchToken(GetToken(tokens, current_token), TokenType::SemiColon))
 		{
 			Advance();
 		}
@@ -143,17 +158,17 @@ namespace SDIM
 #endif
 
 		Utils::Log("");
-		if (tokens.empty())
+		if (GetToken(tokens, .empty())
 		{
-			Utils::Log("No Tokens found in compilation input");
+			Utils::Log("No GetToken(tokens,  found in compilation input");
 			return false;
 		}
-		if (current_token >= tokens.size())
+		if (current_token >= GetToken(tokens, .size())
 		{
-			Utils::Log("Reached end of tokens");
+			Utils::Log("Reached end of GetToken(tokens, ");
 			return true;
 		}
-		Token next_token = tokens[current_token];
+		Token next_token = GetToken(tokens, [current_token];
 		Utils::Log("Parsing token ", next_token.ToString());
 		// TODO: move all of these into functions to make this tidier
 
@@ -175,7 +190,7 @@ namespace SDIM
 			// for now do it the hacky way
 			// TODO: string returns?
 			// TODO: return value in variable
-			if (tokens[current_token + 1].token_type == TokenType::NumericLiteral && tokens[current_token + 2].token_type == TokenType::SemiColon)
+			if (GetToken(tokens, [current_token + 1].token_type == TokenType::NumericLiteral && GetToken(tokens, [current_token + 2].token_type == TokenType::SemiColon)
 			{
 				Advance();
 				bool res = ParseNumericLiteral(tokens, program_data, generator);
@@ -196,14 +211,14 @@ namespace SDIM
 				{
 					Utils::Log("Found Type specifier for type: ", variable_type_strings[i]);
 
-					Token expect_identifier_token = tokens[current_token + 1];
+					Token expect_identifier_token = GetToken(tokens, [current_token + 1];
 
 					if (expect_identifier_token.token_type == TokenType::Identifier)
 					{
 						// found identifier for type declaration good
 						std::string var_name = expect_identifier_token.lexeme;
 
-						Token expect_bracket_or_equal_token = tokens[current_token + 2];
+						Token expect_bracket_or_equal_token = GetToken(tokens, [current_token + 2];
 						// TODO: process args
 						if (expect_bracket_or_equal_token.token_type == TokenType::LeftBracket)
 						{
@@ -303,8 +318,12 @@ namespace SDIM
 	{
 		(void)program_data;
 		(void)generator;
-
-		Token expect_type = tokens[current_token++];
+		if (current_token >= tokens.size())
+		{
+			Error(GetToken(tokens, tokens.size() - 1), "Reached end of file");
+			return false;
+		}
+		Token expect_type = GetToken(tokens, current_token++);
 		if (!MatchToken(expect_type, TokenType::Identifier))
 		{
 			Error(expect_type, "Expected type specifier for function declaration");
@@ -317,7 +336,7 @@ namespace SDIM
 			return false;
 		}
 
-		Token expect_func_name = tokens[current_token++];
+		Token expect_func_name = GetToken(tokens, current_token++);
 		if (!MatchToken(expect_type, TokenType::Identifier))
 		{
 			Error(expect_func_name, "Expected function name for function declaration");
@@ -364,17 +383,17 @@ namespace SDIM
 		scopes_.push_back(func_scope);
 
 		ConsumeToken(tokens, TokenType::LeftBrace, "Expected opening brace for function scope");
-		if (MatchToken(tokens[current_token + 1], TokenType::RightBrace))
+		if (MatchToken(GetToken(tokens, current_token + 1), TokenType::RightBrace))
 		{
-			Error(tokens[current_token + 1], "Expected function body");
+			Error(GetToken(tokens, current_token + 1), "Expected function body");
 			return false;
 		}
 
-		bool res = ParseExpression(tokens, program_data, generator);
-		if (!res)
+		while (ParseExpression(tokens, program_data, generator))
 		{
-			return false;
+
 		}
+		
 		ConsumeToken(tokens, TokenType::RightBrace, "Expected closing brace for function scope");
 		// pop func scope
 		scopes_.pop_back();
@@ -389,7 +408,7 @@ namespace SDIM
 	bool Parser::ParseNumericLiteral(const std::vector<SDIM::Token> & tokens, std::vector<unsigned char> & program_data, Generator * generator)
 	{
 		
-		Token token = tokens[current_token - 1];
+		Token token = GetToken(tokens, current_token - 1);
 		Utils::Log("Numeric literal: ", token.lexeme);
 		if (token.lexeme.find(".") != token.lexeme.npos)
 		{
@@ -420,7 +439,7 @@ namespace SDIM
 
 	bool Parser::ParseStringLiteral(const std::vector<SDIM::Token> & tokens, std::vector<unsigned char> & program_data, Generator * generator)
 	{
-		Token expect_string = tokens[current_token - 1];
+		Token expect_string = GetToken(tokens, current_token - 1);
 		if (!MatchToken(expect_string, TokenType::StringLiteral))
 		{
 			Error(expect_string, "Expected string literal");
@@ -462,10 +481,10 @@ namespace SDIM
 		{
 			return false;
 		}
-		bool close_bracket = MatchToken(tokens[current_token], TokenType::RightBracket);
+		bool close_bracket = MatchToken(GetToken(tokens, current_token), TokenType::RightBracket);
 		if (!close_bracket)
 		{
-			Error(tokens[current_token], "Expected closing right bracket in grouped expression");
+			Error(GetToken(tokens, current_token), "Expected closing right bracket in grouped expression");
 			return false;
 		}
 		Advance();
@@ -474,7 +493,7 @@ namespace SDIM
 
 	bool Parser::ParseUnary(const std::vector<SDIM::Token> & tokens, std::vector<unsigned char> & program_data, Generator * generator)
 	{
-		TokenType op_type = tokens[current_token - 1].token_type;
+		TokenType op_type = GetToken(tokens, current_token - 1).token_type;
 		// evaluate the rest of the expression the unary operator is operating on
 		bool res = ParseExpression(tokens, program_data, generator);
 		if (!res)
@@ -514,8 +533,8 @@ namespace SDIM
 		(void)current_precedence;
 
 		// handle prefix expressions
-		// if(tokens[current_token])
-		Token prev = tokens[current_token];
+		// if(GetToken(tokens, [current_token])
+		Token prev = GetToken(tokens, current_token);
 		Advance();
 		ParseFunc prefix_func = GetParseRule(prev.token_type).prefix;
 		if (prefix_func == nullptr)
@@ -529,10 +548,10 @@ namespace SDIM
 		{
 			Error(prev, "Expected prefix expression");
 		}
-		while (current_precedence <= GetParseRule(tokens[current_token].token_type).prec)
+		while (current_precedence <= GetParseRule(GetToken(tokens, current_token).token_type).prec)
 		{
 			Advance();
-			ParseFunc infix_func = GetParseRule(tokens[current_token - 1].token_type).infix;
+			ParseFunc infix_func = GetParseRule(GetToken(tokens, current_token - 1).token_type).infix;
 			infix_func(this, tokens, program_data, generator);
 
 		}
@@ -541,7 +560,7 @@ namespace SDIM
 
 	bool Parser::ParseReturn(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator)
 	{
-		Token op = tokens[current_token - 1];
+		Token op = GetToken(tokens, current_token - 1);
 		if (op.token_type != TokenType::Return)
 		{
 			Error(op, "Expected return keyword");
@@ -562,7 +581,7 @@ namespace SDIM
 		(void)tokens;
 		(void)program_data;
 		(void)generator;
-		Token expect_type_or_identifier = tokens[current_token - 1];
+		Token expect_type_or_identifier = GetToken(tokens, current_token - 1);
 		if (IsBuiltInType(expect_type_or_identifier))
 		{
 			Utils::Log("Found type specifier ", expect_type_or_identifier.lexeme);
@@ -579,7 +598,7 @@ namespace SDIM
 	bool Parser::BinaryExpression(const std::vector<SDIM::Token> & tokens, std::vector<unsigned char> & program_data, Generator * generator)
 	{
 		
-		Token op = tokens[current_token - 1];
+		Token op = GetToken(tokens, current_token - 1);
 
 		// parse operators with higher precedence
 		bool res = ParsePrecedence(tokens, program_data, generator, GetPrecedence(op.token_type));
@@ -655,11 +674,11 @@ namespace SDIM
 
 	bool Parser::ConsumeToken(const std::vector<SDIM::Token> & tokens, TokenType expect, const char* error_message)
 	{
-		Token consume = tokens[current_token];
+		Token consume = GetToken(tokens, current_token);
 		if (consume.token_type == expect)
 		{
 			// handle brackets here
-			// bool res = HandleBrackets(tokens);
+			// bool res = HandleBrackets(GetToken(tokens, );
 			// if (!res)
 			// {
 			// 	return false;
@@ -668,15 +687,15 @@ namespace SDIM
 			return true;
 		}
 
-		Error(tokens[current_token], error_message);
+		Error(GetToken(tokens, current_token), error_message);
 
 		return false;
 	}
 	/*
-	bool Parser::HandleBrackets(const std::vector<SDIM::Token>& tokens)
+	bool Parser::HandleBrackets(const std::vector<SDIM::Token>& GetToken(tokens, )
 	{
 
-		Token token = tokens[current_token];
+		Token token = GetToken(tokens, [current_token];
 		if (Utils::IsOpeningBracket(token.token_type))
 		{
 			brackets_.push(token.token_type);

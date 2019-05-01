@@ -2,8 +2,7 @@
 
 #include "LangUtils.hpp"
 
-// temp
-#include <iostream>
+#include "Utils.hpp"
 namespace SDIM
 {
 	Scanner::Scanner()
@@ -22,6 +21,15 @@ namespace SDIM
 		auto MatchNext = [&prog_string](char match, size_t idx) -> bool
 		{
 			return prog_string[idx] == match;
+		};
+		auto AddToken = [](std::vector<Token> & token_vec, const Token& token) -> Token
+		{
+#ifdef SDIM_VERBOSE
+			Utils::Log("Added token ", token.ToString());
+#endif
+			token_vec.push_back(token);
+
+			return Token(TokenType::Unknown, "");
 		};
 		// for keywords, identifiers and literals which may encompass several characters
 		Token current_token(TokenType::Unknown, "");
@@ -43,7 +51,7 @@ namespace SDIM
 			if (IsWhitespace(current_char) && current_token.token_type != TokenType::StringLiteral)
 			{
 				// whitespace ends numeric literals and identifiers
-				if (current_token.token_type == TokenType::Identifier || current_token.token_type == TokenType::NumericLiteral)
+				if (current_token.token_type == TokenType::Identifier)
 				{
 					// TODO: make this better using a radix tree
 					auto CheckKeyword = [&current_token](const std::string & match, TokenType type_on_match) -> void
@@ -75,8 +83,7 @@ namespace SDIM
 
 
 					// std::cout << "Extracted lexeme: " << current_token.lexeme << "\n";
-					tokens.push_back(current_token);
-					current_token = CreateToken(TokenType::Unknown, "");
+					current_token = AddToken(tokens, current_token);
 				}
 				// skip whitespace
 				if (current_char == '\n')
@@ -115,22 +122,20 @@ namespace SDIM
 				CheckKeyword("print", TokenType::Print);
 				CheckKeyword("class", TokenType::Class);
 
-				tokens.push_back(current_token);
-				// std::cout << "Extracted lexeme: " << current_token.lexeme << "\n";
-
-				current_token = CreateToken(TokenType::Unknown, "");
+				current_token = AddToken(tokens, current_token);
+				// continue;
 
 			}
-			if (current_token.token_type == TokenType::NumericLiteral && !std::isdigit(current_char) && current_char != '.')
+			if (current_token.token_type == TokenType::NumericLiteral && !std::isdigit(current_char) && current_char != '.' && current_char != 'f')
 			{
-				tokens.push_back(current_token);
-				// std::cout << "Extracted lexeme: " << current_token.lexeme << "\n";
-				current_token = CreateToken(TokenType::Unknown, "");
+				current_token = AddToken(tokens, current_token);
+				
 			}
 			switch (current_char)
 			{
 			case '(':
-				tokens.push_back(CreateToken(TokenType::LeftBracket, ConvertToString(current_char)));
+				current_token = AddToken(tokens, CreateToken(TokenType::LeftBracket, ConvertToString(current_char)));
+				
 				// LogString(std::string("Extracted lexeme: ") + current_char);
 				break;
 			case ')':
@@ -406,6 +411,11 @@ namespace SDIM
 				if (current_token.token_type == TokenType::StringLiteral)
 				{
 					current_token.lexeme += current_char;
+				}
+				else if (current_token.token_type == TokenType::NumericLiteral && current_char == 'f')
+				{
+					current_token.lexeme += current_char;
+					current_token = AddToken(tokens, current_token);
 				}
 				else if (current_token.token_type == TokenType::Identifier && IsIdentifier(current_char))
 				{
