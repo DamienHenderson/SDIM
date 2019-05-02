@@ -89,6 +89,10 @@ namespace SDIM
 
 		bool DeclareVariable(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator);
 
+		bool ParsePrint(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator);
+
+		bool ExpressionStatement(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator);
+
 		void OpenScope();
 		void CloseScope();
 

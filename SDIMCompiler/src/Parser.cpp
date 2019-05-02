@@ -110,10 +110,7 @@ namespace SDIM
 		{
 			return false;
 		}
-		if (MatchToken(GetToken(tokens, current_token), TokenType::SemiColon))
-		{
-			Advance();
-		}
+		
 		return true;
 
 		// return ConsumeToken(tokens, TokenType::SemiColon, "Expected ;");
@@ -371,21 +368,15 @@ namespace SDIM
 
 		ConsumeToken(tokens, TokenType::LeftBrace, "Expected opening brace for function scope");
 		// func scope
-		OpenScope();
-		if (MatchToken(GetToken(tokens, current_token + 1), TokenType::RightBrace))
+		bool res = ParseBlock(tokens, program_data, generator);
+		if (!res)
 		{
-			Error(GetToken(tokens, current_token + 1), "Expected function body");
 			return false;
-		}
-
-		while (ParseExpression(tokens, program_data, generator))
-		{
-
 		}
 		
 		ConsumeToken(tokens, TokenType::RightBrace, "Expected closing brace for function scope");
 		// pop func scope
-		CloseScope();
+		// CloseScope();
 
 		// pop args scope
 		CloseScope();
@@ -536,16 +527,17 @@ namespace SDIM
 		if (!res)
 		{
 			Error(prev, "Expected prefix expression");
+			return false;
 		}
 		while (current_precedence <= GetParseRule(GetToken(tokens, current_token).token_type).prec)
 		{
 			Advance();
 			ParseFunc infix_func = GetParseRule(GetToken(tokens, current_token - 1).token_type).infix;
-			if (infix_func == nullptr)
-			{
-				Error(GetToken(tokens, current_token), "Expression is not a valid infix expression");
-				return false;
-			}
+			// if (infix_func == nullptr)
+			// {
+			// 	Error(GetToken(tokens, current_token), "Expression is not a valid infix expression");
+			// 	return false;
+			// }
 			infix_func(this, tokens, program_data, generator);
 
 		}
@@ -597,20 +589,46 @@ namespace SDIM
 			Token expect_type = GetToken(tokens, current_token);
 			if (IsBuiltInType(expect_type))
 			{
-				DeclareVariable(tokens, program_data, generator);
+				bool res = DeclareVariable(tokens, program_data, generator);
+				if (!res)
+				{
+					return false;
+				}
+				return ConsumeToken(tokens, TokenType::SemiColon, "expect ; at end of declaration");
 			}
-			
+			else
+			{
+				return ParseStatement(tokens, program_data, generator);
+			}
 		}
 		else 
 		{
 			// statement
-			
+			return ParseStatement(tokens, program_data, generator);
 		}
-		return false;
+		// return false;
 	}
 
 	bool Parser::ParseStatement(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator)
 	{
+		(void)tokens;
+		(void)program_data;
+		(void)generator;
+		Utils::Log("Statement");
+		Token curr = GetToken(tokens, current_token);
+		Advance();
+		if (MatchToken(curr, TokenType::Return))
+		{
+			return ParseReturn(tokens, program_data, generator);
+		}
+		else if (MatchToken(curr, TokenType::Print))
+		{
+			return ParsePrint(tokens, program_data, generator);
+		}
+		else if (MatchToken(curr, TokenType::Identifier))
+		{
+			// return ParseIdentifier()
+		}
 		return false;
 	}
 
@@ -754,7 +772,10 @@ namespace SDIM
 
 		if (MatchToken(expect_equal_or_semicolon, TokenType::Equal))
 		{
+			Advance();
 			ParseExpression(tokens, program_data, generator);
+			
+
 		}
 		else
 		{
@@ -770,11 +791,37 @@ namespace SDIM
 		if (AddLocal(local_var))
 		{
 			locals_.push_back(local_var);
-
+			
+			Utils::Log("Added local var ", variable_type_strings[static_cast<UInt8>(local_var.var.type)], " ", local_var.name);
 			generator->WriteLocalVarInstruction(program_data, locals_.size());
-			ConsumeToken(tokens, TokenType::SemiColon, "Expected ; at end of variable declaration");
+			// ConsumeToken(tokens, TokenType::SemiColon, "Expected ; at end of variable declaration");
 			return true;
 		}
+		return false;
+	}
+
+	bool Parser::ParsePrint(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator)
+	{
+		Token print = GetToken(tokens, current_token - 1);
+
+		if (!MatchToken(print, TokenType::Print))
+		{
+			Error(print, "Expected print statement");
+			return false;
+		}
+		bool res = ParseExpression(tokens, program_data, generator);
+		if (!res)
+		{
+			return false;
+		}
+		return ConsumeToken(tokens, TokenType::SemiColon, "Expected semicolon to end print statement");
+	}
+
+	bool Parser::ExpressionStatement(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator)
+	{
+		(void)tokens;
+		(void)program_data;
+		(void)generator;
 		return false;
 	}
 
@@ -950,6 +997,8 @@ namespace SDIM
 
 			// Assignment
 			DefParseRule(TokenType::Equal, nullptr, &Parser::ParseAssignment),
+			// semicolon
+			DefParseRule(TokenType::SemiColon, nullptr, nullptr),
 
 			// return
 			DefParseRule(TokenType::Return, &Parser::ParseReturn, nullptr),
