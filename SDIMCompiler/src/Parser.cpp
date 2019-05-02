@@ -34,19 +34,13 @@ namespace SDIM
 	bool Parser::Parse(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator)
 	{
 #ifdef SDIM_VERBOSE
-		for (const auto& token : tokens )
-		{
-			Utils::Log(token.ToString());
-		}
+		// for (const auto& token : tokens )
+		// {
+		//	Utils::Log(token.ToString());
+		// }
 #endif
-		if (!scopes_.empty())
-		{
-			scopes_.clear();
-		}
-		// add global scope which is entirely disconnected from a scope and refers to anything not within a set of curly braces
-		ScopingBlock global("Global");
-		scopes_.push_back(global);
-
+		
+		
 		// Utilises pratt parsing 
 		// inspired by this webpage http://journal.stuffwithstuff.com/2011/03/19/pratt-parsers-expression-parsing-made-easy/
 		// also inspired by this webpage http://craftinginterpreters.com/compiling-expressions.html
@@ -56,34 +50,7 @@ namespace SDIM
 
 		generator->WriteHaltInstruction(program_data);
 		return res;
-		/*
-		generator->WritePushUInt8Instruction(program_data, 42);
-		generator->WritePushUInt16Instruction(program_data, 42);
-		generator->WritePushUInt32Instruction(program_data, 42);
-		generator->WritePushUInt64Instruction(program_data, 42);
-
-		generator->WritePushInt8Instruction(program_data, 42);
-		generator->WritePushInt16Instruction(program_data, 42);
-		generator->WritePushInt32Instruction(program_data, 42);
-		generator->WritePushInt64Instruction(program_data, 42);
-
-		generator->WritePushF32Instruction(program_data, 42.42f);
-		generator->WritePushF64Instruction(program_data, 42.42);
-		generator->WritePushF64Instruction(program_data, 42.42);
-		generator->WritePushF64Instruction(program_data, 42.42);
-		generator->WriteAddInstruction(program_data);
-		generator->WriteLessInstruction(program_data);
-
-		generator->WriteHaltInstruction(program_data);
-
-		for (size_t idx = 0; idx < GetToken(tokens, .size(); ++idx)
-		{
-			Token current_token = GetToken(tokens, [idx];
-
-			SDIM::Utils::Log("Token[", idx, "]: ", current_token.ToString(), "\n");
-		}
-		return !error_state_;
-		*/
+		
 	}
 
 	bool Parser::ParseModuleDeclaration(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator)
@@ -103,12 +70,13 @@ namespace SDIM
 			Token expect_left_brace = GetToken(tokens, current_token++);
 			if (MatchToken(expect_left_brace, TokenType::LeftBrace))
 			{
-				brackets_.push(expect_left_brace.token_type);
+				// brackets_.push(expect_left_brace.token_type);
 				// correctly formed module statement
-				scopes_.push_back(ScopingBlock(expect_module_name_token.lexeme));
+				// scopes_.push_back(ScopingBlock(expect_module_name_token.lexeme));
 				// TODO: handle modules correctly
 				Utils::Log("Found module: ", expect_module_name_token.lexeme);
 
+				OpenScope();
 				// TODO: ParseTopLevelScope Function
 				// Top level scopes should only contain functions
 				while (ParseFunctionDeclaration(tokens, program_data, generator))
@@ -116,6 +84,7 @@ namespace SDIM
 
 				}
 				--current_token;
+				CloseScope();
 				return ConsumeToken(tokens, TokenType::RightBrace, "Expected } before EOF token");
 			}
 			else
@@ -391,17 +360,18 @@ namespace SDIM
 			BytecodeGenerator* gen = (BytecodeGenerator*)generator;
 			gen->GetHeader().entrypoint_idx = program_data.size();
 		}
-		ScopingBlock func_args_scope(func_name + "__ARGS__");
-		scopes_.push_back(func_args_scope);
+		// args scope
+		OpenScope();
+		// scopes_.push_back(func_args_scope);
 
 
 		// handle args list
 
-		ScopingBlock func_scope(func_name);
-
-		scopes_.push_back(func_scope);
+	
 
 		ConsumeToken(tokens, TokenType::LeftBrace, "Expected opening brace for function scope");
+		// func scope
+		OpenScope();
 		if (MatchToken(GetToken(tokens, current_token + 1), TokenType::RightBrace))
 		{
 			Error(GetToken(tokens, current_token + 1), "Expected function body");
@@ -415,10 +385,10 @@ namespace SDIM
 		
 		ConsumeToken(tokens, TokenType::RightBrace, "Expected closing brace for function scope");
 		// pop func scope
-		scopes_.pop_back();
+		CloseScope();
 
 		// pop args scope
-		scopes_.pop_back();
+		CloseScope();
 
 		// next_token_idx = current_token + 1;
 		return true;
@@ -468,7 +438,7 @@ namespace SDIM
 		// Advance();
 		return true;
 	}
-
+	/*
 	bool Parser::ParseVariableDeclaration(const std::vector<SDIM::Token> & tokens, std::vector<unsigned char> & program_data, Generator * generator)
 	{
 		(void)tokens;
@@ -477,7 +447,7 @@ namespace SDIM
 
 		return false;
 	}
-
+	*/
 	bool Parser::ParseAssignment(const std::vector<SDIM::Token> & tokens, std::vector<unsigned char> & program_data, Generator * generator)
 	{
 		(void)tokens;
@@ -571,6 +541,11 @@ namespace SDIM
 		{
 			Advance();
 			ParseFunc infix_func = GetParseRule(GetToken(tokens, current_token - 1).token_type).infix;
+			if (infix_func == nullptr)
+			{
+				Error(GetToken(tokens, current_token), "Expression is not a valid infix expression");
+				return false;
+			}
 			infix_func(this, tokens, program_data, generator);
 
 		}
@@ -595,6 +570,50 @@ namespace SDIM
 		return true;
 	}
 
+	bool Parser::ParseBlock(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator)
+	{
+		(void)tokens;
+		(void)program_data;
+		(void)generator;
+		OpenScope();
+		while (!MatchToken(tokens[current_token], TokenType::RightBrace) && !MatchToken(tokens[current_token], TokenType::EOFToken))
+		{
+			bool res = ParseDeclaration(tokens, program_data, generator);
+			if (!res)
+			{
+				return false;
+			}
+		}
+		ConsumeToken(tokens, TokenType::RightBrace, "Expected closing brace for scoping block");
+		CloseScope();
+		return true;
+	}
+
+	bool Parser::ParseDeclaration(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator)
+	{
+		if (MatchToken(GetToken(tokens, current_token), TokenType::Identifier)) 
+		{
+			// declaration
+			Token expect_type = GetToken(tokens, current_token);
+			if (IsBuiltInType(expect_type))
+			{
+				DeclareVariable(tokens, program_data, generator);
+			}
+			
+		}
+		else 
+		{
+			// statement
+			
+		}
+		return false;
+	}
+
+	bool Parser::ParseStatement(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator)
+	{
+		return false;
+	}
+
 	bool Parser::ParseIdentifier(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator)
 	{
 		(void)tokens;
@@ -614,13 +633,15 @@ namespace SDIM
 			Token next_token = GetToken(tokens, current_token + 1);
 			if (MatchToken(next_token, TokenType::SemiColon))
 			{
-				ScopingBlock current_scope = scopes_.back();
+				// ScopingBlock current_scope = scopes_.back();
 
 				// just declaration
-				Variable var(TokenToVariableType(expect_type_or_identifier));
-				generator->WriteLocalVarInstruction(program_data, variables_.size());
-				variables_.emplace(next_token.lexeme, variables_.size());
-				current_scope.AddVariable(next_token.lexeme, var);
+				LocalVar var;
+				var.var = Variable(TokenToVariableType(expect_type_or_identifier));
+				generator->WriteLocalVarInstruction(program_data, locals_.size());
+				var.scope = scope_idx_;
+				locals_.push_back(var);
+				
 			}
 			bool res = ParsePrecedence(tokens, program_data, generator, Precedence::Assignment);
 			if (!res)
@@ -632,13 +653,8 @@ namespace SDIM
 		else if(expect_type_or_identifier.token_type == TokenType::Identifier)
 		{
 			Utils::Log("Found identifier ", expect_type_or_identifier.lexeme);
-			const auto& it = variables_.find(expect_type_or_identifier.lexeme);
-			if (it == variables_.end())
-			{
-				Error(expect_type_or_identifier, "Attempting to use value of undefined variable");
-				return false;
-			}
-			generator->WritePushLocalInstruction(program_data, it->second);
+			
+			// generator->WritePushLocalInstruction(program_data, it->second);
 			bool res = ParseExpression(tokens, program_data, generator);
 			if (!res)
 			{
@@ -723,6 +739,71 @@ namespace SDIM
 		return false;
 	}
 
+	bool Parser::DeclareVariable(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator)
+	{
+		Token type_token = GetToken(tokens, current_token);
+
+		VariableType var_type = TokenToVariableType(type_token);
+
+		Advance();
+		Token name_token = GetToken(tokens, current_token);
+
+		Advance();
+
+		Token expect_equal_or_semicolon = GetToken(tokens, current_token);
+
+		if (MatchToken(expect_equal_or_semicolon, TokenType::Equal))
+		{
+			ParseExpression(tokens, program_data, generator);
+		}
+		else
+		{
+			// TODO: do this properly based on the type of the variable being declared
+			generator->WritePushInt64Instruction(program_data, 0);
+		}
+		LocalVar local_var;
+		local_var.var.type = var_type;
+		local_var.name = name_token.lexeme;
+		local_var.scope = scope_idx_;
+		local_var.local_idx = locals_.size();
+		// check for name conflicts
+		if (AddLocal(local_var))
+		{
+			locals_.push_back(local_var);
+
+			generator->WriteLocalVarInstruction(program_data, locals_.size());
+			ConsumeToken(tokens, TokenType::SemiColon, "Expected ; at end of variable declaration");
+			return true;
+		}
+		return false;
+	}
+
+	void Parser::OpenScope()
+	{
+		++scope_idx_;
+	}
+
+	void Parser::CloseScope()
+	{
+		--scope_idx_;
+		if (locals_.empty())
+		{
+			return;
+		}
+		for (auto it = locals_.begin(); it != locals_.end();)
+		{
+			if (it->scope > scope_idx_)
+			{
+				it = locals_.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
+
+	}
+
 
 
 	bool Parser::ConsumeToken(const std::vector<SDIM::Token> & tokens, TokenType expect, const char* error_message)
@@ -785,6 +866,19 @@ namespace SDIM
 	bool Parser::MatchToken(const Token & token, TokenType expect)
 	{
 		return token.token_type == expect;
+	}
+
+	bool Parser::AddLocal(const LocalVar& local)
+	{
+		for (auto it = locals_.begin(); it != locals_.end(); it++)
+		{
+			if (it->scope == local.scope && it->name == local.name)
+			{
+				// var exists in same scope
+				return false;
+			}
+		}
+		return true;
 	}
 
 	void Parser::Advance()
@@ -855,7 +949,7 @@ namespace SDIM
 			DefParseRule(TokenType::NumericLiteral, &Parser::ParseNumericLiteral, nullptr),
 
 			// Assignment
-			DefParseRule(TokenType::Equal, &Parser::ParseAssignment, nullptr),
+			DefParseRule(TokenType::Equal, nullptr, &Parser::ParseAssignment),
 
 			// return
 			DefParseRule(TokenType::Return, &Parser::ParseReturn, nullptr),

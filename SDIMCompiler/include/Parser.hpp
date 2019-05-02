@@ -28,6 +28,15 @@ namespace SDIM
 
 		std::string name;
 	};
+
+	struct LocalVar
+	{
+		Variable var;
+		UInt64 scope{ 0 };
+		UInt64 local_idx{ 0 };
+		std::string name;
+
+	};
 	struct ParseRule
 	{
 		ParseFunc infix;
@@ -55,7 +64,7 @@ namespace SDIM
 
 		bool ParseStringLiteral(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator);
 		
-		bool ParseVariableDeclaration(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator);
+		// bool ParseVariableDeclaration(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator);
 
 		bool ParseAssignment(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator);
 		
@@ -68,16 +77,31 @@ namespace SDIM
 
 		bool ParseReturn(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator);
 
+		bool ParseBlock(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator);
+		
+		bool ParseDeclaration(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator);
+
+		bool ParseStatement(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator);
+
 		bool ParseIdentifier(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator);
 
 		bool BinaryExpression(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator);
 
+		bool DeclareVariable(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator);
+
+		void OpenScope();
+		void CloseScope();
+
+
+		UInt64 scope_idx_{0};
+
+		std::vector<LocalVar> locals_;
 		// bool error_state_{ false };
 		
 		// used for bracket matching
-		std::stack<TokenType> brackets_;
+		// std::stack<TokenType> brackets_;
 
-		std::vector<ScopingBlock> scopes_;
+		// std::vector<ScopingBlock> scopes_;
 
 		// Used to 
 		// Stack var_stack_;
@@ -95,6 +119,8 @@ namespace SDIM
 
 		bool MatchToken(const Token& token, TokenType expect);
 
+		bool AddLocal(const LocalVar& local);
+
 		void Advance();
 
 		bool IsBuiltInType(const Token& token);
@@ -105,7 +131,7 @@ namespace SDIM
 
 		UInt64 current_token{ 0 };
 
-		std::unordered_map<std::string, UInt64> variables_;
+		// std::unordered_map<std::string, UInt64> variables_;
 
 		static ParseRule GetParseRule(TokenType token);
 	};
