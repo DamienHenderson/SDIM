@@ -74,6 +74,7 @@ namespace SDIM
 
 		virtual void WriteLocalVarInstruction(std::vector<unsigned char>& prog_data, UInt64 idx) override;
 
+		virtual void WriteVMCallInstruction(std::vector<unsigned char>& prog_data, UInt64 idx) override;
 		
 		virtual void WriteHaltInstruction(std::vector<unsigned char>& prog_data) override;
 

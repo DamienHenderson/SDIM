@@ -26,6 +26,8 @@ namespace SDIM
 			if (func_id == 1)
 			{
 				state.program_stack_.PrintStackTop();
+				Variable discard = state.program_stack_.Pop();
+				(void)discard;
 			}
 			// size of opcode + size of func id
 			state.program_counter_ += opcode_size + sizeof(func_id);
@@ -657,7 +659,7 @@ namespace SDIM
 			
 			UInt64 id = Utils::ReadUInt64Literal(state, state.program_counter_ + 1);
 			state.variables_.SetVariable(id, state.program_stack_.Pop());
-			state.program_counter_ += opcode_size + sizeof(id);
+			state.program_counter_ += opcode_size + sizeof(UInt64);
 		}
 
 		void Pop(SDIM::VMState& state)

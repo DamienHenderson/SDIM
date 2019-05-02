@@ -1,0 +1,10 @@
+module HelloWorld
+{
+    Int32 Main()
+    {
+        for(Int32 i = 0; i < 10000; i++)
+        {
+            print "hello world";
+        }
+    }
+}

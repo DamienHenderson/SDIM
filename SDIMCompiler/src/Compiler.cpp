@@ -39,6 +39,46 @@ namespace SDIM
 	}
 	bool Compiler::CompileFile(const std::string& file_path, std::vector<unsigned char>& program_data)
 	{
+		(void)file_path;
+
+		BytecodeGenerator gen;
+		gen.GetHeader().entrypoint_idx = 1;
+		gen.GetHeader().file_comment = "Hello World";
+
+		size_t header_size = sizeof(gen.GetHeader().entrypoint_idx) + gen.GetHeader().file_comment.length() + sizeof(UInt64);
+		
+		WriteBytecodeHeader(gen.GetHeader(), program_data);
+		
+		// halt
+		size_t halt_idx = program_data.size();
+		gen.WriteHaltInstruction(program_data);
+		// loop constant
+		// declare iterator
+		gen.WritePushInt64Instruction(program_data, 0);
+		gen.WriteLocalVarInstruction(program_data, 0);
+		// test loop
+		size_t test_idx = program_data.size() - header_size;
+		
+		gen.WritePushLocalInstruction(program_data, 0);
+		gen.WritePushInt64Instruction(program_data, 10);
+
+		gen.WriteLessInstruction(program_data);
+		gen.WriteJumpFalseInstruction(program_data, halt_idx - header_size);
+
+		gen.WritePushLocalInstruction(program_data, 0);
+		gen.WritePushInt64Instruction(program_data, 1);
+		gen.WriteAddInstruction(program_data);
+		gen.WriteLocalVarInstruction(program_data, 0);
+
+
+		gen.WritePushStringInstruction(program_data, "Hello world");
+		gen.WriteVMCallInstruction(program_data, 1);
+		gen.WriteJumpInstruction(program_data, test_idx - header_size);
+
+
+
+		return true;
+		/*
 		Scanner scanner;
 		std::vector<SDIM::Token> tokens;
 		bool res = scanner.ScanFile(file_path, tokens);
@@ -58,5 +98,6 @@ namespace SDIM
 		}
 		
 		return true;
+		*/
 	}
 }

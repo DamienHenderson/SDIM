@@ -598,7 +598,7 @@ namespace SDIM
 			}
 			else
 			{
-				return ParseStatement(tokens, program_data, generator);
+			 	return ExpressionStatement(tokens, program_data, generator);
 			}
 		}
 		else 
@@ -625,9 +625,13 @@ namespace SDIM
 		{
 			return ParsePrint(tokens, program_data, generator);
 		}
+		else if (MatchToken(curr, TokenType::For))
+		{
+			return ParseFor(tokens, program_data, generator);
+		}
 		else if (MatchToken(curr, TokenType::Identifier))
 		{
-			// return ParseIdentifier()
+			return ExpressionStatement(tokens, program_data, generator);
 		}
 		return false;
 	}
@@ -822,7 +826,35 @@ namespace SDIM
 		(void)tokens;
 		(void)program_data;
 		(void)generator;
-		return false;
+		bool res = ParseExpression(tokens, program_data, generator);
+		if (!res)
+		{
+			return false;
+		}
+		return ConsumeToken(tokens, TokenType::SemiColon, "Expected ; at end of expression statement");
+		
+	}
+
+	bool Parser::ParseFor(const std::vector<SDIM::Token>& tokens, std::vector<unsigned char>& program_data, Generator* generator)
+	{
+		(void)program_data;
+		(void)generator;
+		if (!ConsumeToken(tokens, TokenType::LeftBracket, "Expected ( to open for loop declaration"))
+		{
+			return false;
+		}
+		bool res = ParseDeclaration(tokens, program_data, generator);
+		if (!res)
+		{
+			Error(GetToken(tokens, current_token), "Malformed for loop");
+			return false;
+		}
+		if (!ConsumeToken(tokens, TokenType::SemiColon, "Malformed for loop statement"))
+		{
+			return false;
+		}
+			
+		return true;
 	}
 
 	void Parser::OpenScope()

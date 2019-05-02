@@ -1,0 +1,19 @@
+The fibonacci benchmark is a recursive function which tests the performance of the stack mainly
+Originally fibonacci 30 was used however this ran for over 5 minutes without completing
+1000 iterations of the fibonacci function with argument 20 are printed during this test
+fibonacci(20): 
+	Lua: 767 milliseconds average
+	SDIM:
+The hello world benchmark tests the performance of the print statement
+Mainly focusing on maximum throughput
+This test prints hello world 10,000 times
+hello world:
+	Lua: 150 milliseconds average
+	SDIM:
+The is_prime benchmark tests the general performance of the language
+
+is_prime:
+	Lua: 55 milliseconds average
+	SDIM:
+
+

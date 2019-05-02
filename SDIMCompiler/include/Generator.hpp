@@ -79,6 +79,8 @@ namespace SDIM
 		
 		virtual void WriteLocalVarInstruction(std::vector<unsigned char>& prog_data, UInt64 idx) = 0;
 
+		virtual void WriteVMCallInstruction(std::vector<unsigned char>& prog_data, UInt64 idx) = 0;
+
 		virtual void WriteHaltInstruction(std::vector<unsigned char>& prog_data) = 0;
 
 		virtual GeneratorType GetType() const = 0;
