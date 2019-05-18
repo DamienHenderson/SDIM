@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.8)
 
-# TODO: add actual files here
-add_executable(SDIMVM src/main.cpp)
+
+add_executable(SDIMVM main.cpp)
 
 target_include_directories(
     SDIMVM 
-    PUBLIC include 
-    PRIVATE src
+    PUBLIC ../../include/SDIMVM
+    PRIVATE .
 )
 target_compile_features(
     SDIMVM
