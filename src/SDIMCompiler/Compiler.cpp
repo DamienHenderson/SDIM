@@ -60,7 +60,7 @@ namespace SDIM
 		size_t test_idx = program_data.size() - header_size;
 		
 		gen.WritePushLocalInstruction(program_data, 0);
-		gen.WritePushInt64Instruction(program_data, 10);
+		gen.WritePushInt64Instruction(program_data, 10000);
 
 		gen.WriteLessInstruction(program_data);
 		gen.WriteJumpFalseInstruction(program_data, halt_idx - header_size);
@@ -73,7 +73,7 @@ namespace SDIM
 
 		gen.WritePushStringInstruction(program_data, "Hello world");
 		gen.WriteVMCallInstruction(program_data, 1);
-		gen.WriteJumpInstruction(program_data, test_idx - header_size);
+		gen.WriteJumpInstruction(program_data, test_idx);
 
 
 
