@@ -3,7 +3,6 @@
 #include <string>
 #include <cstdint>
 #include <cassert>
-#include <filesystem>
 
 // #include "Utils.hpp"
 #include "Scanner.hpp"
@@ -33,7 +32,7 @@ int main(int argc, char** argv)
 			outfile = argv[3];
 		}
 	}
-	SDIM::Utils::Log("Current dir: ", std::filesystem::current_path());
+
 	std::string compile_filename = argv[1];
 	std::cout << "Attempting to compile: " << compile_filename << "\n";
 	SDIM::Compiler compiler;

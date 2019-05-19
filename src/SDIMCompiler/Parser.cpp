@@ -116,7 +116,7 @@ namespace SDIM
 		// return ConsumeToken(tokens, TokenType::SemiColon, "Expected ;");
 
 		/*
-		/*
+		
 #ifdef SDIM_VERBOSE
 		for (const auto& it : scopes_)
 		{
@@ -346,7 +346,7 @@ namespace SDIM
 		{
 			return false;
 		}
-		constexpr char* entrypoint_name = "Main";
+		const char* entrypoint_name = "Main";
 
 		Utils::Log("Function ", variable_type_strings[static_cast<UInt8>(func_return)], " ", func_name, " defined at bytecode address ", program_data.size());
 

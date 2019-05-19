@@ -24,6 +24,7 @@ namespace SDIM
 		};
 		auto AddToken = [this](std::vector<Token> & token_vec, const Token& token) -> Token
 		{
+			(void)this;
 #ifdef SDIM_VERBOSE
 			Utils::Log("Added token ", token.ToString());
 #endif
